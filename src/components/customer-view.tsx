@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useSessionTimer } from '@/hooks/use-session-timer';
 import { useCart } from '@/hooks/use-cart';
 import { menuItems } from '@/lib/menu-data';
@@ -16,13 +16,24 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import SessionTimer from './session-timer';
+import { useToast } from '@/hooks/use-toast';
 
 export default function CustomerView({ tableId }: { tableId: string | null }) {
   const { clearCart, addToCart } = useCart();
   const [isCartOpen, setCartOpen] = useState(false);
+  const { toast } = useToast();
 
   const { timeLeft } = useSessionTimer(clearCart);
+
+  useEffect(() => {
+    if (tableId && typeof window !== 'undefined' && window.innerWidth < 768) {
+      toast({
+        title: "Session Timer Started",
+        description: "Order within 10mins as the session will be cleared post 10mins.",
+        duration: 5000,
+      });
+    }
+  }, [tableId, toast]);
 
   const categorizedMenu = useMemo(() => {
     const categoryOrder = ['Wraps', 'Shawarma', 'Kebabs & Falafel', 'Lebanese Grill', 'Broasted Chicken', 'Broast Platters', 'Platters', 'Salads', 'Burgers', 'Fries', 'Sides', 'Drinks'];
@@ -71,14 +82,6 @@ export default function CustomerView({ tableId }: { tableId: string | null }) {
       <CartSheet isOpen={isCartOpen} onOpenChange={setCartOpen} tableId={tableId} />
       
       {/* Floating elements for mobile */}
-      <div className="fixed bottom-6 left-6 z-50 md:hidden">
-        <div className="p-3 text-center rounded-lg border-2 border-foreground bg-card text-card-foreground shadow-[4px_4px_0px_#000]">
-          <SessionTimer timeLeft={timeLeft} />
-          <p className="text-xs mt-2 text-muted-foreground max-w-48 mx-auto">
-            Order within 10mins as the session will be cleared post 10mins.
-          </p>
-        </div>
-      </div>
       <div className="fixed bottom-6 right-6 z-50 md:hidden">
           <CartIcon onOpen={() => setCartOpen(true)} />
       </div>

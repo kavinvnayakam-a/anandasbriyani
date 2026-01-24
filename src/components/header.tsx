@@ -18,10 +18,13 @@ export function Header({ tableId, onCartClick, timeLeft }: HeaderProps) {
         <div className="flex items-center gap-4">
           {tableId && (
             <>
-              {/* Mobile table ID */}
-              <div className="flex items-center gap-2 rounded-md border-2 border-foreground bg-card px-3 py-1.5 text-foreground shadow-[2px_2px_0px_#000] sm:hidden">
-                  <span className="text-sm">TABLE</span>
-                  <span className="text-lg">{tableId}</span>
+              {/* Mobile timer and table ID */}
+              <div className="flex items-center gap-4 sm:hidden">
+                  <SessionTimer timeLeft={timeLeft} />
+                  <div className="flex items-center gap-2 rounded-md border-2 border-foreground bg-card px-3 py-1.5 text-foreground shadow-[2px_2px_0px_#000]">
+                      <span className="text-sm">TABLE</span>
+                      <span className="text-lg">{tableId}</span>
+                  </div>
               </div>
               {/* Desktop timer and table ID */}
               <div className="hidden sm:flex items-center gap-4">
