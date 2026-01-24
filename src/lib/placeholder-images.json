@@ -1,40 +1,106 @@
 {
   "placeholderImages": [
     {
-      "id": "smoky-bbq-ribs",
-      "description": "A rack of smoky BBQ ribs, glazed and grilled to perfection.",
-      "imageUrl": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxiYnElMjByaWJzfGVufDB8fHx8MTc2OTI3MzA3NHww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "bbq ribs"
+      "id": "veg-tikki-burger",
+      "description": "A delicious veg tikki patty in a soft bun.",
+      "imageUrl": "https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=600&q=80",
+      "imageHint": "veg burger"
     },
     {
-      "id": "grilled-chicken-sandwich",
-      "description": "Juicy grilled chicken breast with lettuce, tomato, and our special sauce on a brioche bun.",
-      "imageUrl": "https://images.unsplash.com/photo-1666819604716-7b60a604bb76?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxjaGlja2VuJTIwc2FuZHdpY2h8ZW58MHx8fHwxNzY5MTk1NDcwfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "chicken sandwich"
+      "id": "paneer-burger",
+      "description": "Grilled paneer patty with spices in a burger bun.",
+      "imageUrl": "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=600&q=80",
+      "imageHint": "paneer burger"
     },
     {
-      "id": "classic-beef-burger",
-      "description": "A classic beef burger with cheese, pickles, onions, and a toasted sesame seed bun.",
-      "imageUrl": "https://images.unsplash.com/photo-1543392765-620e968d2162?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxiZWVmJTIwYnVyZ2VyfGVufDB8fHx8MTc2OTI3MzA3NHww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "beef burger"
+      "id": "chicken-zinger-burger",
+      "description": "Crispy zinger chicken fillet in a burger.",
+      "imageUrl": "https://images.unsplash.com/photo-1561758033-d89a9ad46330?w=600&q=80",
+      "imageHint": "zinger burger"
     },
     {
-      "id": "veggie-skewer",
-      "description": "Colorful skewers of grilled vegetables, including bell peppers, zucchini, and onions.",
-      "imageUrl": "https://images.unsplash.com/photo-1715793797560-7b015218cb13?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHx2ZWdldGFibGUlMjBza2V3ZXJ8ZW58MHx8fHwxNzY5MjczMDc0fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "vegetable skewer"
+      "id": "chicken-crispy-burger",
+      "description": "A crispy chicken patty burger.",
+      "imageUrl": "https://images.unsplash.com/photo-1606131731446-5568d87113aa?w=600&q=80",
+      "imageHint": "crispy burger"
     },
     {
-      "id": "loaded-fries",
-      "description": "Crispy french fries loaded with melted cheese, bacon bits, and green onions.",
-      "imageUrl": "https://images.unsplash.com/photo-1485962398705-ef6a13c41e8f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxsb2FkZWQlMjBmcmllc3xlbnwwfHx8fDE3NjkyNzMwNzR8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "loaded fries"
+      "id": "chicken-smash-grill-burger",
+      "description": "Smashed and grilled chicken patty burger.",
+      "imageUrl": "https://images.unsplash.com/photo-1607013251379-e6eecfffe234?w=600&q=80",
+      "imageHint": "smash burger"
     },
     {
-      "id": "grilled-corn",
-      "description": "Corn on the cob grilled and smothered in a chili-lime butter.",
-      "imageUrl": "https://images.unsplash.com/photo-1708077810728-b370b167952d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxncmlsbGVkJTIwY29ybnxlbnwwfHx8fDE3NjkyNzMwNzR8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "grilled corn"
+      "id": "cheese-chicken-burger",
+      "description": "Chicken burger with a slice of cheese.",
+      "imageUrl": "https://images.unsplash.com/photo-1550547660-d9450f859349?w=600&q=80",
+      "imageHint": "cheese burger"
+    },
+    {
+      "id": "chicken-peri-peri-burger",
+      "description": "Spicy peri peri chicken burger.",
+      "imageUrl": "https://images.unsplash.com/photo-1627907228175-2bf846a303b4?w=600&q=80",
+      "imageHint": "peri peri burger"
+    },
+    {
+      "id": "classic-fries",
+      "description": "Golden crispy french fries.",
+      "imageUrl": "https://images.unsplash.com/photo-1598679253544-2c9740f99191?w=600&q=80",
+      "imageHint": "french fries"
+    },
+    {
+      "id": "peri-peri-fries",
+      "description": "Fries tossed in spicy peri peri seasoning.",
+      "imageUrl": "https://images.unsplash.com/photo-1622637992981-b3b33235a975?w=600&q=80",
+      "imageHint": "peri peri fries"
+    },
+    {
+      "id": "cheesy-fries",
+      "description": "Fries loaded with melted cheese.",
+      "imageUrl": "https://images.unsplash.com/photo-1600892043744-ccb9134a4c9b?w=600&q=80",
+      "imageHint": "cheesy fries"
+    },
+    {
+      "id": "saucy-fries",
+      "description": "Fries topped with various sauces.",
+      "imageUrl": "https://images.unsplash.com/photo-1585109649434-307f15b439c3?w=600&q=80",
+      "imageHint": "saucy fries"
+    },
+    {
+      "id": "water-bottle",
+      "description": "A bottle of mineral water.",
+      "imageUrl": "https://images.unsplash.com/photo-1523362628745-0c100150b504?w=600&q=80",
+      "imageHint": "water bottle"
+    },
+    {
+      "id": "soft-drink",
+      "description": "A can of a carbonated soft drink.",
+      "imageUrl": "https://images.unsplash.com/photo-1581636625419-6a37a1d21946?w=600&q=80",
+      "imageHint": "soft drink"
+    },
+    {
+      "id": "mojito",
+      "description": "A refreshing mint and lime mojito.",
+      "imageUrl": "https://images.unsplash.com/photo-155153885-3570375d553b?w=600&q=80",
+      "imageHint": "mojito"
+    },
+    {
+      "id": "bread",
+      "description": "A slice of bread.",
+      "imageUrl": "https://images.unsplash.com/photo-1533086915093-68f7495b2839?w=600&q=80",
+      "imageHint": "bread"
+    },
+    {
+      "id": "falafel",
+      "description": "Deep-fried balls made from chickpeas.",
+      "imageUrl": "https://images.unsplash.com/photo-1594220263300-c97a5509e504?w=600&q=80",
+      "imageHint": "falafel"
+    },
+    {
+      "id": "extra-chicken",
+      "description": "A side of grilled chicken.",
+      "imageUrl": "https://images.unsplash.com/photo-1598515213692-5f284240dfa0?w=600&q=80",
+      "imageHint": "grilled chicken"
     }
   ]
 }
