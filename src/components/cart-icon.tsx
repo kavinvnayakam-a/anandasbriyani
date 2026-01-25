@@ -19,6 +19,7 @@ export function CartIcon({ onOpen }: { onOpen?: () => void }) {
   return (
     <button 
       onClick={onOpen}
+      aria-label="Open cart"
       className={`
         /* Positioning: Fixed to the right edge, middle of screen */
         fixed right-0 top-1/2 -translate-y-1/2 z-50

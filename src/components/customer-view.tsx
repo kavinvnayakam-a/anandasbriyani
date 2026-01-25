@@ -224,9 +224,7 @@ export default function CustomerView({ tableId }: { tableId: string | null }) {
       </footer>
 
       <CartSheet isOpen={isCartOpen} onOpenChange={setCartOpen} tableId={tableId} />
-      <button onClick={() => setCartOpen(true)} aria-label="Open cart">
-        <CartIcon onOpen={() => setCartOpen(true)} />
-      </button>
+      <CartIcon onOpen={() => setCartOpen(true)} />
     </div>
   );
 }
