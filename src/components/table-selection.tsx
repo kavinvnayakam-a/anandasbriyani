@@ -23,7 +23,7 @@ export default function TableSelection() {
           <div className="mx-auto bg-zinc-900 text-white w-fit px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.3em] mb-4">
             Welcome
           </div>
-          <Image src="https://firebasestorage.googleapis.com/v0/b/grillicious-backend.firebasestorage.app/o/Grillicious-logo.webp?alt=media&token=d67ff384-ece6-4583-8d05-1327121a8b15" alt="Grillicious" width={250} height={60} className="mx-auto" />
+          <Image src="https://firebasestorage.googleapis.com/v0/b/grillicious-backend.firebasestorage.app/o/Grillicious-logo.webp?alt=media&token=efbfa1e4-5a67-417f-aff0-bef82099852a" alt="Grillicious" width={250} height={60} className="mx-auto" />
           <CardDescription className="text-sm font-bold text-zinc-500 uppercase tracking-widest pt-3">
             Select your table to start
           </CardDescription>

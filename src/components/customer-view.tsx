@@ -115,7 +115,7 @@ export default function CustomerView({ tableId }: { tableId: string | null }) {
         <div className="max-w-md w-full text-center space-y-8">
           {/* Brand Identity */}
           <div className="space-y-2">
-            <Image src="https://firebasestorage.googleapis.com/v0/b/grillicious-backend.firebasestorage.app/o/Grillicious-logo.webp?alt=media&token=d67ff384-ece6-4583-8d05-1327121a8b15" alt="Grillicious Logo" width={400} height={100} className="mx-auto" />
+            <Image src="https://firebasestorage.googleapis.com/v0/b/grillicious-backend.firebasestorage.app/o/Grillicious-logo.webp?alt=media&token=efbfa1e4-5a67-417f-aff0-bef82099852a" alt="Grillicious Logo" width={400} height={100} className="mx-auto" />
             <div className="h-2 w-24 bg-zinc-900 mx-auto rounded-full" />
             <p className="font-bold text-zinc-900 uppercase tracking-[0.3em] text-xs pt-2">
               Authentic Grill & Broast
@@ -210,7 +210,7 @@ export default function CustomerView({ tableId }: { tableId: string | null }) {
 
       <footer className="mt-20 bg-zinc-900 text-white py-12 px-6 border-t-4 border-white">
         <div className="container mx-auto flex flex-col items-center gap-6">
-          <Image src="https://firebasestorage.googleapis.com/v0/b/grillicious-backend.firebasestorage.app/o/Grillicious-logo.webp?alt=media&token=d67ff384-ece6-4583-8d05-1327121a8b15" alt="Grillicious Logo" width={180} height={45} />
+          <Image src="https://firebasestorage.googleapis.com/v0/b/grillicious-backend.firebasestorage.app/o/Grillicious-logo.webp?alt=media&token=efbfa1e4-5a67-417f-aff0-bef82099852a" alt="Grillicious Logo" width={180} height={45} />
           <div className="h-px w-16 bg-zinc-800" />
           <Link href="https://www.getpik.in/" target="_blank" className="group flex flex-col items-center gap-2">
             <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-zinc-500">Designed By</span>
@@ -225,7 +225,7 @@ export default function CustomerView({ tableId }: { tableId: string | null }) {
 
       <CartSheet isOpen={isCartOpen} onOpenChange={setCartOpen} tableId={tableId} />
       <button onClick={() => setCartOpen(true)} aria-label="Open cart">
-        <CartIcon />
+        <CartIcon onOpen={() => setCartOpen(true)} />
       </button>
     </div>
   );

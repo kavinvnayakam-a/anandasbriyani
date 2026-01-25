@@ -17,7 +17,7 @@ export function Header({ tableId, timeLeft }: HeaderProps) {
         
         {/* Branding */}
         <div className="flex flex-col">
-          <Image src="https://firebasestorage.googleapis.com/v0/b/grillicious-backend.firebasestorage.app/o/Grillicious-logo.webp?alt=media&token=d67ff384-ece6-4583-8d05-1327121a8b15" alt="Grillicious Logo" width={140} height={35} />
+          <Image src="https://firebasestorage.googleapis.com/v0/b/grillicious-backend.firebasestorage.app/o/Grillicious-logo.webp?alt=media&token=efbfa1e4-5a67-417f-aff0-bef82099852a" alt="Grillicious Logo" width={140} height={35} />
           <span className="text-[8px] font-bold text-[#d4af37] uppercase tracking-widest mt-0.5">
             Est 2025
           </span>

@@ -21,7 +21,7 @@ export default function AdminDashboard() {
       {/* SIDEBAR NAVIGATION */}
       <nav className="fixed bottom-0 w-full bg-zinc-900 text-white p-4 flex justify-around md:top-0 md:left-0 md:w-64 md:h-screen md:flex-col md:justify-start md:gap-8 md:p-8 z-50 border-t-4 border-[#d4af37] md:border-t-0 md:border-r-4">
         <div className="hidden md:block mb-10">
-          <Image src="https://firebasestorage.googleapis.com/v0/b/grillicious-backend.firebasestorage.app/o/Grillicious-logo.webp?alt=media&token=d67ff384-ece6-4583-8d05-1327121a8b15" alt="Grillicious Logo" width={200} height={50} />
+          <Image src="https://firebasestorage.googleapis.com/v0/b/grillicious-backend.firebasestorage.app/o/Grillicious-logo.webp?alt=media&token=efbfa1e4-5a67-417f-aff0-bef82099852a" alt="Grillicious Logo" width={200} height={50} />
           <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Control Center</p>
         </div>
 

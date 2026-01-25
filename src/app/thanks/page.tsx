@@ -29,7 +29,7 @@ export default function ThankYouPage() {
           </div>
         </div>
 
-        <Image src="https://firebasestorage.googleapis.com/v0/b/grillicious-backend.firebasestorage.app/o/Grillicious-logo.webp?alt=media&token=d67ff384-ece6-4583-8d05-1327121a8b15" alt="Grillicious Logo" width={250} height={60} className="mx-auto mb-2" />
+        <Image src="https://firebasestorage.googleapis.com/v0/b/grillicious-backend.firebasestorage.app/o/Grillicious-logo.webp?alt=media&token=efbfa1e4-5a67-417f-aff0-bef82099852a" alt="Grillicious Logo" width={250} height={60} className="mx-auto mb-2" />
         <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400 mb-6">
           Hearts Full. Bellies Fuller.
         </p>
