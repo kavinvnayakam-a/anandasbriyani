@@ -45,7 +45,7 @@ export default function ThankYouPage() {
 
         {/* Google Maps Call to Action */}
         <Link 
-          href="https://goo.gl/maps/YOUR_LINK" 
+          href="https://maps.app.goo.gl/a2fZ7znN8HuEmCsC6" 
           target="_blank"
           className="block w-full bg-zinc-900 text-white p-6 rounded-2xl border-2 border-zinc-900 shadow-[4px_4px_0px_0px_#d4af37] active:translate-y-1 active:shadow-none transition-all mb-8 group"
         >
@@ -59,13 +59,13 @@ export default function ThankYouPage() {
 
         {/* Social Icons */}
         <div className="flex justify-center gap-6 mb-10">
-          <Link href="#" className="p-3 bg-zinc-100 rounded-xl hover:bg-[#d4af37] transition-colors">
+          <Link href="https://www.instagram.com/eatgrillicious?igsh=MTJhd2E2MnZkZmlpeA==" className="p-3 bg-zinc-100 rounded-xl hover:bg-[#d4af37] transition-colors">
             <Facebook className="h-6 w-6" />
           </Link>
-          <Link href="#" className="p-3 bg-zinc-100 rounded-xl hover:bg-[#d4af37] transition-colors">
+          <Link href="https://www.instagram.com/eatgrillicious?igsh=MTJhd2E2MnZkZmlpeA==" className="p-3 bg-zinc-100 rounded-xl hover:bg-[#d4af37] transition-colors">
             <Instagram className="h-6 w-6" />
           </Link>
-          <Link href="https://wa.me/YOUR_NUMBER" className="p-3 bg-zinc-100 rounded-xl hover:bg-[#d4af37] transition-colors">
+          <Link href="" className="p-3 bg-zinc-100 rounded-xl hover:bg-[#d4af37] transition-colors">
             <MessageCircle className="h-6 w-6" />
           </Link>
         </div>
