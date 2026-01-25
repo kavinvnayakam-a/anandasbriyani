@@ -1,120 +1,22 @@
-/**
- * Core Philosophy:
- * This ruleset is designed for the Grillicious restaurant application. The security
- * model is built on public-read access for shared data like the menu and tables,
- * with a path-based ownership model for orders. The system supports anonymous
- * users, allowing anyone to browse the menu and place an order for a specific table.
- *
- * Data Structure:
- * - /menu_items/{menuItemId}: A global, public collection of all menu items.
- * - /tables/{tableId}: A global, public collection of all restaurant tables.
- * - /tables/{tableId}/orders/{orderId}: A subcollection where each order is
- *   hierarchically tied to the table that placed it.
- *
- * Key Security Decisions:
- * - Public Data: Menu items and tables are publicly readable by anyone, including
- *   unauthenticated users, to allow browsing.
- * - Locked-Down Management: All write operations (create, update, delete) on the
- *   top-level /menu_items and /tables collections are disabled by default. This
- *   is a secure posture that assumes this data will be managed by an admin through a
- *   separate, trusted environment (e.g., the Firebase Console or a backend server
- *   with Admin SDK access) until specific admin roles are defined in the rules.
- * - Order Creation: Any authenticated user (including anonymous ones) can create an
- *   order, but it must be correctly associated with a table via the document path.
- * - Order Privacy: Users can fetch individual orders if they know the path, but
- *   they cannot list all orders for a given table to protect privacy. All updates
- *   and deletes on orders are disabled for clients, awaiting a staff/admin role.
- *
- * Denormalization for Authorization:
- * - The rules enforce that when an Order document is created, its internal `tableId`
- *   field must match the `tableId` from its path in the database. This creates a
- *   simple, unbreakable link between an order and its table without requiring
- *   costly `get()` calls in the rules.
- */
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // Helper functions for readable, reusable logic
-    function isSignedIn() {
-      return request.auth != null;
+    
+    // Allow anyone to read the menu (Customers & Admin)
+    match /menu/{item} {
+      allow read: if true;
+      allow write: if true; 
     }
 
-    /**
-     * On create, validates that the order document's internal 'tableId' field
-     * matches the table document it is being created under.
-     */
-    function isOrderForThisTable(tableId) {
-      return request.resource.data.tableId == tableId;
+    // Allow anyone to read/write orders
+    match /orders/{order} {
+      allow read, write: if true;
     }
-
-    /**
-     * @description
-     *   Manages the restaurant's menu items. This data is public for all users to
-     *   read, but cannot be modified by any client.
-     * @path
-     *   /menu_items/{menuItemId}
-     * @allow
-     *   Any user, signed-in or not, can read a menu item. (get, list)
-     * @deny
-     *   A signed-in user attempts to add a new menu item. (create)
-     * @principle
-     *   Public read access for shared data, with writes locked down pending the
-     *   implementation of an admin role system.
-     */
-    match /menu_items/{menuItemId} {
-      allow get: if true;
-      allow list: if true;
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
-    }
-
-    /**
-     * @description
-     *   Manages the restaurant's table information. This data is public for all
-     *   users to read, but cannot be modified by any client.
-     * @path
-     *   /tables/{tableId}
-     * @allow
-     *   Any user, signed-in or not, can list all tables. (list)
-     * @deny
-     *   A signed-in user attempts to delete a table. (delete)
-     * @principle
-     *   Public read access for shared data, with writes locked down pending the
-     *   implementation of an admin role system.
-     */
-    match /tables/{tableId} {
-      allow get: if true;
-      allow list: if true;
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
-    }
-
-    /**
-     * @description
-     *   Manages orders, which are nested under the table that placed them. Any
-     *   authenticated user can create an order for a table.
-     * @path
-     *   /tables/{tableId}/orders/{orderId}
-     * @allow
-     *   An anonymous user creates a new order for table 't1'. (create)
-     * @deny
-     *   A user tries to list all orders for table 't1'. (list)
-     * @deny
-     *   A user tries to create an order under '/tables/t1' with a `tableId`
-     *   field in the data set to 't2'. (create)
-     * @principle
-     *   Enforces path-based ownership and relational integrity. Allows creation
-     *   by any authenticated user but restricts modification and listing.
-     */
-    match /tables/{tableId}/orders/{orderId} {
-      allow get: if isSignedIn();
-      allow list: if false;
-      allow create: if isSignedIn() && isOrderForThisTable(tableId);
-      allow update: if false;
-      allow delete: if false;
+    
+    // Default fallback for other collections
+    match /{document=**} {
+      allow read, write: if true;
     }
   }
 }
