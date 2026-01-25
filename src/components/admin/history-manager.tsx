@@ -2,7 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { db } from '@/firebase/config';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { 
+  collection, 
+  getDocs, 
+  query, 
+  orderBy,
+  where,
+  Timestamp
+} from 'firebase/firestore';
 import { 
   Calendar as CalendarIcon, 
   ShoppingBag, 
@@ -26,13 +33,27 @@ export default function HistoryManager() {
 
   const fetchHistory = async () => {
     setIsLoading(true);
+    if (!selectedDate) {
+      setPastOrders([]);
+      setIsLoading(false);
+      return;
+    }
     try {
-      // Split "2026-01-25" into year, month, day
-      const [year, month, day] = selectedDate.split('-');
+      // Create date range for the selected day in the local timezone
+      const startOfDay = new Date(selectedDate);
+      startOfDay.setHours(0, 0, 0, 0);
       
-      // Target the specific date folder: order_history/2026/01/25
-      const historyPath = `order_history/${year}/${month}/${day}`;
-      const q = query(collection(db, historyPath), orderBy("timestamp", "desc"));
+      const endOfDay = new Date(selectedDate);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      // Query the single 'order_history' collection
+      const historyCollection = collection(db, "order_history");
+      const q = query(
+        historyCollection, 
+        where("timestamp", ">=", Timestamp.fromDate(startOfDay)),
+        where("timestamp", "<=", Timestamp.fromDate(endOfDay)),
+        orderBy("timestamp", "desc")
+      );
       
       const snapshot = await getDocs(q);
       const orders = snapshot.docs.map(doc => ({ 
@@ -43,11 +64,12 @@ export default function HistoryManager() {
       setPastOrders(orders);
     } catch (err) {
       console.error("Failed to fetch history:", err);
-      setPastOrders([]);
+      setPastOrders([]); // Clear on error
     } finally {
       setIsLoading(false);
     }
   };
+
 
   // Calculations for the Daily Summary
   const totalRevenue = pastOrders.reduce((sum, order) => sum + (order.totalPrice || 0), 0);

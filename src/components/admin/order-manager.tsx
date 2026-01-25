@@ -9,8 +9,7 @@ import {
   orderBy, 
   doc, 
   updateDoc, 
-  deleteDoc, 
-  addDoc, 
+  writeBatch,
   serverTimestamp 
 } from 'firebase/firestore';
 import { Order } from '@/lib/types';
@@ -70,42 +69,52 @@ export default function OrderManager() {
     await updateDoc(doc(db, "orders", orderId), { status: newStatus });
   };
 
-  // 5. Archive to History (YYYY/MM/DD structure)
+  // 5. Archive and Clear Table
   const archiveAndClearTable = async (tableId: string) => {
     const items = tableMap[tableId];
-    if (!items || items.length === 0) return;
-    
-    if (!confirm(`Are you sure? This will archive all orders for ${tableId} and clear the table.`)) return;
+    const tableDisplayName = tableId === 'Takeaway' ? 'Takeaway' : `Table ${tableId}`;
 
-    const now = new Date();
-    const year = now.getFullYear().toString();
-    const month = (now.getMonth() + 1).toString().padStart(2, '0');
-    const day = now.getDate().toString().padStart(2, '0');
+    if (!items || items.length === 0) {
+      toast({
+          title: "Nothing to clear",
+          description: `${tableDisplayName} is already empty.`,
+      });
+      return;
+    }
     
-    // Path: order_history/2026/01/25
-    const historyPath = `order_history/${year}/${month}/${day}`;
+    if (!confirm(`Are you sure? This will archive all ${items.length} order(s) for ${tableDisplayName} and clear the table.`)) return;
+
+    const historyCollection = collection(db, "order_history");
+    const batch = writeBatch(db);
 
     try {
       for (const order of items) {
-        // Step A: Copy to History
-        await addDoc(collection(db, historyPath), {
+        // Step A: Copy to History collection with a new random ID
+        const historyDocRef = doc(historyCollection);
+        batch.set(historyDocRef, {
           ...order,
           archivedAt: serverTimestamp(),
-          finalStatus: 'Served'
+          finalStatus: 'Completed'
         });
-        // Step B: Remove from Live
-        await deleteDoc(doc(db, "orders", order.id));
+        
+        // Step B: Remove from Live 'orders' collection
+        const liveOrderDocRef = doc(db, "orders", order.id);
+        batch.delete(liveOrderDocRef);
       }
+      
+      await batch.commit();
+
       setSelectedTable(null);
       toast({
         title: "Table Cleared! ✅",
-        description: `Orders moved to history for ${day}/${month}/${year}`,
+        description: `Orders for ${tableDisplayName} were successfully archived.`,
       });
-    } catch (err) {
+    } catch (err: any) {
       console.error("Archiving Error:", err);
-      toast({ title: "Error", description: "Could not archive orders.", variant: "destructive" });
+      toast({ title: "Error", description: err.message || "Could not archive orders.", variant: "destructive" });
     }
   };
+
 
   const allTables = ["Takeaway", ...Array.from({ length: 12 }, (_, i) => (i + 1).toString())];
 
@@ -171,7 +180,7 @@ export default function OrderManager() {
 
             {/* Individual Order Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {tableMap[selectedTable]?.map((order) => (
+              {(tableMap[selectedTable] || []).map((order) => (
                 <div key={order.id} className="bg-white border-4 border-zinc-900 p-6 rounded-[2.5rem] shadow-xl relative overflow-hidden flex flex-col">
                   
                   {/* Order Number Ribbon */}
