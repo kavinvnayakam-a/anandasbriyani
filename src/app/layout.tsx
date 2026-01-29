@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { CartProvider } from '@/context/cart-context'; // Import the provider
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 import Link from 'next/link';
-import { LifeBuoy } from 'lucide-react';
+import { MessageCircleQuestion } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Grillicious',
@@ -32,7 +32,7 @@ export default function RootLayout({
           </CartProvider>
         </FirebaseClientProvider>
         <Link href="mailto:info@getpik.in" className="fixed bottom-6 right-6 z-50 bg-zinc-900 text-white p-4 rounded-full shadow-lg border-2 border-[#d4af37] hover:bg-zinc-800 transition-colors">
-            <LifeBuoy className="h-6 w-6" />
+            <MessageCircleQuestion className="h-6 w-6" />
             <span className="sr-only">Support</span>
         </Link>
       </body>

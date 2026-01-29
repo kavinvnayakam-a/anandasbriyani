@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import MenuManager from "@/components/admin/menu-manager"; 
 import OrderManager from "@/components/admin/order-manager"; 
 import AnalyticsDashboard from "@/components/admin/analytics-dashboard";
@@ -193,6 +194,17 @@ export default function AdminDashboard() {
               <AnalyticsDashboard />
             </div>
           )}
+        </div>
+        
+        {/* GETPIK FOOTER */}
+        <div className="text-center py-8 bg-zinc-100 border-t-2 border-zinc-200">
+            <Link href="https://www.getpik.in/" target="_blank" className="group inline-flex flex-col items-center gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-zinc-500">Designed By</span>
+                <div className="flex items-center gap-2 bg-white px-5 py-2 rounded-2xl border-2 border-zinc-900 shadow-[4px_4px_0_0_#18181b]">
+                    <span className="text-zinc-900 font-black text-xl tracking-tight">GetPik</span>
+                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                </div>
+            </Link>
         </div>
       </div>
     </div>
