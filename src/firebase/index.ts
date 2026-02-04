@@ -1,13 +1,19 @@
 'use client';
 
-import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
+import { initializeApp, getApps, getApp, FirebaseApp, FirebaseOptions } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
-// IMPORTANT: DO NOT MODIFY THIS FUNCTION
-export function initializeFirebase() {
-  const firebaseConfig = {
+export function initializeFirebase(dynamicConfig?: FirebaseOptions) {
+  if (getApps().length) {
+    return getSdks(getApp());
+  }
+
+  // LOG FOR DEBUGGING: Open your browser console to see if these are 'undefined'
+  console.log("Checking Local Env:", process.env.NEXT_PUBLIC_FIREBASE_API_KEY ? "Found" : "Missing");
+
+  const firebaseConfig: FirebaseOptions = dynamicConfig || {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
     authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
     projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
@@ -16,14 +22,9 @@ export function initializeFirebase() {
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
   };
 
-  if (getApps().length) {
-    return getSdks(getApp());
-  }
-  
-  // Validate the config
   if (!firebaseConfig.apiKey) {
-    // This error will be caught by the developer in their console.
-    throw new Error('Firebase configuration is invalid. Ensure your Firebase project credentials (especially NEXT_PUBLIC_FIREBASE_API_KEY) are set correctly in your environment variables.');
+    // If we get here, .env.local isn't being read or prefix is missing
+    throw new Error('Firebase Config Error: NEXT_PUBLIC_FIREBASE_API_KEY is undefined.');
   }
 
   const firebaseApp = initializeApp(firebaseConfig);
@@ -38,7 +39,9 @@ export function getSdks(firebaseApp: FirebaseApp) {
     storage: getStorage(firebaseApp)
   };
 }
+// ... rest of exports
 
+// Re-exports
 export * from './provider';
 export * from './client-provider';
 export * from './firestore/use-collection';

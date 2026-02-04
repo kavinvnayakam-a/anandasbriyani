@@ -48,7 +48,7 @@ export default function AdminDashboard() {
         {/* Logo Section */}
         <div className="hidden md:block p-8 border-b-2 border-zinc-900/10">
           <h1 className="text-3xl font-black uppercase italic tracking-tighter text-zinc-900">
-            Grillicious
+            Swiss Delights
           </h1>
           <p className="text-[10px] font-black text-zinc-900/60 uppercase tracking-widest mt-1">Admin Control</p>
         </div>

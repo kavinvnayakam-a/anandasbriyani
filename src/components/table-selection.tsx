@@ -23,7 +23,7 @@ export default function TableSelection() {
           <div className="mx-auto bg-zinc-900 text-white w-fit px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.3em] mb-4">
             Welcome
           </div>
-          <Image src="https://firebasestorage.googleapis.com/v0/b/grillicious-backend.firebasestorage.app/o/Grillicious-logo.webp?alt=media&token=efbfa1e4-5a67-417f-aff0-bef82099852a" alt="Grillicious" width={250} height={60} className="mx-auto" />
+          <Image src="https://firebasestorage.googleapis.com/v0/b/swissdelights-2a272.firebasestorage.app/o/Swiss_logo.webp?alt=media&token=70912942-ad4e-4840-9c22-99ab267c42c6" alt="Swiss Delights" width={250} height={63} className="mx-auto" />
           <CardDescription className="text-sm font-bold text-zinc-500 uppercase tracking-widest pt-3">
             Select your table to start
           </CardDescription>
@@ -53,7 +53,7 @@ export default function TableSelection() {
           
           <div className="mt-10 text-center">
             <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
-              Authentic Grill & Broast Experience
+              Sizzling flavors, delivered fast.
             </p>
           </div>
         </CardContent>

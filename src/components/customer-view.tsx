@@ -117,17 +117,17 @@ export default function CustomerView({ tableId }: { tableId: string | null }) {
         <div className="max-w-md w-full text-center space-y-8">
           {/* Brand Identity */}
           <div className="space-y-2">
-            <Image src="https://firebasestorage.googleapis.com/v0/b/grillicious-backend.firebasestorage.app/o/Grillicious-logo.webp?alt=media&token=efbfa1e4-5a67-417f-aff0-bef82099852a" alt="Grillicious Logo" width={400} height={100} className="mx-auto" />
+            <Image src="https://firebasestorage.googleapis.com/v0/b/swissdelights-2a272.firebasestorage.app/o/Swiss_logo.webp?alt=media&token=70912942-ad4e-4840-9c22-99ab267c42c6" alt="Swiss Delights Logo" width={300} height={75} className="mx-auto" />
             <div className="h-2 w-24 bg-zinc-900 mx-auto rounded-full" />
             <p className="font-bold text-white uppercase tracking-[0.3em] text-xs pt-2">
-              Authentic Grill & Broast
+              Sizzling flavors, delivered fast.
             </p>
           </div>
 
           {/* Restaurant Details Card */}
           <div className="bg-white border-4 border-zinc-900 p-8 rounded-[3rem] shadow-[12px_12px_0_0_#000] space-y-6 text-left transform -rotate-1">
             <p className="text-zinc-800 font-bold italic text-lg leading-tight">
-              "The smoke of the grill meets the crunch of the broast. Experience Hyderabad's finest Lebanese flavors."
+              "Experience the finest flavors in town, delivered fast and fresh."
             </p>
             
             <div className="space-y-4 pt-4 border-t-2 border-zinc-100">
@@ -212,7 +212,7 @@ export default function CustomerView({ tableId }: { tableId: string | null }) {
 
       <footer className="mt-20 bg-[#e76876] text-white py-12 px-6 border-t-4 border-zinc-900">
         <div className="container mx-auto flex flex-col items-center gap-6">
-          <Image src="https://firebasestorage.googleapis.com/v0/b/grillicious-backend.firebasestorage.app/o/Grillicious-logo.webp?alt=media&token=efbfa1e4-5a67-417f-aff0-bef82099852a" alt="Grillicious Logo" width={180} height={45} />
+          <Image src="https://firebasestorage.googleapis.com/v0/b/swissdelights-2a272.firebasestorage.app/o/Swiss_logo.webp?alt=media&token=70912942-ad4e-4840-9c22-99ab267c42c6" alt="Swiss Delights Logo" width={180} height={45} />
           <div className="h-px w-16 bg-white" />
           <Link href="https://www.getpik.in/" target="_blank" className="group flex flex-col items-center gap-2">
             <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-white/80">Designed By</span>

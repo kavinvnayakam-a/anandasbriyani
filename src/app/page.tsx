@@ -2,23 +2,32 @@ import CustomerView from '@/components/customer-view';
 import { Suspense } from 'react';
 import Image from 'next/image';
 
-export default function Home({
+// Next.js 15: searchParams is now a Promise
+export default async function Home({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const tableId = typeof searchParams.table === 'string' ? searchParams.table : null;
-  const isTakeAway = searchParams.mode === 'takeaway' || (!tableId);
+  // Await the params before accessing properties
+  const resolvedParams = await searchParams;
+  
+  const tableId = typeof resolvedParams.table === 'string' ? resolvedParams.table : null;
+  const isTakeAway = resolvedParams.mode === 'takeaway' || (!tableId);
 
   return (
     <Suspense 
       fallback={
         <div className="h-screen w-full flex flex-col items-center justify-center bg-[#e76876]">
-          <Image src="https://firebasestorage.googleapis.com/v0/b/grillicious-backend.firebasestorage.app/o/Grillicious-logo.webp?alt=media&token=efbfa1e4-5a67-417f-aff0-bef82099852a" alt="Grillicious Logo" width={300} height={75} className="animate-pulse" />
+          <Image 
+            src="https://firebasestorage.googleapis.com/v0/b/swissdelights-2a272.firebasestorage.app/o/Swiss_logo.webp?alt=media&token=70912942-ad4e-4840-9c22-99ab267c42c6" 
+            alt="Swiss Delights Logo" 
+            width={300} 
+            height={75} 
+            className="animate-pulse" 
+          />
         </div>
       }
     >
-      {/* If no tableId is present, the CustomerView will handle the "Welcome" & "Takeaway" logic */}
       <CustomerView tableId={tableId} mode={isTakeAway ? 'takeaway' : 'dine-in'} />
     </Suspense>
   );
