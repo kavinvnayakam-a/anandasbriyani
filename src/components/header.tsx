@@ -2,6 +2,8 @@
 
 import SessionTimer from "@/components/session-timer";
 import Image from 'next/image';
+import { Clock, ShoppingBag } from 'lucide-react';
+import { cn } from "@/lib/utils";
 
 type HeaderProps = {
   tableId: string | null;
@@ -10,49 +12,85 @@ type HeaderProps = {
 };
 
 export function Header({ tableId, timeLeft }: HeaderProps) {
+  const isTakeaway = !tableId || tableId === "Takeaway";
+
   return (
-    <header className="sticky top-0 z-50 w-full bg-background/90 backdrop-blur-sm border-b-2 border-border">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+    <header className="sticky top-0 z-50 w-full h-20 bg-[#b73538] shadow-lg shadow-red-900/20">
+      <div className="container mx-auto h-full flex items-center justify-between px-6">
         
-        <div className="flex flex-col">
-          <div className="bg-white rounded-full p-2 shadow-sm">
-            <Image src="https://firebasestorage.googleapis.com/v0/b/swissdelights-2a272.firebasestorage.app/o/Swiss_logo.webp?alt=media&token=70912942-ad4e-4840-9c22-99ab267c42c6" alt="Swiss Delight Logo" width={120} height={30} />
+        {/* 1. PROJECTED LOGO: Vertically Centered */}
+        <div className="flex items-center h-full">
+          <div className="
+            relative 
+            bg-white 
+            h-14 w-14 
+            rounded-2xl 
+            shadow-[0_10px_25px_-5px_rgba(0,0,0,0.3)]
+            flex items-center justify-center
+            overflow-hidden
+          ">
+            <Image 
+              src="https://firebasestorage.googleapis.com/v0/b/swissdelights-2a272.firebasestorage.app/o/Swiss_logo.webp?alt=media&token=70912942-ad4e-4840-9c22-99ab267c42c6" 
+              alt="Logo" 
+              width={42} 
+              height={42} 
+              className="object-contain"
+              priority
+            />
+            {/* Subtle gloss shine across logo box */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/30 to-white/10 pointer-events-none" />
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          {tableId && (
-            <>
-              <div className="hidden md:flex items-center bg-foreground/5 px-2.5 py-1 rounded-full border border-border">
+        {/* 2. WHITE GLOSS STATUS PILL */}
+        <div className="flex items-center">
+          <div className="
+            relative
+            flex items-center 
+            bg-white/20 
+            backdrop-blur-xl 
+            rounded-2xl 
+            p-1.5 pr-5 
+            border border-white/30
+            shadow-[0_4px_15px_rgba(0,0,0,0.1)]
+            overflow-hidden
+          ">
+            {/* Glossy Overlay Reflection */}
+            <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/20 to-transparent pointer-events-none" />
+            
+            {/* Mode Badge (Table # or Takeaway Icon) */}
+            <div className={cn(
+              "relative z-10 w-10 h-10 rounded-xl flex flex-col items-center justify-center shadow-inner",
+              isTakeaway 
+                ? "bg-white/10 text-white border border-white/20" 
+                : "bg-white text-[#b73538] border border-white shadow-md"
+            )}>
+              {isTakeaway ? (
+                <ShoppingBag size={18} />
+              ) : (
+                <>
+                  <span className="text-[8px] font-bold uppercase opacity-60 leading-none">Tbl</span>
+                  <span className="text-sm font-black tracking-tight">{tableId}</span>
+                </>
+              )}
+            </div>
+            
+            {/* THE TIMER: High contrast white text on the glossy pill */}
+            <div className="relative z-10 flex flex-col justify-center ml-3">
+              <div className="flex items-center gap-1.5 mb-0.5">
+                <Clock size={10} className="text-white animate-pulse" />
+                <span className="text-[10px] font-black text-white/70 uppercase tracking-widest">
+                  {isTakeaway ? "Takeaway" : "Time Left"}
+                </span>
+              </div>
+              <div className="text-white font-mono font-black text-sm leading-none tabular-nums drop-shadow-sm">
                 <SessionTimer timeLeft={timeLeft} />
               </div>
-              
-              <div className="relative">
-                <div className="
-                  translate-y-4
-                  flex flex-col items-center justify-center
-                  min-w-[60px] h-[60px] 
-                  rounded-2xl border-4 border-foreground
-                  bg-foreground text-background
-                  shadow-[4px_4px_0_0_hsl(var(--foreground))]
-                ">
-                  <span className="text-[9px] uppercase font-black leading-none mb-0.5">
-                    Table
-                  </span>
-                  <span className="text-2xl font-black leading-none tracking-tighter">
-                    {tableId}
-                  </span>
-                </div>
-              </div>
-            </>
-          )}
+            </div>
+
+          </div>
         </div>
       </div>
-       {tableId && (
-          <div className="md:hidden absolute top-20 right-4 bg-foreground/90 backdrop-blur-sm text-background px-4 py-2 rounded-xl border border-border shadow-lg">
-            <SessionTimer timeLeft={timeLeft} />
-          </div>
-        )}
     </header>
   );
 }

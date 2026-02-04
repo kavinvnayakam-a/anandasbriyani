@@ -3,6 +3,7 @@
 import { ShoppingBag } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
 
 export function CartIcon({ onOpen }: { onOpen?: () => void }) {
   const { totalItems } = useCart();
@@ -19,40 +20,42 @@ export function CartIcon({ onOpen }: { onOpen?: () => void }) {
     <button 
       onClick={onOpen}
       aria-label="Open cart"
-      className={`
-        fixed right-0 top-1/2 -translate-y-1/2 z-50
-        flex flex-col items-center gap-2
-        bg-foreground text-background
-        py-5 px-3
-        rounded-l-[2rem]
-        border-y-2 border-l-2 border-accent
-        
-        shadow-[-10px_0px_30px_rgba(0,0,0,0.2)]
-        transition-all duration-300 active:scale-90
-        ${isAnimate ? 'translate-x-0 scale-110' : 'translate-x-0 scale-100'}
-        hover:bg-foreground/90
-      `}
+      className={cn(
+        "fixed right-0 top-[65%] -translate-y-1/2 z-40",
+        "flex flex-col items-center gap-3",
+        "bg-[#b73538] text-white", // Pure solid brand red
+        "py-6 px-4",
+        "rounded-l-[1.5rem]", // Slightly tighter radius for a sharper look
+        "border border-white/30 border-r-0", // Crisp thin border
+        "shadow-[-4px_4px_12px_rgba(0,0,0,0.15)]", // Tight, neutral shadow with ZERO spread
+        "transition-all duration-300 ease-in-out",
+        isAnimate ? "scale-110" : "hover:bg-[#a02e31]",
+        "active:scale-90 group"
+      )}
     >
-      <div className="
-        flex h-6 w-6 items-center justify-center 
-        rounded-full bg-accent text-accent-foreground
-        text-[10px] font-black border-2 border-white
-        shadow-sm
-      ">
+      {/* Items Counter - Solid White Circle */}
+      <div className={cn(
+        "flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-black transition-all",
+        totalItems > 0 
+          ? "bg-white text-[#b73538]" 
+          : "bg-black/20 text-white/50"
+      )}>
         {totalItems}
       </div>
 
-      <ShoppingBag className="h-6 w-6 text-accent" />
+      {/* Shopping Bag Icon - No extra effects */}
+      <ShoppingBag className={cn(
+        "h-5 w-5",
+        totalItems > 0 ? "text-white" : "text-white/40"
+      )} />
 
-      <span className="[writing-mode:vertical-lr] rotate-180 text-[10px] font-black uppercase tracking-[0.2em] mt-1">
-        Your Cart
+      {/* View Cart Text */}
+      <span className="[writing-mode:vertical-lr] rotate-180 text-[10px] font-black uppercase tracking-[0.2em]">
+        Cart
       </span>
 
-      {totalItems > 0 && (
-        <div className="mt-2 pt-2 border-t border-background/20 w-full flex justify-center">
-          <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-        </div>
-      )}
+      {/* Bottom marker - Pure white solid line */}
+      <div className="h-4 w-[2px] bg-white/20 mt-1 rounded-full" />
     </button>
   );
 }

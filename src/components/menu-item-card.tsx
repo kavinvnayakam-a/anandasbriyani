@@ -3,8 +3,7 @@
 import Image from "next/image";
 import type { MenuItem } from "@/lib/types";
 import { formatCurrency, cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { ImageIcon } from "lucide-react";
+import { ImageIcon, Plus } from "lucide-react";
 
 type MenuItemCardProps = {
   item: MenuItem;
@@ -16,64 +15,84 @@ export function MenuItemCard({ item, onAddToCart }: MenuItemCardProps) {
 
   return (
     <div className={cn(
-      "group bg-card rounded-[2.5rem] border-2 border-border/10 overflow-hidden transition-all shadow-md",
-      isSoldOut ? "opacity-70" : "active:scale-[0.98] hover:shadow-2xl"
+      "group relative bg-white rounded-[2rem] overflow-hidden transition-all duration-500",
+      "border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)]",
+      isSoldOut ? "opacity-60" : "hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:-translate-y-1"
     )}>
       
-      <div className="relative h-60 w-full overflow-hidden bg-muted">
+      {/* Image Container with Soft Overlay */}
+      <div className="relative h-64 w-full overflow-hidden bg-slate-50">
         {isSoldOut && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/30">
-            <span className="bg-foreground text-background font-black uppercase italic px-4 py-2 rounded-xl border-2 border-background/50 text-sm shadow-lg">
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/60 backdrop-blur-[2px]">
+            <span className="bg-slate-900 text-white font-bold uppercase tracking-widest px-4 py-2 rounded-full text-[10px] shadow-xl">
               Sold Out
             </span>
           </div>
         )}
+        
         {item.image ? (
           <Image
             src={item.image}
             alt={item.name}
             fill
             className={cn(
-              "object-cover transition-transform duration-700",
+              "object-cover transition-transform duration-1000 ease-out",
               !isSoldOut && "group-hover:scale-110"
             )}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
-            <ImageIcon className="h-16 w-16 text-border" />
+            <ImageIcon className="h-12 w-12 text-slate-200" />
+          </div>
+        )}
+
+        {/* Floating Price Tag (Top Left) */}
+        {!isSoldOut && (
+          <div className="absolute top-4 left-4 z-10">
+            <div className="bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full shadow-sm border border-white/20">
+              <span className="text-slate-900 font-black text-sm tabular-nums">
+                {formatCurrency(item.price)}
+              </span>
+            </div>
           </div>
         )}
       </div>
 
+      {/* Content Section */}
       <div className="p-6">
-        <div className="mb-4">
-          <h3 className="text-2xl font-black uppercase italic tracking-tighter text-foreground leading-tight">
+        <div className="min-h-[80px]">
+          <h3 className="text-xl font-bold text-slate-900 leading-tight group-hover:text-[#b73538] transition-colors">
             {item.name}
           </h3>
-          <p className="text-muted-foreground text-sm font-medium line-clamp-2 mt-2 leading-relaxed">
+          <p className="text-slate-400 text-xs font-medium mt-2 line-clamp-2 leading-relaxed tracking-wide">
             {item.description}
           </p>
         </div>
 
-        <div className="flex flex-col gap-4 mt-6">
-          <div className="flex items-baseline justify-between">
-             <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">Price</span>
-             <span className={cn(
-               "text-4xl font-black tracking-tighter tabular-nums",
-                isSoldOut ? "text-muted-foreground" : "text-emerald-600"
-              )}>
-                {formatCurrency(item.price)}
-             </span>
-          </div>
-
-          <Button
+        {/* Action Button - Brand Red & White Gloss */}
+        <div className="mt-6">
+          <button
             onClick={() => onAddToCart(item)}
             disabled={isSoldOut}
-            className="w-full h-16 rounded-2xl bg-foreground text-background hover:bg-foreground/90 font-black uppercase italic tracking-widest transition-all shadow-[6px_6px_0px_0px_hsl(var(--accent))] active:shadow-none active:translate-x-1 active:translate-y-1 text-lg disabled:bg-muted disabled:shadow-none disabled:text-muted-foreground disabled:cursor-not-allowed"
+            className={cn(
+              "w-full h-14 rounded-xl flex items-center justify-center gap-3 transition-all duration-300 font-bold uppercase tracking-widest text-xs",
+              isSoldOut 
+                ? "bg-slate-100 text-slate-400 cursor-not-allowed" 
+                : "bg-[#b73538] text-white shadow-[0_10px_20px_-5px_rgba(183,53,56,0.3)] active:scale-95 hover:bg-[#a02e31]"
+            )}
           >
-            {isSoldOut ? 'Unavailable' : 'Add to Order'}
-          </Button>
+            {isSoldOut ? (
+              'Unavailable'
+            ) : (
+              <>
+                <span>Add to Order</span>
+                <div className="bg-white/20 p-1 rounded-full">
+                  <Plus size={14} strokeWidth={3} />
+                </div>
+              </>
+            )}
+          </button>
         </div>
       </div>
     </div>

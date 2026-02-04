@@ -3,7 +3,7 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/use-cart";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import { Minus, Plus, Trash2, ShoppingBag, Loader2, ImageIcon } from "lucide-react";
@@ -36,12 +36,10 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
       const orderNumber = await runTransaction(firestore, async (transaction) => {
         const counterDoc = await transaction.get(counterRef);
         let newCount = 1;
-
         if (counterDoc.exists()) {
           newCount = counterDoc.data().count + 1;
           if (newCount > 1000) newCount = 1;
         }
-
         transaction.set(counterRef, { count: newCount }, { merge: true });
         return newCount.toString().padStart(4, '0');
       });
@@ -65,9 +63,9 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
       const docRef = await addDoc(collection(firestore, "orders"), orderData);
 
       toast({
-        title: `Order #${orderNumber} Sent! 🚀`,
-        description: "Waiting for the cafe's approval...",
-        className: "bg-foreground text-background border-b-4 border-accent",
+        title: `Order #${orderNumber} Confirmed!`,
+        description: "Your Swiss delights are being prepared.",
+        className: "bg-[#b73538] text-white border-none shadow-2xl",
       });
 
       clearCart();
@@ -75,7 +73,6 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
       router.push(`/order-status/${docRef.id}`);
 
     } catch (error) {
-      console.error("Order Error:", error);
       toast({
         title: "Order Failed",
         description: "Something went wrong. Please try again.",
@@ -90,59 +87,66 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
       <SheetContent 
         side="right" 
-        className="flex flex-col bg-foreground border-l-4 border-accent text-background w-[85vw] sm:max-w-md p-0 overflow-hidden"
+        className="flex flex-col bg-[#FDFDFD] border-l border-slate-100 w-[90vw] sm:max-w-md p-0 overflow-hidden"
       >
-        <SheetHeader className="p-6 border-b border-background/20">
-          <SheetTitle className="text-xl font-black uppercase italic tracking-tighter text-background flex items-center gap-2">
-            <ShoppingBag className="text-accent h-5 w-5" /> 
-            {tableId ? `Table ${tableId}` : 'Takeaway Order'}
+        <SheetHeader className="p-8 border-b border-slate-50 bg-white">
+          <SheetTitle className="text-2xl font-bold text-slate-900 flex items-center justify-between">
+            <div className="flex flex-col">
+              <span className="text-xs font-black uppercase tracking-[0.2em] text-[#b73538] mb-1">Your Order</span>
+              <span className="font-serif italic">{tableId ? `Table ${tableId}` : 'Takeaway'}</span>
+            </div>
+            <div className="bg-slate-50 p-3 rounded-2xl">
+              <ShoppingBag className="text-[#b73538] h-5 w-5" />
+            </div>
           </SheetTitle>
         </SheetHeader>
 
-        <div className="flex-1 overflow-y-auto px-4">
+        <div className="flex-1 overflow-y-auto px-6 py-4">
           {cartItems.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full opacity-30 space-y-4">
-              <ShoppingBag size={40} />
-              <p className="text-center font-bold uppercase tracking-widest text-[10px]">Your cart is empty</p>
+            <div className="flex flex-col items-center justify-center h-full space-y-4">
+              <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-2">
+                <ShoppingBag size={32} className="text-slate-200" />
+              </div>
+              <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Your bag is empty</p>
             </div>
           ) : (
-            <div className="divide-y divide-background/20">
+            <div className="space-y-6 pt-4">
               {cartItems.map((item) => (
-                <div key={item.id} className="flex items-center gap-3 py-5 animate-in fade-in slide-in-from-right-4">
-                  <div className="relative h-14 w-14 shrink-0">
+                <div key={item.id} className="flex items-start gap-4 animate-in fade-in slide-in-from-right-4 duration-500">
+                  <div className="relative h-16 w-16 shrink-0 shadow-sm">
                     {item.image ? (
                       <Image 
                         src={item.image} 
                         alt={item.name} 
                         fill 
-                        className="rounded-lg object-cover border border-background/20 shadow-lg"
+                        className="rounded-xl object-cover border border-slate-100"
                       />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center rounded-lg border border-background/20 bg-background/5">
-                        <ImageIcon className="h-6 w-6 text-muted" />
+                      <div className="flex h-full w-full items-center justify-center rounded-xl bg-slate-50 border border-slate-100">
+                        <ImageIcon className="h-6 w-6 text-slate-200" />
                       </div>
                     )}
                   </div>
                   
-                  <div className="flex-1 min-w-0">
-                    <p className="font-black uppercase italic tracking-tight text-xs truncate leading-none mb-1">
+                  <div className="flex-1 min-w-0 pt-1">
+                    <p className="font-bold text-slate-800 text-sm leading-tight truncate">
                       {item.name}
                     </p>
-                    <p className="text-accent font-bold text-xs">
+                    <p className="text-[#b73538] font-bold text-xs mt-1">
                       {formatCurrency(item.price)}
                     </p>
                     
-                    <div className="flex items-center gap-2 mt-2">
-                      <div className="flex items-center bg-background/10 rounded-lg border border-background/20 p-0.5">
+                    <div className="flex items-center gap-3 mt-3">
+                      <div className="flex items-center bg-white rounded-full border border-slate-100 p-1 shadow-sm">
                         <button 
-                          className="p-1 hover:text-accent transition-colors"
+                          className="w-6 h-6 flex items-center justify-center hover:bg-slate-50 rounded-full transition-colors text-slate-400"
                           onClick={() => updateQuantity(item.id, item.quantity - 1)}
                         >
                           <Minus className="h-3 w-3"/>
                         </button>
-                        <span className="w-6 text-center font-bold text-[10px] tabular-nums">{item.quantity}</span>
+                        <span className="w-8 text-center font-bold text-xs text-slate-700 tabular-nums">{item.quantity}</span>
                         <button 
-                          className="p-1 hover:text-accent transition-colors"
+                          className="w-6 h-6 flex items-center justify-center hover:bg-slate-50 rounded-full transition-colors text-slate-400"
                           onClick={() => updateQuantity(item.id, item.quantity + 1)}
                         >
                           <Plus className="h-3 w-3"/>
@@ -152,7 +156,7 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
                   </div>
 
                   <button 
-                    className="p-2 text-background/50 hover:text-rose-500 transition-colors"
+                    className="p-2 text-slate-300 hover:text-red-500 transition-colors mt-1"
                     onClick={() => removeFromCart(item.id)}
                   >
                     <Trash2 className="h-4 w-4"/>
@@ -164,26 +168,30 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
         </div>
 
         {cartItems.length > 0 && (
-          <SheetFooter className="bg-background/5 p-6 mt-auto border-t border-background/20 backdrop-blur-sm">
-            <div className="w-full space-y-4">
-              <div className="flex justify-between items-end px-2">
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-background/60">Total</span>
-                <div className="text-4xl font-black text-accent tracking-tighter tabular-nums">
-                  {formatCurrency(cartTotal)}
+          <SheetFooter className="p-8 bg-white border-t border-slate-100 mt-auto shadow-[0_-10px_40px_rgba(0,0,0,0.02)]">
+            <div className="w-full space-y-6">
+              <div className="flex justify-between items-end">
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Total Balance</span>
+                  <div className="text-3xl font-bold text-slate-900 tracking-tight tabular-nums">
+                    {formatCurrency(cartTotal)}
+                  </div>
                 </div>
+                <div className="h-8 w-[2px] bg-slate-100 rounded-full" />
               </div>
               
               <Button
                 onClick={handlePlaceOrder}
                 disabled={isPlacingOrder}
-                className="w-full h-16 text-base font-black uppercase italic tracking-widest bg-accent text-accent-foreground hover:bg-white rounded-2xl shadow-[0_8px_0_0_hsl(var(--accent-dark))] active:shadow-none active:translate-y-1 transition-all flex items-center justify-center gap-3"
+                className="w-full h-14 text-xs font-bold uppercase tracking-widest bg-[#b73538] text-white hover:bg-[#a02e31] rounded-xl transition-all flex items-center justify-center gap-3 shadow-xl shadow-red-900/10 active:scale-95"
               >
                 {isPlacingOrder ? (
-                  <>
-                    <Loader2 className="animate-spin" /> Sending...
-                  </>
+                  <Loader2 className="animate-spin h-4 w-4" />
                 ) : (
-                  "Confirm Order"
+                  <>
+                    Confirm Order
+                    <Plus className="h-4 w-4 bg-white/20 rounded-full p-0.5" />
+                  </>
                 )}
               </Button>
             </div>
