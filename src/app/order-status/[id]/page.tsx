@@ -44,29 +44,24 @@ export default function OrderStatusPage() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const lastStatus = useRef<string>('');
 
-  // --- 1. NOTIFICATION SOUND SETUP ---
+  // 1. Audio Setup
   useEffect(() => {
     audioRef.current = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
   }, []);
 
-  // --- 2. FIREBASE & STATUS MONITORING ---
+  // 2. Firebase Listener
   useEffect(() => {
     if (!id || !firestore) return;
     const unsub = onSnapshot(doc(firestore, "orders", id), (docSnapshot) => {
       if (docSnapshot.exists()) {
         const data = docSnapshot.data();
-        
-        // Play notification if status changed
         if (lastStatus.current && lastStatus.current !== data.status) {
           audioRef.current?.play().catch(() => {});
         }
         lastStatus.current = data.status;
-
-        // Trigger 3-min timer when Served
         if (data.status === 'Served' && !isTimerRunning) {
           setIsTimerRunning(true);
         }
-        
         setStatus(data.status);
         setOrderData(data);
       }
@@ -74,32 +69,28 @@ export default function OrderStatusPage() {
     return () => unsub();
   }, [id, firestore, isTimerRunning]);
 
-  // --- 3. THE 3-MINUTE SERVED TIMER ---
+  // 3. 3-Minute Redirect Timer
   useEffect(() => {
     if (!isTimerRunning || !id) return;
     const timerKey = `expiry_${id}`;
     let expiryTime = localStorage.getItem(timerKey);
-    
     if (!expiryTime) {
-      expiryTime = (Date.now() + 180000).toString(); // 180 seconds
+      expiryTime = (Date.now() + 180000).toString();
       localStorage.setItem(timerKey, expiryTime);
     }
-
     const interval = setInterval(() => {
       const remaining = Math.max(0, Math.floor((parseInt(expiryTime!) - Date.now()) / 1000));
       setTimeLeft(remaining);
-      
       if (remaining <= 0) {
         clearInterval(interval);
         localStorage.removeItem(timerKey);
         router.push('/thanks'); 
       }
     }, 1000);
-
     return () => clearInterval(interval);
   }, [isTimerRunning, id, router]);
 
-  // --- 4. BRIGHT PASTRY RAIN GAME ---
+  // 4. Pastry Rain Game Logic (Optimized Speed & Brightness)
   useEffect(() => {
     if (!gameActive || !canvasRef.current) return;
     const canvas = canvasRef.current;
@@ -109,7 +100,6 @@ export default function OrderStatusPage() {
 
     let basketX = canvas.width / 2;
     const pastries: any[] = [];
-    // Brighter collection of pastry emojis
     const emojis = ["🥐", "🧁", "🥨", "🍩", "🍪"];
     let frame = 0;
     let animationId: number;
@@ -117,25 +107,24 @@ export default function OrderStatusPage() {
     const gameLoop = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // Draw Basket (Brighter styling)
       ctx.shadowBlur = 15;
       ctx.shadowColor = "rgba(0,0,0,0.1)";
       ctx.font = "60px serif";
       ctx.textAlign = "center";
       ctx.fillText("🧺", basketX, canvas.height - 100);
 
-      if (frame % 35 === 0) {
+      // Slower spawn rate (every 60 frames)
+      if (frame % 60 === 0) {
         pastries.push({ 
           x: Math.random() * (canvas.width - 60) + 30, 
           y: -50, 
           emoji: emojis[Math.floor(Math.random() * emojis.length)],
-          speed: 5 + Math.random() * 4 
+          speed: 2 + Math.random() * 2 // Reduced falling speed
         });
       }
 
       pastries.forEach((p, i) => {
         p.y += p.speed;
-        // Brighter/Larger items
         ctx.shadowBlur = 10;
         ctx.shadowColor = "rgba(183, 53, 56, 0.3)";
         ctx.font = "50px serif";
@@ -170,7 +159,7 @@ export default function OrderStatusPage() {
     };
   }, [gameActive]);
 
-  // --- MENU FETCHING & ACTION HANDLERS ---
+  // 5. Fetch Menu Items
   useEffect(() => {
     if (!firestore) return;
     const fetchMenu = async () => {
@@ -197,31 +186,36 @@ export default function OrderStatusPage() {
     setHelpLoading(false);
   };
 
+  // Filter: Matches search query AND must be available (in stock)
   const groupedMenu = fullMenu.reduce((acc: Record<string, any[]>, item) => {
     const cat = item.category || 'General';
-    if (!acc[cat]) acc[cat] = [];
-    if (item.name.toLowerCase().includes(searchQuery.toLowerCase())) acc[cat].push(item);
+    const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const isAvailable = item.available !== false;
+
+    if (matchesSearch && isAvailable) {
+      if (!acc[cat]) acc[cat] = [];
+      acc[cat].push(item);
+    }
     return acc;
   }, {});
 
   return (
     <div className="fixed inset-0 bg-[#FDFDFD] font-sans overflow-hidden select-none">
-      {/* GAME CANVAS - Opacity set to 1 for brightness, Z-index lowered but colors enhanced */}
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full z-10 opacity-100" />
 
-      {/* 3-MINUTE TIMER OVERLAY (Only visible when Served) */}
+      {/* Timer Overlay */}
       {isTimerRunning && (
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[60] bg-slate-900 text-white px-4 py-2 rounded-full flex items-center gap-2 shadow-2xl scale-90">
-          <span className="text-[10px] font-black uppercase tracking-widest opacity-60">Redirecting in:</span>
+          <span className="text-[10px] font-black uppercase tracking-widest opacity-60">Closing in:</span>
           <span className="font-mono font-bold text-[#facc15]">
             {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
           </span>
         </div>
       )}
 
-      {/* HEADER */}
+      {/* Header / Status Bar - Positioned Higher (top-8) */}
       <div className={cn(
-        "absolute top-16 left-1/2 -translate-x-1/2 w-[90%] max-w-md z-50 transition-all duration-700",
+        "absolute top-8 left-1/2 -translate-x-1/2 w-[90%] max-w-md z-50 transition-all duration-700",
         gameActive ? "-translate-y-40 opacity-0" : "translate-y-0 opacity-100"
       )}>
         <div className="bg-white/80 backdrop-blur-xl border border-white p-6 rounded-[2.5rem] shadow-xl shadow-black/5 flex flex-col gap-4">
@@ -237,14 +231,14 @@ export default function OrderStatusPage() {
           </div>
           <div className="flex items-center justify-center gap-2">
             <span className="text-xs font-bold text-slate-800 uppercase">
-              {status === 'Pending' ? 'Wait Approval' : status === 'Served' ? 'Enjoy your Food!' : 'Baking Delights'}
+              {status === 'Pending' ? 'Wait Approval' : status === 'Served' ? 'Order Served!' : 'Baking Delights'}
             </span>
             <Heart size={14} className="text-[#b73538] fill-[#b73538] animate-pulse" />
           </div>
         </div>
       </div>
 
-      {/* BOTTOM ACTIONS */}
+      {/* Action Buttons */}
       {!gameActive && (
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-[90%] max-w-md z-50 flex gap-4">
           <button onClick={() => setShowOrderMore(true)} className="flex-1 bg-white h-16 rounded-2xl flex items-center justify-center gap-2 shadow-xl border border-slate-100">
@@ -261,7 +255,7 @@ export default function OrderStatusPage() {
         </div>
       )}
 
-      {/* GAME OVERLAY */}
+      {/* Game Overlay */}
       {!gameActive && !showOrderMore && (
         <div className="absolute inset-0 z-40 flex flex-col items-center justify-center bg-[#FDFDFD]/40 backdrop-blur-sm p-8">
           <div className="bg-white p-10 rounded-[4rem] shadow-2xl text-center space-y-8 max-w-sm border border-slate-50">
@@ -280,14 +274,14 @@ export default function OrderStatusPage() {
         </div>
       )}
 
-      {/* GAME SCORE */}
+      {/* Score Display */}
       {gameActive && (
         <div className="absolute top-24 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center pointer-events-none">
           <span className="text-8xl font-serif italic text-[#b73538] drop-shadow-lg">{score}</span>
         </div>
       )}
 
-      {/* ORDER MORE POPUP */}
+      {/* Order More Popup - Only Showing In-Stock Items */}
       {showOrderMore && (
         <div className="absolute inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-end">
           <div className="w-full bg-[#FDFDFD] rounded-t-[3rem] p-8 border-t border-slate-100 max-h-[85vh] flex flex-col">
@@ -297,20 +291,32 @@ export default function OrderStatusPage() {
             </div>
             <div className="relative mb-6">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={16} />
-              <input type="text" placeholder="Search menu..." className="w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-2xl text-sm outline-none" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+              <input 
+                type="text" 
+                placeholder="Search available..." 
+                className="w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-2xl text-sm outline-none" 
+                value={searchQuery} 
+                onChange={(e) => setSearchQuery(e.target.value)} 
+              />
             </div>
             <div className="flex-1 overflow-y-auto space-y-6 pb-10">
-              {Object.keys(groupedMenu).map((cat) => (
-                <div key={cat} className="space-y-3">
-                  <p className="text-[10px] font-black uppercase text-[#b73538] tracking-widest">{cat}</p>
-                  {groupedMenu[cat].map((item: any) => (
-                    <button key={item.id} onClick={() => addMoreFood(item)} className="w-full flex justify-between items-center p-5 bg-white border border-slate-50 rounded-2xl shadow-sm">
-                      <span className="text-sm font-bold text-slate-700">{item.name}</span>
-                      <span className="text-xs font-black text-slate-400">₹{item.price}</span>
-                    </button>
-                  ))}
+              {Object.keys(groupedMenu).length > 0 ? (
+                Object.keys(groupedMenu).map((cat) => (
+                  <div key={cat} className="space-y-3">
+                    <p className="text-[10px] font-black uppercase text-[#b73538] tracking-widest">{cat}</p>
+                    {groupedMenu[cat].map((item: any) => (
+                      <button key={item.id} onClick={() => addMoreFood(item)} className="w-full flex justify-between items-center p-5 bg-white border border-slate-50 rounded-2xl shadow-sm active:scale-95 transition-all">
+                        <span className="text-sm font-bold text-slate-700">{item.name}</span>
+                        <span className="text-xs font-black text-slate-400">₹{item.price}</span>
+                      </button>
+                    ))}
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-10">
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">No available items found</p>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>

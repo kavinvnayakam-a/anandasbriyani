@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSessionTimer } from '@/hooks/use-session-timer';
 import { useCart } from '@/hooks/use-cart';
@@ -14,7 +14,14 @@ import type { MenuItem } from '@/lib/types';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
-import { MapPin, Clock as ClockIcon, ArrowRight, ChevronRight } from 'lucide-react';
+import { 
+  MapPin, 
+  Clock as ClockIcon, 
+  ChevronRight, 
+  Search, 
+  ArrowUp, 
+  X 
+} from 'lucide-react';
 import { cn } from "@/lib/utils";
 
 export default function CustomerView({ tableId }: { tableId: string | null, mode: 'dine-in' | 'takeaway' }) {
@@ -22,12 +29,15 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
   const { clearCart, addToCart } = useCart();
   const [isCartOpen, setCartOpen] = useState(false);
   const [showMenu, setShowMenu] = useState(!!tableId);
-  const { toast } = useToast();
   const firestore = useFirestore();
 
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('');
+  
+  // New States for Search and Scroll
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showBackToTop, setShowBackToTop] = useState(false);
 
   useEffect(() => {
     if (!firestore) return;
@@ -39,20 +49,35 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
       })) as MenuItem[];
       setMenuItems(items);
       setLoading(false);
-    }, (error) => {
-      setLoading(false);
-    });
+    }, () => setLoading(false));
     return () => unsubscribe(); 
   }, [firestore]);
+
+  // Handle Scroll for Back to Top button
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 400);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const { timeLeft } = useSessionTimer(() => {
     clearCart();
     router.push('/thanks');
   });
 
+  // Filter and Categorize Menu
   const categorizedMenu = useMemo(() => {
     const categoryOrder = ['Coffee', 'Pastries', 'Cakes', 'Sandwiches', 'Beverages', 'Swiss Specials'];
-    const grouped = menuItems.reduce((acc, item) => {
+    
+    // First, filter by search query
+    const filtered = menuItems.filter(item => 
+      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.category?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    const grouped = filtered.reduce((acc, item) => {
       const category = item.category || 'Other';
       if (!acc[category]) acc[category] = [];
       acc[category].push(item);
@@ -64,7 +89,11 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
       const indexB = categoryOrder.indexOf(b);
       return (indexA === -1 ? 99 : indexA) - (indexB === -1 ? 99 : indexB);
     }).map(cat => ({ category: cat, items: grouped[cat] }));
-  }, [menuItems]);
+  }, [menuItems, searchQuery]);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   if (loading) {
     return (
@@ -77,7 +106,6 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
     );
   }
 
-  // --- WELCOME SCREEN (TAKEAWAY) ---
   if (!showMenu && !tableId) {
     return (
       <div className="min-h-screen bg-[#FAFAFA] flex flex-col items-center justify-center p-6">
@@ -91,21 +119,21 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
 
           <div className="bg-white p-8 rounded-[3rem] shadow-xl shadow-black/5 space-y-6 text-left border border-white">
             <div className="flex items-center gap-4 group">
-              <div className="bg-red-50 p-3 rounded-2xl text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors">
+              <div className="bg-red-50 p-3 rounded-2xl text-red-600 transition-colors">
                 <MapPin size={20}/>
               </div>
               <div>
                 <p className="text-[10px] font-bold uppercase text-slate-400 tracking-tight">Location</p>
-                <p className="font-semibold text-slate-700">Vanasthalipuram, HYD</p>
+                <p className="font-semibold text-slate-700">L. B. Nagar, Hyderabad, Telangana 500074</p>
               </div>
             </div>
             <div className="flex items-center gap-4 group">
-              <div className="bg-amber-50 p-3 rounded-2xl text-amber-600 group-hover:bg-amber-600 group-hover:text-white transition-colors">
+              <div className="bg-amber-50 p-3 rounded-2xl text-amber-600 transition-colors">
                 <ClockIcon size={20}/>
               </div>
               <div>
                 <p className="text-[10px] font-bold uppercase text-slate-400 tracking-tight">Open Daily</p>
-                <p className="font-semibold text-slate-700">08:00 AM - 10:00 PM</p>
+                <p className="font-semibold text-slate-700">24hrs</p>
               </div>
             </div>
           </div>
@@ -122,37 +150,63 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
     );
   }
 
-  // --- MAIN MENU VIEW ---
   return (
     <div className="min-h-screen bg-[#FDFDFD]">
       <Header tableId={tableId || "Takeaway"} onCartClick={() => setCartOpen(true)} timeLeft={timeLeft} />
       
-      {/* Category Quick-Nav */}
-      <div className="sticky top-16 z-30 bg-white/80 backdrop-blur-md border-b border-slate-100 overflow-x-auto no-scrollbar px-4 py-4">
-        <div className="flex gap-2 max-w-5xl mx-auto">
-          {categorizedMenu.map(({ category }) => (
-            <button
-              key={category}
-              onClick={() => {
-                document.getElementById(category)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                setActiveCategory(category);
-              }}
-              className={cn(
-                "px-5 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all",
-                activeCategory === category 
-                  ? "bg-slate-900 text-white shadow-lg" 
-                  : "bg-slate-100 text-slate-500 hover:bg-slate-200"
-              )}
-            >
-              {category}
-            </button>
-          ))}
+      {/* Search and Category Quick-Nav */}
+      <div className="sticky top-16 z-30 bg-white/90 backdrop-blur-md border-b border-slate-100 px-4 py-4 space-y-4">
+        <div className="max-w-5xl mx-auto flex flex-col gap-4">
+          {/* Search Bar */}
+          <div className="relative group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-red-500 transition-colors" size={18} />
+            <input 
+              type="text"
+              placeholder="Search for delights..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full h-12 pl-12 pr-12 bg-slate-100/50 border-none rounded-2xl text-sm font-medium focus:ring-2 ring-red-500/20 transition-all outline-none"
+            />
+            {searchQuery && (
+              <button 
+                onClick={() => setSearchQuery("")}
+                className="absolute right-4 top-1/2 -translate-y-1/2 p-1 bg-slate-200 rounded-full hover:bg-slate-300 transition-colors"
+              >
+                <X size={14} className="text-slate-600" />
+              </button>
+            )}
+          </div>
+
+          {/* Categories */}
+          {!searchQuery && (
+            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+              {categorizedMenu.map(({ category }) => (
+                <button
+                  key={category}
+                  onClick={() => {
+                    document.getElementById(category)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    setActiveCategory(category);
+                  }}
+                  className={cn(
+                    "px-5 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all",
+                    activeCategory === category 
+                      ? "bg-slate-900 text-white shadow-lg" 
+                      : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                  )}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
       <main className="max-w-5xl mx-auto px-4 py-12 pb-40">
         <header className="mb-12">
-          <h1 className="text-4xl font-serif italic text-slate-900">Our Menu</h1>
+          <h1 className="text-4xl font-serif italic text-slate-900">
+            {searchQuery ? `Results for "${searchQuery}"` : "Our Menu"}
+          </h1>
           <div className="flex items-center gap-2 mt-2">
             <span className="w-8 h-[2px] bg-red-500" />
             <p className="text-slate-400 font-medium text-xs uppercase tracking-widest">
@@ -162,23 +216,49 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
         </header>
 
         <div className="space-y-16">
-          {categorizedMenu.map(({ category, items }) => (
-            <section key={category} id={category} className="scroll-mt-40">
-              <h3 className="text-xl font-bold text-slate-800 mb-8 flex items-center gap-4">
-                {category}
-                <span className="h-px flex-1 bg-slate-100" />
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {items.map((item) => (
-                  <div key={item.id} className="transition-transform duration-300 hover:-translate-y-1">
-                    <MenuItemCard item={item} onAddToCart={addToCart} />
-                  </div>
-                ))}
+          {categorizedMenu.length > 0 ? (
+            categorizedMenu.map(({ category, items }) => (
+              <section key={category} id={category} className="scroll-mt-48">
+                <h3 className="text-xl font-bold text-slate-800 mb-8 flex items-center gap-4">
+                  {category}
+                  <span className="h-px flex-1 bg-slate-100" />
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {items.map((item) => (
+                    <div key={item.id}>
+                      <MenuItemCard item={item} onAddToCart={addToCart} />
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ))
+          ) : (
+            <div className="py-20 text-center space-y-4">
+              <div className="inline-block p-6 bg-slate-50 rounded-full">
+                <Search size={40} className="text-slate-200" />
               </div>
-            </section>
-          ))}
+              <p className="text-slate-500 font-medium italic">We couldn't find any items matching "{searchQuery}"</p>
+              <button 
+                onClick={() => setSearchQuery("")}
+                className="text-red-500 text-sm font-bold uppercase tracking-widest hover:underline"
+              >
+                Clear Search
+              </button>
+            </div>
+          )}
         </div>
       </main>
+
+      {/* Back to Top Button */}
+      <button
+        onClick={scrollToTop}
+        className={cn(
+          "fixed bottom-28 right-6 z-[60] p-4 bg-white border border-slate-100 shadow-2xl rounded-full text-slate-900 transition-all duration-500",
+          showBackToTop ? "translate-y-0 opacity-100 scale-100" : "translate-y-20 opacity-0 scale-50"
+        )}
+      >
+        <ArrowUp size={24} strokeWidth={2.5} />
+      </button>
 
       <footer className="bg-white border-t border-slate-100 py-16 px-6">
         <div className="max-w-5xl mx-auto flex flex-col items-center gap-8">
