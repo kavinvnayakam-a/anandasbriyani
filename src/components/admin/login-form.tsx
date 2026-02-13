@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState } from "react";
@@ -45,13 +46,13 @@ export default function LoginForm() {
         <Button 
           onClick={handleDevLogin} 
           disabled={isLoading} 
-          className="w-full h-16 text-lg font-black uppercase tracking-widest bg-slate-900 hover:bg-slate-800 text-white rounded-2xl shadow-[4px_4px_0px_0px_hsl(var(--primary))] active:shadow-none active:translate-y-1 transition-all"
+          className="w-full h-16 text-lg font-black uppercase tracking-widest bg-primary hover:bg-red-700 text-white rounded-2xl shadow-[4px_4px_0px_0px_#1e293b] active:shadow-none active:translate-y-1 transition-all border-none"
         >
           {isLoading ? (
             <Loader2 className="mr-2 h-6 w-6 animate-spin" />
           ) : (
             <>
-              <Unlock className="mr-2 h-6 w-6 text-primary" />
+              <Unlock className="mr-2 h-6 w-6 text-white" />
               Enter Dashboard
             </>
           )}

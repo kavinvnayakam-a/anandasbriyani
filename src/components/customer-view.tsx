@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useMemo, useEffect } from 'react';
@@ -109,8 +110,8 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
       <div className="min-h-screen bg-orange-50/50 flex flex-col items-center justify-center p-6">
         <div className="max-w-sm w-full space-y-12 text-center">
           <div className="space-y-6">
-            <div className="relative inline-block p-1 bg-white rounded-full shadow-2xl ring-4 ring-primary/10">
-              <Image src={LOGO_URL} alt="Dasara Logo" width={100} height={100} className="rounded-full" priority />
+            <div className="relative inline-block p-1.5 bg-white rounded-full shadow-2xl ring-2 ring-primary/10">
+              <Image src={LOGO_URL} alt="Dasara Logo" width={80} height={80} className="rounded-full" priority />
             </div>
             <div className="space-y-2">
               <h2 className="text-4xl font-serif italic text-slate-900 leading-tight">Authentic Flavors,</h2>
@@ -141,7 +142,7 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
 
           <button 
             onClick={() => setShowMenu(true)}
-            className="w-full bg-primary text-white py-6 rounded-full font-black uppercase tracking-widest shadow-xl shadow-orange-900/10 flex items-center justify-center gap-3 hover:bg-orange-600 transition-all transform active:scale-95"
+            className="w-full bg-primary text-white py-6 rounded-full font-black uppercase tracking-widest shadow-xl shadow-orange-900/10 flex items-center justify-center gap-3 hover:bg-red-700 transition-all transform active:scale-95"
           >
             Explore Menu
             <ChevronRight size={20} />
@@ -233,7 +234,7 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
             categorizedMenu.map(({ category, items }) => (
               <section key={category} id={category} className="scroll-mt-48">
                 <div className="flex items-center gap-6 mb-10">
-                  <div className="dasara-banner bg-slate-900 px-10 py-4 text-white">
+                  <div className="dasara-banner bg-primary px-10 py-4 text-white">
                     <h3 className="text-sm font-serif italic font-black uppercase tracking-[0.2em]">
                       {category}
                     </h3>
@@ -262,7 +263,7 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
               </div>
               <button 
                 onClick={() => setSearchQuery("")} 
-                className="inline-flex items-center gap-2 bg-primary text-white px-8 py-3 rounded-full font-black text-[10px] uppercase tracking-[0.2em] hover:bg-orange-600 transition-all"
+                className="inline-flex items-center gap-2 bg-primary text-white px-8 py-3 rounded-full font-black text-[10px] uppercase tracking-[0.2em] hover:bg-red-700 transition-all"
               >
                 Reset Search <ChevronRight size={14} />
               </button>
@@ -283,12 +284,12 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
 
       <footer className="bg-white border-t border-orange-100 py-16 px-6">
         <div className="max-w-5xl mx-auto flex flex-col items-center gap-10">
-          <div className="relative p-1 bg-white rounded-full shadow-2xl ring-4 ring-primary/5">
+          <div className="relative p-1.5 bg-white rounded-full shadow-2xl ring-2 ring-primary/5">
             <Image 
               src={LOGO_URL} 
               alt="Dasara Logo" 
-              width={80} 
-              height={80} 
+              width={60} 
+              height={60} 
               className="rounded-full" 
             />
           </div>

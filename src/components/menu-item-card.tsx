@@ -1,3 +1,4 @@
+
 "use client"
 
 import Image from "next/image";
@@ -88,7 +89,7 @@ export function MenuItemCard({ item, onAddToCart, globalShowImages = true }: Men
               "dasara-banner relative z-10 w-full h-16 flex items-center justify-center gap-3 transition-all duration-500 font-black uppercase tracking-[0.2em] text-[10px]",
               isSoldOut 
                 ? "bg-orange-50 text-orange-200 cursor-not-allowed" 
-                : "bg-primary text-white shadow-xl hover:bg-orange-600 hover:translate-y-[-2px] active:translate-y-0 shadow-orange-900/10"
+                : "bg-primary text-white shadow-xl hover:bg-red-700 hover:translate-y-[-2px] active:translate-y-0 shadow-orange-900/10"
             )}
           >
             {isSoldOut ? (

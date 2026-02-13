@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -23,8 +24,8 @@ export default function TableSelection() {
           <div className="mx-auto bg-primary text-white w-fit px-8 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.4em] mb-6 shadow-lg shadow-orange-900/20">
             NAMASKARAM
           </div>
-          <div className="relative inline-block mx-auto p-1 bg-white rounded-full shadow-2xl ring-4 ring-primary/10 mb-6">
-            <Image src={LOGO_URL} alt="Dasara Fine Dine" width={100} height={100} className="rounded-full" priority />
+          <div className="relative inline-block mx-auto p-1.5 bg-white rounded-full shadow-2xl ring-2 ring-primary/10 mb-6">
+            <Image src={LOGO_URL} alt="Dasara Fine Dine" width={80} height={80} className="rounded-full" priority />
           </div>
           <div className="space-y-2">
             <h2 className="text-3xl font-serif italic text-slate-900">Welcome to Dasara</h2>
@@ -44,7 +45,7 @@ export default function TableSelection() {
                   dasara-banner h-20 text-3xl font-black italic
                   bg-primary text-white
                   transition-all duration-300
-                  hover:bg-orange-600 hover:shadow-xl hover:translate-y-[-4px]
+                  hover:bg-red-700 hover:shadow-xl hover:translate-y-[-4px]
                   active:translate-y-0 shadow-orange-900/10
                 "
               >
