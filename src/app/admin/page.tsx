@@ -6,6 +6,7 @@ import MenuManager from "@/components/admin/menu-manager";
 import OrderManager from "@/components/admin/order-manager"; 
 import AnalyticsDashboard from "@/components/admin/analytics-dashboard";
 import OrderHistory from "@/components/admin/order-history"; 
+import AiMenuImporter from "@/components/admin/ai-menu-importer";
 import { useFirestore } from "@/firebase";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { 
@@ -19,7 +20,8 @@ import {
   TrendingUp,
   Settings,
   ShieldCheck,
-  Database
+  Database,
+  Sparkles
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -28,7 +30,7 @@ import { pushLocalMenuToFirestore } from "@/lib/sync-menu";
 import Image from "next/image";
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState<'orders' | 'history' | 'menu' | 'analytics'>('orders');
+  const [activeTab, setActiveTab] = useState<'orders' | 'history' | 'menu' | 'analytics' | 'ai-import'>('orders');
   const [takeawayCount, setTakeawayCount] = useState(0);
   const firestore = useFirestore();
   const { toast } = useToast();
@@ -119,23 +121,6 @@ export default function AdminDashboard() {
             <span className="hidden md:inline">History</span>
           </button>
 
-          <div className="hidden md:block px-2 py-2 mt-2">
-            <div className="bg-slate-800/50 rounded-2xl p-4 border border-slate-700/50">
-               <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <ShoppingBag className="w-4 h-4 text-primary" />
-                    <span className="text-[9px] font-black uppercase tracking-tighter text-slate-400">Takeaways</span>
-                  </div>
-                  <span className={cn(
-                    "text-[10px] font-black px-2 py-0.5 rounded-lg",
-                    takeawayCount > 0 ? 'bg-primary text-white animate-pulse' : 'bg-slate-700 text-slate-500'
-                  )}>
-                    {takeawayCount}
-                  </span>
-               </div>
-            </div>
-          </div>
-
           <button 
             onClick={() => setActiveTab('menu')}
             className={cn(
@@ -147,6 +132,20 @@ export default function AdminDashboard() {
           >
             <Coffee className="w-4 h-4" />
             <span className="hidden md:inline">Dasara Menu</span>
+          </button>
+
+          <button 
+            onClick={() => setActiveTab('ai-import')}
+            className={cn(
+              "flex items-center gap-3 p-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all relative overflow-hidden",
+              activeTab === 'ai-import' 
+              ? "bg-primary text-white shadow-lg shadow-orange-900/40" 
+              : "text-slate-400 hover:bg-slate-800 hover:text-white"
+            )}
+          >
+            <Sparkles className="w-4 h-4" />
+            <span className="hidden md:inline">AI Importer</span>
+            <div className="absolute top-0 right-0 bg-red-500 text-[6px] px-1 py-0.5 font-black uppercase">New</div>
           </button>
 
           <button 
@@ -180,7 +179,7 @@ export default function AdminDashboard() {
                 Dasara / {activeTab}
               </span>
               <h2 className="text-3xl font-serif italic text-slate-900 leading-none capitalize">
-                {activeTab === 'orders' ? 'Live Tickets' : activeTab === 'menu' ? 'Fine Dine Menu' : activeTab === 'history' ? 'Archives' : 'Business Insights'}
+                {activeTab === 'orders' ? 'Live Tickets' : activeTab === 'menu' ? 'Fine Dine Menu' : activeTab === 'history' ? 'Archives' : activeTab === 'ai-import' ? 'AI Menu Generation' : 'Business Insights'}
               </h2>
             </div>
 
@@ -201,7 +200,7 @@ export default function AdminDashboard() {
                 className="bg-primary hover:bg-orange-600 text-white border-none text-[10px] font-black uppercase shadow-lg shadow-orange-900/40"
               >
                 <Database className={`mr-2 h-4 w-4 ${isSyncing ? 'animate-spin' : ''}`}/> 
-                {isSyncing ? 'Syncing...' : 'Sync Dasara Data'}
+                {isSyncing ? 'Syncing...' : 'Sync Local Data'}
               </Button>
 
               <button className="p-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl relative hover:bg-slate-50 transition-colors">
@@ -234,6 +233,12 @@ export default function AdminDashboard() {
             {activeTab === 'menu' && (
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <MenuManager />
+              </div>
+            )}
+
+            {activeTab === 'ai-import' && (
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <AiMenuImporter />
               </div>
             )}
 
