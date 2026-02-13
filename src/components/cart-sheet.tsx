@@ -64,8 +64,8 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
 
       toast({
         title: `Order #${orderNumber} Confirmed!`,
-        description: "Your Swiss delights are being prepared.",
-        className: "bg-[#b73538] text-white border-none shadow-2xl",
+        description: "Dasara's chef has started preparing your feast.",
+        className: "bg-primary text-white border-none shadow-2xl",
       });
 
       clearCart();
@@ -87,16 +87,16 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
       <SheetContent 
         side="right" 
-        className="flex flex-col bg-[#FDFDFD] border-l border-slate-100 w-[90vw] sm:max-w-md p-0 overflow-hidden"
+        className="flex flex-col bg-orange-50 border-l border-orange-100 w-[90vw] sm:max-w-md p-0 overflow-hidden"
       >
-        <SheetHeader className="p-8 border-b border-slate-50 bg-white">
+        <SheetHeader className="p-8 border-b border-orange-50 bg-white">
           <SheetTitle className="text-2xl font-bold text-slate-900 flex items-center justify-between">
             <div className="flex flex-col">
-              <span className="text-xs font-black uppercase tracking-[0.2em] text-[#b73538] mb-1">Your Order</span>
-              <span className="font-serif italic">{tableId ? `Table ${tableId}` : 'Takeaway'}</span>
+              <span className="text-xs font-black uppercase tracking-[0.2em] text-primary mb-1">Your Selection</span>
+              <span className="font-serif italic">{tableId ? `Table ${tableId}` : 'Takeaway Order'}</span>
             </div>
-            <div className="bg-slate-50 p-3 rounded-2xl">
-              <ShoppingBag className="text-[#b73538] h-5 w-5" />
+            <div className="bg-orange-50 p-3 rounded-2xl">
+              <ShoppingBag className="text-primary h-5 w-5" />
             </div>
           </SheetTitle>
         </SheetHeader>
@@ -104,10 +104,10 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
         <div className="flex-1 overflow-y-auto px-6 py-4">
           {cartItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full space-y-4">
-              <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-2">
-                <ShoppingBag size={32} className="text-slate-200" />
+              <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mb-2">
+                <ShoppingBag size={32} className="text-orange-300" />
               </div>
-              <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Your bag is empty</p>
+              <p className="text-orange-400 font-bold uppercase tracking-widest text-[10px]">Your tray is empty</p>
             </div>
           ) : (
             <div className="space-y-6 pt-4">
@@ -119,11 +119,11 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
                         src={item.image} 
                         alt={item.name} 
                         fill 
-                        className="rounded-xl object-cover border border-slate-100"
+                        className="rounded-xl object-cover border border-orange-100"
                       />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center rounded-xl bg-slate-50 border border-slate-100">
-                        <ImageIcon className="h-6 w-6 text-slate-200" />
+                      <div className="flex h-full w-full items-center justify-center rounded-xl bg-orange-50 border border-orange-100">
+                        <ImageIcon className="h-6 w-6 text-orange-200" />
                       </div>
                     )}
                   </div>
@@ -132,21 +132,21 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
                     <p className="font-bold text-slate-800 text-sm leading-tight truncate">
                       {item.name}
                     </p>
-                    <p className="text-[#b73538] font-bold text-xs mt-1">
+                    <p className="text-primary font-bold text-xs mt-1">
                       {formatCurrency(item.price)}
                     </p>
                     
                     <div className="flex items-center gap-3 mt-3">
-                      <div className="flex items-center bg-white rounded-full border border-slate-100 p-1 shadow-sm">
+                      <div className="flex items-center bg-white rounded-full border border-orange-100 p-1 shadow-sm">
                         <button 
-                          className="w-6 h-6 flex items-center justify-center hover:bg-slate-50 rounded-full transition-colors text-slate-400"
+                          className="w-6 h-6 flex items-center justify-center hover:bg-orange-50 rounded-full transition-colors text-slate-400"
                           onClick={() => updateQuantity(item.id, item.quantity - 1)}
                         >
                           <Minus className="h-3 w-3"/>
                         </button>
                         <span className="w-8 text-center font-bold text-xs text-slate-700 tabular-nums">{item.quantity}</span>
                         <button 
-                          className="w-6 h-6 flex items-center justify-center hover:bg-slate-50 rounded-full transition-colors text-slate-400"
+                          className="w-6 h-6 flex items-center justify-center hover:bg-orange-50 rounded-full transition-colors text-slate-400"
                           onClick={() => updateQuantity(item.id, item.quantity + 1)}
                         >
                           <Plus className="h-3 w-3"/>
@@ -168,28 +168,28 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
         </div>
 
         {cartItems.length > 0 && (
-          <SheetFooter className="p-8 bg-white border-t border-slate-100 mt-auto shadow-[0_-10px_40px_rgba(0,0,0,0.02)]">
+          <SheetFooter className="p-8 bg-white border-t border-orange-100 mt-auto shadow-[0_-10px_40px_rgba(0,0,0,0.02)]">
             <div className="w-full space-y-6">
               <div className="flex justify-between items-end">
                 <div className="flex flex-col">
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Total Balance</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Grand Total</span>
                   <div className="text-3xl font-bold text-slate-900 tracking-tight tabular-nums">
                     {formatCurrency(cartTotal)}
                   </div>
                 </div>
-                <div className="h-8 w-[2px] bg-slate-100 rounded-full" />
+                <div className="h-8 w-[2px] bg-orange-100 rounded-full" />
               </div>
               
               <Button
                 onClick={handlePlaceOrder}
                 disabled={isPlacingOrder}
-                className="w-full h-14 text-xs font-bold uppercase tracking-widest bg-[#b73538] text-white hover:bg-[#a02e31] rounded-xl transition-all flex items-center justify-center gap-3 shadow-xl shadow-red-900/10 active:scale-95"
+                className="w-full h-14 text-xs font-bold uppercase tracking-widest bg-primary text-white hover:bg-orange-600 rounded-xl transition-all flex items-center justify-center gap-3 shadow-xl shadow-orange-900/10 active:scale-95"
               >
                 {isPlacingOrder ? (
                   <Loader2 className="animate-spin h-4 w-4" />
                 ) : (
                   <>
-                    Confirm Order
+                    Confirm Dining Order
                     <Plus className="h-4 w-4 bg-white/20 rounded-full p-0.5" />
                   </>
                 )}

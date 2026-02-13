@@ -5,8 +5,8 @@ import { CartProvider } from '@/context/cart-context';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 
 export const metadata: Metadata = {
-  title: 'Swiss Delight',
-  description: 'Exquisite pastries, coffee, and Swiss confections.',
+  title: 'Dasara Fine Dine',
+  description: 'Exquisite flavors and premium dining experience.',
   robots: {
     index: false,
     follow: false,
@@ -23,10 +23,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Define the config on the server.
-  // During production builds, environment variables might be unavailable.
-  // We use placeholder values to allow the build to succeed.
-  // At runtime on App Hosting, these will be correctly injected from Secret Manager.
   const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "build-time-placeholder",
     authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "build-time-placeholder",
@@ -44,7 +40,6 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased font-bold">
-        {/* Pass the server-side config to the client provider */}
         <FirebaseClientProvider config={firebaseConfig}>
           <CartProvider>
             {children}

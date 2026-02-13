@@ -11,12 +11,11 @@ export const useSessionTimer = (onTimeout: () => void) => {
   const hasTimedOut = useRef(false);
 
   useEffect(() => {
-    // 1. Get or Set the session start time in LocalStorage
-    let sessionStartTime = localStorage.getItem('grillicious_session_start');
+    let sessionStartTime = localStorage.getItem('dasara_session_start');
     
     if (!sessionStartTime) {
       sessionStartTime = Date.now().toString();
-      localStorage.setItem('grillicious_session_start', sessionStartTime);
+      localStorage.setItem('dasara_session_start', sessionStartTime);
     }
 
     const startTime = parseInt(sessionStartTime);
@@ -40,19 +39,16 @@ export const useSessionTimer = (onTimeout: () => void) => {
     }, 1000);
 
     const handleExpiry = () => {
-      // Clear storage so the next QR scan starts fresh
-      localStorage.removeItem('grillicious_session_start');
+      localStorage.removeItem('dasara_session_start');
       
       toast({
-        title: "Session Expired",
-        description: "Your 10-minute session has ended. Redirecting...",
+        title: "Dining Session Expired",
+        description: "Your session at Dasara has ended. Thank you for visiting.",
         variant: "destructive",
       });
 
-      // Execute the provided cleanup (like clearing the cart)
       onTimeout();
 
-      // Redirect to home/scan page
       setTimeout(() => {
         window.location.href = '/';
       }, 2000);
