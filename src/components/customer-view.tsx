@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useMemo, useEffect } from 'react';
@@ -59,13 +60,13 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Session timer active for tracking demo conclude
   const { timeLeft } = useSessionTimer(() => {
-    clearCart();
-    router.push('/thanks');
+    console.log("Demo session concluded");
   });
 
   const categorizedMenu = useMemo(() => {
-    // Prioritize Cinematic Combos in the first line
+    // Cinematic Combos ALWAYS at the first line
     const categoryOrder = ['Cinematic Combos', 'Cinematic Specials', 'Popcorn & Snacks', 'Appetizers', 'Main Course', 'Desserts', 'Beverages'];
     
     const filtered = menuItems.filter(item => 

@@ -19,14 +19,16 @@ import {
   BellRing, 
   X, 
   Search,
-  Heart,
   Film,
   Ticket,
-  ChevronRight
+  ChevronRight,
+  Clock
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import Image from 'next/image';
 import placeholderData from '@/app/lib/placeholder-images.json';
+import { useSessionTimer } from '@/hooks/use-session-timer';
+import SessionTimer from '@/components/session-timer';
 
 export default function OrderStatusPage() {
   const router = useRouter();
@@ -43,6 +45,11 @@ export default function OrderStatusPage() {
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const lastStatus = useRef<string>('');
+
+  const { timeLeft } = useSessionTimer(() => {
+    // Optional: Logic when the 3-min demo timer ends
+    console.log("Session demo concluded");
+  });
 
   useEffect(() => {
     audioRef.current = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
@@ -113,14 +120,19 @@ export default function OrderStatusPage() {
         <div className="max-w-md mx-auto px-6 pt-12 space-y-10">
           
           {/* Order Status Header */}
-          <div className="bg-zinc-900/80 backdrop-blur-xl border border-primary/20 p-8 rounded-[2.5rem] shadow-2xl space-y-6">
-            <div className="flex justify-between items-center">
+          <div className="bg-zinc-900/80 backdrop-blur-xl border border-primary/20 p-8 rounded-[2.5rem] shadow-2xl space-y-6 relative overflow-hidden">
+            <div className="flex justify-between items-center relative z-10">
               <div className="flex flex-col">
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-1">Live Order</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-1">Live Ticket</span>
                 <span className="text-xl font-black italic uppercase text-white">#{orderData?.orderNumber}</span>
               </div>
-              <div className="bg-primary/10 px-4 py-2 rounded-xl border border-primary/20">
-                <span className="text-[10px] font-black uppercase text-primary tracking-widest">{orderData?.tableId}</span>
+              <div className="flex flex-col items-end gap-1">
+                <div className="bg-primary/10 px-4 py-2 rounded-xl border border-primary/20">
+                  <span className="text-[10px] font-black uppercase text-primary tracking-widest">{orderData?.tableId}</span>
+                </div>
+                <div className="flex items-center gap-2 mt-2 px-3 py-1 bg-black/40 rounded-full border border-primary/10 shadow-[0_0_10px_rgba(212,175,55,0.2)]">
+                  <SessionTimer timeLeft={timeLeft} />
+                </div>
               </div>
             </div>
 

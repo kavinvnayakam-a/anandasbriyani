@@ -3,25 +3,25 @@
   "movies": [
     {
       "id": "m1",
-      "url": "https://picsum.photos/seed/art1/400/600",
+      "url": "https://picsum.photos/seed/gladiator2/400/600",
       "title": "Gladiator II",
       "hint": "movie poster"
     },
     {
       "id": "m2",
-      "url": "https://picsum.photos/seed/art2/400/600",
+      "url": "https://picsum.photos/seed/wicked/400/600",
       "title": "Wicked",
       "hint": "movie poster"
     },
     {
       "id": "m3",
-      "url": "https://picsum.photos/seed/art3/400/600",
+      "url": "https://picsum.photos/seed/moana2/400/600",
       "title": "Moana 2",
       "hint": "movie poster"
     },
     {
       "id": "m4",
-      "url": "https://picsum.photos/seed/art4/400/600",
+      "url": "https://picsum.photos/seed/mufasa/400/600",
       "title": "Mufasa",
       "hint": "movie poster"
     }
@@ -29,7 +29,7 @@
   "ads": [
     {
       "id": "ad1",
-      "url": "https://picsum.photos/seed/ad1/800/400",
+      "url": "https://picsum.photos/seed/goldclass/800/400",
       "title": "Upgrade to Gold Class",
       "hint": "cinema luxury"
     }
