@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState } from "react";
@@ -29,17 +28,17 @@ export default function LoginForm() {
           <ShieldCheck className="w-8 h-8 text-primary" />
         </div>
         <CardTitle className="text-4xl font-black uppercase italic tracking-tighter text-slate-900 leading-none">
-          Dasara Portal
+          Cinema Portal
         </CardTitle>
         <CardDescription className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-3">
-          Dasara Fine Dine Restaurant
+          ART Cinemas Management
         </CardDescription>
       </CardHeader>
 
       <CardContent className="p-8 space-y-6">
         <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-4 text-center">
           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">
-            Login restricted to Dasara authorized staff only.
+            Login restricted to authorized ART Cinemas staff.
           </p>
         </div>
 
@@ -59,7 +58,7 @@ export default function LoginForm() {
         </Button>
         
         <p className="text-[9px] text-center text-slate-400 font-bold uppercase tracking-widest">
-          Dasara Management System v1.0
+          ART Cinemas System v1.0
         </p>
       </CardContent>
     </Card>

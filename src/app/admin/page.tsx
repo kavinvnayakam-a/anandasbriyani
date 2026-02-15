@@ -21,13 +21,16 @@ import {
   Settings,
   ShieldCheck,
   Database,
-  Sparkles
+  Sparkles,
+  Film
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { pushLocalMenuToFirestore } from "@/lib/sync-menu";
 import Image from "next/image";
+
+const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/dasara-finedine.firebasestorage.app/o/Art%20Cinemas%20Logo.jpeg?alt=media&token=0e8ee706-4ba1-458d-b2b9-d85434f8f2ba";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<'orders' | 'history' | 'menu' | 'analytics' | 'ai-import'>('orders');
@@ -98,7 +101,7 @@ export default function AdminDashboard() {
       });
       return;
     }
-    if (!confirm("Overwrite cloud menu with local Dasara data?")) {
+    if (!confirm("Overwrite cloud menu with local ART Cinemas data?")) {
       return;
     }
     setIsSyncing(true);
@@ -107,7 +110,7 @@ export default function AdminDashboard() {
 
     if (result.success) {
       toast({
-        title: "Dasara Sync Successful",
+        title: "Sync Successful",
         description: `Uploaded ${result.count} items.`,
         className: "bg-emerald-600 text-white border-b-4 border-zinc-900",
       });
@@ -127,10 +130,10 @@ export default function AdminDashboard() {
         
         <div className="hidden md:flex flex-col items-center py-10 border-b border-slate-800">
           <div className="bg-white p-1 rounded-full mb-4 shadow-lg overflow-hidden w-16 h-16 relative border-2 border-primary">
-             <Image src="https://firebasestorage.googleapis.com/v0/b/swissdelights-2a272.firebasestorage.app/o/Dasara%20Fine%20Dine.jpg?alt=media&token=b7591bfd-13ee-4d28-b8c0-278f3662c5b7" alt="Dasara" fill className="object-cover" />
+             <Image src={LOGO_URL} alt="ART Cinemas" fill className="object-cover" />
           </div>
-          <h1 className="text-sm font-black uppercase tracking-[0.3em] text-white">Dasara</h1>
-          <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-1">Management Portal</p>
+          <h1 className="text-sm font-black uppercase tracking-[0.3em] text-white">ART Cinemas</h1>
+          <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-1">Admin Dashboard</p>
         </div>
 
         <div className="flex md:flex-col flex-1 justify-around md:justify-start gap-1 p-4 md:p-3 mt-4">
@@ -169,8 +172,8 @@ export default function AdminDashboard() {
               : "text-slate-400 hover:bg-slate-800 hover:text-white"
             )}
           >
-            <Coffee className="w-4 h-4" />
-            <span className="hidden md:inline">Dasara Menu</span>
+            <Film className="w-4 h-4" />
+            <span className="hidden md:inline">Cinema Menu</span>
           </button>
 
           <button 
@@ -197,7 +200,7 @@ export default function AdminDashboard() {
             )}
           >
             <TrendingUp className="w-4 h-4" />
-            <span className="hidden md:inline">Insights</span>
+            <span className="hidden md:inline">Analytics</span>
           </button>
         </div>
 
@@ -215,10 +218,10 @@ export default function AdminDashboard() {
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-1">
-                Dasara / {activeTab}
+                ART Cinemas / {activeTab}
               </span>
               <h2 className="text-3xl font-serif italic text-slate-900 leading-none capitalize">
-                {activeTab === 'orders' ? 'Live Tickets' : activeTab === 'menu' ? 'Fine Dine Menu' : activeTab === 'history' ? 'Archives' : activeTab === 'ai-import' ? 'AI Menu Generation' : 'Business Insights'}
+                {activeTab === 'orders' ? 'Live Tickets' : activeTab === 'menu' ? 'Cinema Menu' : activeTab === 'history' ? 'Archives' : activeTab === 'ai-import' ? 'AI Menu Generation' : 'Business Insights'}
               </h2>
             </div>
 
@@ -292,7 +295,7 @@ export default function AdminDashboard() {
         <footer className="py-10 px-10 bg-white border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
               <ShieldCheck className="text-slate-300 w-5 h-5" />
-              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Dasara Admin Secure Session</span>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">ART Cinemas Admin Session</span>
             </div>
             
             <Link href="https://www.getpik.in/" target="_blank" className="group flex flex-col items-center gap-2">

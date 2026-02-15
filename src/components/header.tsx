@@ -5,6 +5,8 @@ import Image from 'next/image';
 import { Clock, ShoppingBag } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
+const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/dasara-finedine.firebasestorage.app/o/Art%20Cinemas%20Logo.jpeg?alt=media&token=0e8ee706-4ba1-458d-b2b9-d85434f8f2ba";
+
 type HeaderProps = {
   tableId: string | null;
   onCartClick: () => void;
@@ -30,8 +32,8 @@ export function Header({ tableId, timeLeft }: HeaderProps) {
             border-2 border-white
           ">
             <Image 
-              src="https://firebasestorage.googleapis.com/v0/b/swissdelights-2a272.firebasestorage.app/o/Dasara%20Fine%20Dine.jpg?alt=media&token=b7591bfd-13ee-4d28-b8c0-278f3662c5b7" 
-              alt="Dasara Logo" 
+              src={LOGO_URL} 
+              alt="ART Cinemas Logo" 
               width={40} 
               height={40} 
               className="object-cover"
@@ -64,7 +66,7 @@ export function Header({ tableId, timeLeft }: HeaderProps) {
                 <ShoppingBag size={18} />
               ) : (
                 <>
-                  <span className="text-[8px] font-bold uppercase opacity-60 leading-none">Tbl</span>
+                  <span className="text-[8px] font-bold uppercase opacity-60 leading-none">Seat</span>
                   <span className="text-sm font-black tracking-tight">{tableId}</span>
                 </>
               )}
@@ -74,7 +76,7 @@ export function Header({ tableId, timeLeft }: HeaderProps) {
               <div className="flex items-center gap-1.5 mb-0.5">
                 <Clock size={10} className="text-white animate-pulse" />
                 <span className="text-[10px] font-black text-white/70 uppercase tracking-widest">
-                  {isTakeaway ? "Order Session" : "Time Left"}
+                  {isTakeaway ? "Theater Session" : "Show Time Left"}
                 </span>
               </div>
               <div className="text-white font-mono font-black text-sm leading-none tabular-nums drop-shadow-sm">

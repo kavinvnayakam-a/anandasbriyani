@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useMemo, useEffect } from 'react';
@@ -25,7 +24,7 @@ import {
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
-const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/swissdelights-2a272.firebasestorage.app/o/Dasara%20Fine%20Dine.jpg?alt=media&token=b7591bfd-13ee-4d28-b8c0-278f3662c5b7";
+const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/dasara-finedine.firebasestorage.app/o/Art%20Cinemas%20Logo.jpeg?alt=media&token=0e8ee706-4ba1-458d-b2b9-d85434f8f2ba";
 
 export default function CustomerView({ tableId }: { tableId: string | null, mode: 'dine-in' | 'takeaway' }) {
   const router = useRouter();
@@ -69,7 +68,7 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
   });
 
   const categorizedMenu = useMemo(() => {
-    const categoryOrder = ['Dasara Specials', 'Starters', 'Biryani & Rice', 'Burgers and Sandwiches', 'Pasta\'s', 'Dessert', 'Beverages'];
+    const categoryOrder = ['Cinematic Specials', 'Popcorn & Snacks', 'Appetizers', 'Main Course', 'Desserts', 'Beverages'];
     
     const filtered = menuItems.filter(item => 
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -99,7 +98,7 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
       <div className="min-h-screen bg-orange-50 flex items-center justify-center">
         <div className="relative flex flex-col items-center">
           <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-          <p className="mt-4 text-sm font-black text-primary animate-pulse tracking-widest uppercase">Dasara Fine Dine</p>
+          <p className="mt-4 text-sm font-black text-primary animate-pulse tracking-widest uppercase">ART Cinemas</p>
         </div>
       </div>
     );
@@ -111,11 +110,11 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
         <div className="max-w-sm w-full space-y-12 text-center">
           <div className="space-y-6">
             <div className="relative inline-block p-1.5 bg-white rounded-full shadow-2xl ring-2 ring-primary/10">
-              <Image src={LOGO_URL} alt="Dasara Logo" width={80} height={80} className="rounded-full" priority />
+              <Image src={LOGO_URL} alt="ART Cinemas Logo" width={80} height={80} className="rounded-full" priority />
             </div>
             <div className="space-y-2">
-              <h2 className="text-4xl font-serif italic text-slate-900 leading-tight">Authentic Flavors,</h2>
-              <p className="text-primary font-black uppercase tracking-[0.3em] text-xs">Exquisite Fine Dine</p>
+              <h2 className="text-4xl font-serif italic text-slate-900 leading-tight">Elevated Flavors,</h2>
+              <p className="text-primary font-black uppercase tracking-[0.3em] text-xs">Premium Cinema Dining</p>
             </div>
           </div>
 
@@ -126,7 +125,7 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
               </div>
               <div>
                 <p className="text-[10px] font-black uppercase text-slate-400 tracking-tight">Location</p>
-                <p className="font-bold text-slate-800">L. B. Nagar, Hyderabad</p>
+                <p className="font-bold text-slate-800">Premium Cinemas Worldwide</p>
               </div>
             </div>
             <div className="flex items-center gap-4 group">
@@ -134,8 +133,8 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
                 <ClockIcon size={20}/>
               </div>
               <div>
-                <p className="text-[10px] font-black uppercase text-slate-400 tracking-tight">Open Daily</p>
-                <p className="font-bold text-slate-800">24 Hours Dining</p>
+                <p className="text-[10px] font-black uppercase text-slate-400 tracking-tight">Showtimes</p>
+                <p className="font-bold text-slate-800">24/7 Cinematic Experience</p>
               </div>
             </div>
           </div>
@@ -162,7 +161,7 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors" size={18} />
             <input 
               type="text"
-              placeholder="Search for delicacies..."
+              placeholder="Search cinematic snacks..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full h-12 pl-12 pr-12 bg-orange-50 border-none rounded-2xl text-sm font-bold focus:ring-2 ring-primary/20 transition-all outline-none"
@@ -214,18 +213,18 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
         <header className="mb-12 text-center md:text-left flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
             <h1 className="text-5xl font-serif italic text-slate-900 tracking-tight">
-              {searchQuery ? `Searching "${searchQuery}"` : "Dasara Menu"}
+              {searchQuery ? `Searching "${searchQuery}"` : "Cinema Menu"}
             </h1>
             <div className="flex items-center justify-center md:justify-start gap-3 mt-4">
               <span className="w-12 h-[2px] bg-primary" />
               <p className="text-primary font-black text-[10px] uppercase tracking-[0.3em]">
-                {tableId ? `Fine Dining Table ${tableId}` : 'Take-Away Experience'}
+                {tableId ? `Theater Seat ${tableId}` : 'Cinema Take-Away'}
               </p>
             </div>
           </div>
           <div className="hidden md:flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-orange-100 shadow-sm">
              <Heart className="text-primary fill-primary animate-pulse" size={14} />
-             <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Authentic Telangana Flavors</span>
+             <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Premium Cinematic Flavors</span>
           </div>
         </header>
 
@@ -258,7 +257,7 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
                 </div>
               </div>
               <div className="space-y-2">
-                <p className="text-slate-800 font-bold text-lg">No delicacies found</p>
+                <p className="text-slate-800 font-bold text-lg">No snacks found</p>
                 <p className="text-slate-400 text-xs font-medium uppercase tracking-widest italic">Try another search or browse full menu</p>
               </div>
               <button 
@@ -287,7 +286,7 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
           <div className="relative p-1.5 bg-white rounded-full shadow-2xl ring-2 ring-primary/5">
             <Image 
               src={LOGO_URL} 
-              alt="Dasara Logo" 
+              alt="ART Cinemas Logo" 
               width={60} 
               height={60} 
               className="rounded-full" 
@@ -297,7 +296,7 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
           <div className="flex flex-col items-center gap-4">
              <div className="flex items-center gap-3">
                <span className="h-px w-8 bg-orange-200" />
-               <p className="font-serif italic text-slate-400">Authentic fine dine experience.</p>
+               <p className="font-serif italic text-slate-400">Elevated cinematic dining experience.</p>
                <span className="h-px w-8 bg-orange-200" />
              </div>
              

@@ -19,6 +19,7 @@ import {
   X, 
   Search,
   Heart,
+  Film
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
@@ -96,7 +97,7 @@ export default function OrderStatusPage() {
 
     let basketX = canvas.width / 2;
     const items: any[] = [];
-    const emojis = ["🍗", "🥘", "🌶️", "🍛", "🍲"];
+    const emojis = ["🍿", "🥤", "🍔", "🍫", "🍕"];
     let frame = 0;
     let animationId: number;
 
@@ -107,7 +108,7 @@ export default function OrderStatusPage() {
       ctx.shadowColor = "rgba(0,0,0,0.1)";
       ctx.font = "60px serif";
       ctx.textAlign = "center";
-      ctx.fillText("🥘", basketX, canvas.height - 100);
+      ctx.fillText("🍿", basketX, canvas.height - 100);
 
       if (frame % 60 === 0) {
         items.push({ 
@@ -212,7 +213,7 @@ export default function OrderStatusPage() {
         <div className="bg-white/80 backdrop-blur-xl border border-orange-100 p-6 rounded-[2.5rem] shadow-xl shadow-orange-900/5 flex flex-col gap-4">
           <div className="flex justify-between items-center px-1">
             <span className="text-[10px] font-black uppercase tracking-widest text-primary">Order #{orderData?.orderNumber}</span>
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Tbl {orderData?.tableId}</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Seat {orderData?.tableId}</span>
           </div>
           <div className="relative h-4 w-full bg-orange-100/50 rounded-full overflow-hidden">
             <div 
@@ -222,7 +223,7 @@ export default function OrderStatusPage() {
           </div>
           <div className="flex items-center justify-center gap-2">
             <span className="text-xs font-bold text-slate-800 uppercase">
-              {status === 'Pending' ? 'Wait Approval' : status === 'Served' ? 'Meal Served!' : 'Crafting Flavors'}
+              {status === 'Pending' ? 'Theater Approval' : status === 'Served' ? 'Snacks Served!' : 'Preparing Treats'}
             </span>
             <Heart size={14} className="text-primary fill-primary animate-pulse" />
           </div>
@@ -233,7 +234,7 @@ export default function OrderStatusPage() {
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-[90%] max-w-md z-50 flex gap-4">
           <button onClick={() => setShowOrderMore(true)} className="flex-1 bg-white h-16 rounded-2xl flex items-center justify-center gap-2 shadow-xl border border-orange-50">
             <PlusCircle size={20} className="text-primary" />
-            <span className="text-[11px] font-black uppercase tracking-widest">Order More</span>
+            <span className="text-[11px] font-black uppercase tracking-widest">More Snacks</span>
           </button>
           <button onClick={requestHelp} className={cn(
             "flex-1 h-16 rounded-2xl flex items-center justify-center gap-2 shadow-xl transition-all",
@@ -248,10 +249,10 @@ export default function OrderStatusPage() {
       {!gameActive && !showOrderMore && (
         <div className="absolute inset-0 z-40 flex flex-col items-center justify-center bg-orange-50/40 backdrop-blur-sm p-8">
           <div className="bg-white p-10 rounded-[4rem] shadow-2xl text-center space-y-8 max-w-sm border border-orange-100">
-            <div className="text-7xl">{isGameOver ? "🍛" : "🥘"}</div>
+            <div className="text-7xl">{isGameOver ? "🎥" : "🍿"}</div>
             <div className="space-y-2">
-              <h2 className="text-2xl font-serif italic text-slate-800">Spice Catch</h2>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Catch the Dasara delicacies!</p>
+              <h2 className="text-2xl font-serif italic text-slate-800">Popcorn Catch</h2>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Catch the ART Cinemas treats!</p>
             </div>
             <button 
               onClick={() => { setScore(0); setGameActive(true); setIsGameOver(false); }} 
@@ -273,14 +274,14 @@ export default function OrderStatusPage() {
         <div className="absolute inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-end">
           <div className="w-full bg-white rounded-t-[3rem] p-8 border-t border-orange-100 max-h-[85vh] flex flex-col">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-serif italic text-slate-800">Dasara Specials</h2>
+              <h2 className="text-xl font-serif italic text-slate-800">Cinema Specials</h2>
               <button onClick={() => setShowOrderMore(false)} className="p-2 bg-orange-50 rounded-full"><X size={20} /></button>
             </div>
             <div className="relative mb-6">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={16} />
               <input 
                 type="text" 
-                placeholder="Search menu..." 
+                placeholder="Search cinema menu..." 
                 className="w-full pl-12 pr-4 py-4 bg-orange-50/50 border-none rounded-2xl text-sm outline-none" 
                 value={searchQuery} 
                 onChange={(e) => setSearchQuery(e.target.value)} 
@@ -301,7 +302,7 @@ export default function OrderStatusPage() {
                 ))
               ) : (
                 <div className="text-center py-10">
-                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">No delicacies found</p>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">No treats found</p>
                 </div>
               )}
             </div>

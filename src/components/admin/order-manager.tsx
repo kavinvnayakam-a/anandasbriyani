@@ -31,11 +31,11 @@ export default function OrderManager() {
   const firestore = useFirestore();
   
   const [printSettings, setPrintSettings] = useState<PrintSettings>({
-    storeName: "Dasara Fine Dine",
-    address: "L. B. Nagar, Hyderabad",
+    storeName: "ART Cinemas",
+    address: "Premium Theater Complex",
     phone: "+91 000 000 0000",
     gstin: "36ABCDE1234F1Z5",
-    footerMessage: "Thank you for dining with Dasara! Visit again."
+    footerMessage: "Thank you for visiting ART Cinemas! Enjoy the show."
   });
   
   const { toast } = useToast();
@@ -90,7 +90,7 @@ export default function OrderManager() {
       status: "Served", 
       helpRequested: false 
     });
-    toast({ title: "Dasara Feast Served!", description: "Customer timer initiated." });
+    toast({ title: "ART Cinema Treats Served!", description: "Session timer active." });
   };
 
   const resolveHelp = async (orderId: string) => {
@@ -110,14 +110,14 @@ export default function OrderManager() {
       batch.delete(doc(firestore, "orders", o.id));
     });
     await batch.commit();
-    toast({ title: "Table Cleared & Archived" });
+    toast({ title: "Seat Cleared & Archived" });
   };
 
   const saveSettings = async () => {
     if (!firestore) return;
     await setDoc(doc(firestore, "settings", "print_template"), printSettings);
     setShowSettings(false);
-    toast({ title: "Dasara Receipt Saved" });
+    toast({ title: "Receipt Settings Saved" });
   };
 
   if (!isMounted) return null;
@@ -146,7 +146,7 @@ export default function OrderManager() {
           <p className="text-xs">GST: {printSettings.gstin}</p>
         </div>
         <div className="flex justify-between font-bold mb-2 text-xs">
-          <span>Table: {selectedTable}</span>
+          <span>Seat: {selectedTable}</span>
           <span>{printTime}</span>
         </div>
         <div className="border-b border-black mb-2 text-xs">
@@ -179,7 +179,7 @@ export default function OrderManager() {
                   key={tId} 
                   onClick={() => setSelectedTable(tId)} 
                   className={`p-6 rounded-[2rem] border-4 transition-all ${
-                    selectedTable === tId ? "bg-slate-900 text-white border-slate-900 shadow-[6px_6px_0_0_hsl(var(--primary))]" : 
+                    selectedTable === tId ? "bg-slate-900 text-white border-slate-900 shadow-[6px_6px_0_0_#e76876]" : 
                     hasHelp ? "bg-rose-500 text-white border-slate-900 animate-pulse" :
                     tableMap[tId]?.length ? "bg-rose-500 text-white border-slate-900" : "bg-emerald-500 text-white border-slate-900"
                   }`}
@@ -195,12 +195,12 @@ export default function OrderManager() {
           <div className="animate-in fade-in duration-300">
             <div className="flex justify-between items-center bg-slate-900 p-6 rounded-[2.5rem] text-white mb-6 border-b-4 border-primary">
               <div>
-                <h3 className="text-3xl font-black italic uppercase tracking-tighter">TABLE {selectedTable}</h3>
-                <p className="text-[10px] text-primary font-bold uppercase">{tableMap[selectedTable]?.length || 0} ACTIVE DASH TICKETS</p>
+                <h3 className="text-3xl font-black italic uppercase tracking-tighter">SEAT {selectedTable}</h3>
+                <p className="text-[10px] text-primary font-bold uppercase">{tableMap[selectedTable]?.length || 0} ACTIVE THEATER TICKETS</p>
               </div>
               <div className="flex gap-2">
                 <button onClick={() => window.print()} className="bg-primary text-white px-4 py-3 rounded-xl font-black text-xs uppercase italic flex items-center gap-2 shadow-[4px_4px_0_0_#000]"><Printer size={16}/> Print Bill</button>
-                <button onClick={() => archiveTable(selectedTable)} className="bg-rose-500 text-white px-4 py-3 rounded-xl font-black text-xs uppercase italic shadow-[4px_4px_0_0_#000]">Clear Table</button>
+                <button onClick={() => archiveTable(selectedTable)} className="bg-rose-500 text-white px-4 py-3 rounded-xl font-black text-xs uppercase italic shadow-[4px_4px_0_0_#000]">Clear Seat</button>
               </div>
             </div>
 
@@ -210,7 +210,7 @@ export default function OrderManager() {
                   
                   {order.helpRequested && (
                     <div className="mb-4 bg-rose-500 p-4 rounded-2xl flex items-center justify-between">
-                        <span className="text-white font-black italic uppercase text-xs animate-bounce">Guest Needs Help!</span>
+                        <span className="text-white font-black italic uppercase text-xs animate-bounce">Seat Needs Help!</span>
                         <button onClick={() => resolveHelp(order.id)} className="bg-white text-rose-500 px-3 py-1 rounded-lg font-black uppercase text-[10px]">Resolve</button>
                     </div>
                   )}
@@ -248,7 +248,7 @@ export default function OrderManager() {
                     className={`mt-6 w-full py-4 rounded-2xl font-black uppercase italic text-xs flex items-center justify-center gap-2 border-2 border-slate-900 transition-all ${order.status === 'Served' ? 'bg-slate-100 text-slate-400 border-slate-200' : 'bg-emerald-500 text-white shadow-[4px_4px_0_0_#000] active:translate-y-1 active:shadow-none'}`}
                     disabled={order.status === 'Served'}
                   >
-                    <CheckCircle2 size={16}/> {order.status === 'Served' ? 'GUEST FINISHING' : 'FINAL SERVE'}
+                    <CheckCircle2 size={16}/> {order.status === 'Served' ? 'WATCHING SHOW' : 'FINAL SERVE'}
                   </button>
                 </div>
               ))}
@@ -256,7 +256,7 @@ export default function OrderManager() {
           </div>
         ) : (
           <div className="h-full min-h-[400px] flex items-center justify-center bg-white border-4 border-dashed border-orange-200 rounded-[4rem] text-orange-200 font-black uppercase italic p-12 text-center">
-            Select a Dasara table to manage
+            Select an ART Cinemas seat to manage
           </div>
         )}
       </div>
@@ -265,7 +265,7 @@ export default function OrderManager() {
         <div className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-md rounded-[3rem] border-4 border-slate-900 p-8 flex flex-col gap-4 animate-in zoom-in-95">
             <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-black uppercase italic tracking-tighter">Dasara Receipt</h2>
+              <h2 className="text-2xl font-black uppercase italic tracking-tighter">Receipt Layout</h2>
               <button onClick={() => setShowSettings(false)} className="p-2 bg-slate-100 rounded-full"><X size={20}/></button>
             </div>
             <div className="space-y-4 overflow-y-auto max-h-[60vh] pr-2">

@@ -5,8 +5,8 @@ import { CartProvider } from '@/context/cart-context';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 
 export const metadata: Metadata = {
-  title: 'Dasara Fine Dine',
-  description: 'Exquisite flavors and premium dining experience.',
+  title: 'ART Cinemas',
+  description: 'Premium cinematic dining experience.',
   // Strictly prevent indexing and crawling across all search engines
   robots: {
     index: false,
