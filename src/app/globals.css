@@ -8,25 +8,25 @@ body {
 
 @layer base {
   :root {
-    --background: 35 100% 98%; /* Very light orange cream */
-    --foreground: 25 60% 10%;
-    --card: 0 0% 100%;
-    --card-foreground: 25 60% 10%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 25 60% 10%;
-    --primary: 25 100% 45%;      /* Dark Orange Brand Color */
-    --primary-foreground: 35 100% 98%;
-    --secondary: 35 100% 94%;
-    --secondary-foreground: 25 100% 30%;
-    --muted: 35 100% 94%;
-    --muted-foreground: 25 40% 45%;
-    --accent: 35 90% 60%; 
-    --accent-foreground: 25 60% 10%;
+    --background: 0 0% 0%; /* Pure Black */
+    --foreground: 45 61% 95%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 45 61% 95%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 45 61% 95%;
+    --primary: 45 61% 52%;      /* Gold (#d4af37) */
+    --primary-foreground: 0 0% 0%;
+    --secondary: 240 10% 10%;
+    --secondary-foreground: 45 61% 52%;
+    --muted: 240 10% 10%;
+    --muted-foreground: 45 20% 60%;
+    --accent: 45 61% 52%; 
+    --accent-foreground: 0 0% 0%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 35 100% 90%;
-    --input: 35 100% 92%;
-    --ring: 25 100% 45%;
+    --border: 240 10% 15%;
+    --input: 240 10% 15%;
+    --ring: 45 61% 52%;
     --radius: 0.75rem;
   }
 }
