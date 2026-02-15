@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useEffect, useState, useRef } from 'react';
@@ -19,9 +20,13 @@ import {
   X, 
   Search,
   Heart,
-  Film
+  Film,
+  Ticket,
+  ChevronRight
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
+import Image from 'next/image';
+import placeholderData from '@/app/lib/placeholder-images.json';
 
 export default function OrderStatusPage() {
   const router = useRouter();
@@ -31,17 +36,11 @@ export default function OrderStatusPage() {
 
   const [status, setStatus] = useState('Pending');
   const [orderData, setOrderData] = useState<any>(null);
-  const [score, setScore] = useState(0);
-  const [gameActive, setGameActive] = useState(false);
-  const [isGameOver, setIsGameOver] = useState(false);
   const [helpLoading, setHelpLoading] = useState(false);
   const [showOrderMore, setShowOrderMore] = useState(false);
   const [fullMenu, setFullMenu] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [timeLeft, setTimeLeft] = useState(180);
-  const [isTimerRunning, setIsTimerRunning] = useState(false);
   
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const lastStatus = useRef<string>('');
 
@@ -58,102 +57,12 @@ export default function OrderStatusPage() {
           audioRef.current?.play().catch(() => {});
         }
         lastStatus.current = data.status;
-        if (data.status === 'Served' && !isTimerRunning) {
-          setIsTimerRunning(true);
-        }
         setStatus(data.status);
         setOrderData(data);
       }
     });
     return () => unsub();
-  }, [id, firestore, isTimerRunning]);
-
-  useEffect(() => {
-    if (!isTimerRunning || !id) return;
-    const timerKey = `expiry_${id}`;
-    let expiryTime = localStorage.getItem(timerKey);
-    if (!expiryTime) {
-      expiryTime = (Date.now() + 180000).toString();
-      localStorage.setItem(timerKey, expiryTime);
-    }
-    const interval = setInterval(() => {
-      const remaining = Math.max(0, Math.floor((parseInt(expiryTime!) - Date.now()) / 1000));
-      setTimeLeft(remaining);
-      if (remaining <= 0) {
-        clearInterval(interval);
-        localStorage.removeItem(timerKey);
-        router.push('/thanks'); 
-      }
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [isTimerRunning, id, router]);
-
-  useEffect(() => {
-    if (!gameActive || !canvasRef.current) return;
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d')!;
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    let basketX = canvas.width / 2;
-    const items: any[] = [];
-    const emojis = ["🍿", "🥤", "🍔", "🍫", "🍕"];
-    let frame = 0;
-    let animationId: number;
-
-    const gameLoop = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      ctx.shadowBlur = 15;
-      ctx.shadowColor = "rgba(0,0,0,0.1)";
-      ctx.font = "60px serif";
-      ctx.textAlign = "center";
-      ctx.fillText("🍿", basketX, canvas.height - 100);
-
-      if (frame % 60 === 0) {
-        items.push({ 
-          x: Math.random() * (canvas.width - 60) + 30, 
-          y: -50, 
-          emoji: emojis[Math.floor(Math.random() * emojis.length)],
-          speed: 2 + Math.random() * 2 
-        });
-      }
-
-      items.forEach((p, i) => {
-        p.y += p.speed;
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = "rgba(234, 88, 12, 0.3)";
-        ctx.font = "50px serif";
-        ctx.fillText(p.emoji, p.x, p.y);
-
-        if (p.y > canvas.height - 140 && p.y < canvas.height - 70 && Math.abs(p.x - basketX) < 60) {
-          setScore(s => s + 1);
-          items.splice(i, 1);
-        }
-        if (p.y > canvas.height) {
-          setGameActive(false);
-          setIsGameOver(true);
-        }
-      });
-
-      frame++;
-      animationId = requestAnimationFrame(gameLoop);
-    };
-
-    const handleMove = (e: any) => {
-      const x = e.touches ? e.touches[0].clientX : e.clientX;
-      basketX = x;
-    };
-
-    window.addEventListener('mousemove', handleMove);
-    window.addEventListener('touchmove', handleMove, { passive: false });
-    animationId = requestAnimationFrame(gameLoop);
-    return () => {
-      cancelAnimationFrame(animationId);
-      window.removeEventListener('mousemove', handleMove);
-      window.removeEventListener('touchmove', handleMove);
-    };
-  }, [gameActive]);
+  }, [id, firestore]);
 
   useEffect(() => {
     if (!firestore) return;
@@ -194,115 +103,175 @@ export default function OrderStatusPage() {
   }, {});
 
   return (
-    <div className="fixed inset-0 bg-orange-50/30 font-sans overflow-hidden select-none">
-      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full z-10 opacity-100" />
+    <div className="fixed inset-0 bg-black font-sans overflow-hidden select-none">
+      
+      {/* Background Cinematic Glow */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent opacity-30" />
 
-      {isTimerRunning && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[60] bg-slate-900 text-white px-4 py-2 rounded-full flex items-center gap-2 shadow-2xl scale-90">
-          <span className="text-[10px] font-black uppercase tracking-widest opacity-60">Session ends in:</span>
-          <span className="font-mono font-bold text-primary">
-            {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
-          </span>
-        </div>
-      )}
+      {/* Main Content Area (Scrollable part) */}
+      <div className="absolute inset-0 overflow-y-auto pb-40 no-scrollbar">
+        <div className="max-w-md mx-auto px-6 pt-12 space-y-10">
+          
+          {/* Order Status Header */}
+          <div className="bg-zinc-900/80 backdrop-blur-xl border border-primary/20 p-8 rounded-[2.5rem] shadow-2xl space-y-6">
+            <div className="flex justify-between items-center">
+              <div className="flex flex-col">
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-1">Live Order</span>
+                <span className="text-xl font-black italic uppercase text-white">#{orderData?.orderNumber}</span>
+              </div>
+              <div className="bg-primary/10 px-4 py-2 rounded-xl border border-primary/20">
+                <span className="text-[10px] font-black uppercase text-primary tracking-widest">{orderData?.tableId}</span>
+              </div>
+            </div>
 
-      <div className={cn(
-        "absolute top-8 left-1/2 -translate-x-1/2 w-[90%] max-w-md z-50 transition-all duration-700",
-        gameActive ? "-translate-y-40 opacity-0" : "translate-y-0 opacity-100"
-      )}>
-        <div className="bg-white/80 backdrop-blur-xl border border-orange-100 p-6 rounded-[2.5rem] shadow-xl shadow-orange-900/5 flex flex-col gap-4">
-          <div className="flex justify-between items-center px-1">
-            <span className="text-[10px] font-black uppercase tracking-widest text-primary">Order #{orderData?.orderNumber}</span>
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Seat {orderData?.tableId}</span>
+            <div className="relative h-2 w-full bg-zinc-800 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-primary transition-all duration-1000 shadow-[0_0_10px_rgba(212,175,55,0.5)]"
+                style={{ width: status === 'Pending' ? '30%' : status === 'Served' ? '100%' : '65%' }}
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                {status === 'Pending' ? 'Theater Approval' : status === 'Served' ? 'Enjoy the show!' : 'Treats Incoming'}
+              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-primary uppercase italic">{status}</span>
+                <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+              </div>
+            </div>
           </div>
-          <div className="relative h-4 w-full bg-orange-100/50 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-primary transition-all duration-1000"
-              style={{ width: status === 'Pending' ? '30%' : status === 'Served' ? '100%' : '65%' }}
+
+          {/* Ad Banner */}
+          <div className="relative group overflow-hidden rounded-[2rem] border border-primary/20 aspect-[2/1] bg-zinc-900 shadow-2xl">
+            <Image 
+              src={placeholderData.ads[0].url} 
+              alt="Promotion" 
+              fill 
+              className="object-cover opacity-60 group-hover:scale-105 transition-transform duration-700" 
+              data-ai-hint={placeholderData.ads[0].hint}
             />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
+            <div className="absolute bottom-6 left-6 right-6">
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary mb-1">ART Exclusive</p>
+              <h4 className="text-lg font-black italic uppercase text-white tracking-tight leading-none">Upgrade to Gold Class</h4>
+              <p className="text-[9px] font-bold text-zinc-400 uppercase mt-2">Visit the concierge for more details</p>
+            </div>
           </div>
-          <div className="flex items-center justify-center gap-2">
-            <span className="text-xs font-bold text-slate-800 uppercase">
-              {status === 'Pending' ? 'Theater Approval' : status === 'Served' ? 'Snacks Served!' : 'Preparing Treats'}
-            </span>
-            <Heart size={14} className="text-primary fill-primary animate-pulse" />
+
+          {/* Upcoming Movies Section */}
+          <div className="space-y-6">
+            <div className="flex items-center justify-between px-2">
+              <h3 className="text-sm font-black italic uppercase tracking-widest text-white flex items-center gap-2">
+                <Film size={16} className="text-primary" /> Coming Soon
+              </h3>
+              <button className="text-[9px] font-black uppercase text-primary tracking-widest flex items-center gap-1 hover:text-white transition-colors">
+                View All <ChevronRight size={10} />
+              </button>
+            </div>
+
+            <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4 -mx-2 px-2">
+              {placeholderData.movies.map((movie) => (
+                <div key={movie.id} className="shrink-0 w-40 space-y-3">
+                  <div className="relative aspect-[2/3] rounded-2xl overflow-hidden border border-white/10 shadow-xl group">
+                    <Image 
+                      src={movie.url} 
+                      alt={movie.title} 
+                      fill 
+                      className="object-cover transition-transform duration-500 group-hover:scale-110" 
+                      data-ai-hint={movie.hint}
+                    />
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors" />
+                    <div className="absolute top-2 right-2">
+                       <div className="bg-black/60 backdrop-blur-md p-1.5 rounded-full border border-white/10">
+                          <Ticket size={12} className="text-primary" />
+                       </div>
+                    </div>
+                  </div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-center text-zinc-400 truncate px-1">
+                    {movie.title}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
-      {!gameActive && (
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-[90%] max-w-md z-50 flex gap-4">
-          <button onClick={() => setShowOrderMore(true)} className="flex-1 bg-white h-16 rounded-2xl flex items-center justify-center gap-2 shadow-xl border border-orange-50">
-            <PlusCircle size={20} className="text-primary" />
-            <span className="text-[11px] font-black uppercase tracking-widest">More Snacks</span>
-          </button>
-          <button onClick={requestHelp} className={cn(
-            "flex-1 h-16 rounded-2xl flex items-center justify-center gap-2 shadow-xl transition-all",
-            orderData?.helpRequested ? 'bg-emerald-500 text-white' : 'bg-primary text-white hover:bg-orange-600'
-          )}>
-            <BellRing size={20} />
-            <span className="text-[11px] font-black uppercase tracking-widest">{orderData?.helpRequested ? 'Coming!' : 'Call Staff'}</span>
-          </button>
-        </div>
-      )}
+      {/* Bottom Actions */}
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-[90%] max-w-md z-50 flex gap-4">
+        <button 
+          onClick={() => setShowOrderMore(true)} 
+          className="flex-1 bg-zinc-900 h-16 rounded-2xl flex items-center justify-center gap-3 shadow-2xl border border-primary/20 hover:border-primary/50 transition-all active:scale-95"
+        >
+          <PlusCircle size={20} className="text-primary" />
+          <span className="text-[11px] font-black uppercase tracking-[0.2em] text-white">More Snacks</span>
+        </button>
+        <button 
+          onClick={requestHelp} 
+          className={cn(
+            "flex-1 h-16 rounded-2xl flex items-center justify-center gap-3 shadow-2xl transition-all border border-transparent active:scale-95",
+            orderData?.helpRequested ? 'bg-emerald-600 text-white' : 'bg-primary text-black hover:bg-white'
+          )}
+        >
+          <BellRing size={20} className={cn(orderData?.helpRequested && "animate-ring")} />
+          <span className="text-[11px] font-black uppercase tracking-[0.2em]">
+            {orderData?.helpRequested ? 'Help Coming' : 'Call Staff'}
+          </span>
+        </button>
+      </div>
 
-      {!gameActive && !showOrderMore && (
-        <div className="absolute inset-0 z-40 flex flex-col items-center justify-center bg-orange-50/40 backdrop-blur-sm p-8">
-          <div className="bg-white p-10 rounded-[4rem] shadow-2xl text-center space-y-8 max-w-sm border border-orange-100">
-            <div className="text-7xl">{isGameOver ? "🎥" : "🍿"}</div>
-            <div className="space-y-2">
-              <h2 className="text-2xl font-serif italic text-slate-800">Popcorn Catch</h2>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Catch the ART Cinemas treats!</p>
-            </div>
-            <button 
-              onClick={() => { setScore(0); setGameActive(true); setIsGameOver(false); }} 
-              className="w-full bg-primary text-white py-5 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl hover:bg-orange-600 transition-all"
-            >
-              {isGameOver ? "Play Again" : "Start Game"}
-            </button>
-          </div>
-        </div>
-      )}
-
-      {gameActive && (
-        <div className="absolute top-24 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center pointer-events-none">
-          <span className="text-8xl font-serif italic text-primary drop-shadow-lg">{score}</span>
-        </div>
-      )}
-
+      {/* Order More Slide-up Menu */}
       {showOrderMore && (
-        <div className="absolute inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-end">
-          <div className="w-full bg-white rounded-t-[3rem] p-8 border-t border-orange-100 max-h-[85vh] flex flex-col">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-serif italic text-slate-800">Cinema Specials</h2>
-              <button onClick={() => setShowOrderMore(false)} className="p-2 bg-orange-50 rounded-full"><X size={20} /></button>
+        <div className="absolute inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-end animate-in fade-in duration-300">
+          <div className="w-full bg-zinc-950 rounded-t-[3rem] p-8 border-t border-primary/20 max-h-[85vh] flex flex-col shadow-[0_-20px_50px_rgba(212,175,55,0.1)]">
+            <div className="flex justify-between items-center mb-8">
+              <div className="flex flex-col">
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary mb-1">Menu</span>
+                <h2 className="text-2xl font-black italic uppercase text-white">Cinema Specials</h2>
+              </div>
+              <button 
+                onClick={() => setShowOrderMore(false)} 
+                className="p-3 bg-zinc-900 text-primary rounded-full hover:bg-primary hover:text-black transition-all"
+              >
+                <X size={20} />
+              </button>
             </div>
-            <div className="relative mb-6">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={16} />
+            
+            <div className="relative mb-8">
+              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40" size={18} />
               <input 
                 type="text" 
                 placeholder="Search cinema menu..." 
-                className="w-full pl-12 pr-4 py-4 bg-orange-50/50 border-none rounded-2xl text-sm outline-none" 
+                className="w-full pl-14 pr-6 py-5 bg-zinc-900/50 border border-primary/10 rounded-2xl text-sm font-bold text-white outline-none focus:ring-2 ring-primary/20 transition-all" 
                 value={searchQuery} 
                 onChange={(e) => setSearchQuery(e.target.value)} 
               />
             </div>
-            <div className="flex-1 overflow-y-auto space-y-6 pb-10">
+
+            <div className="flex-1 overflow-y-auto space-y-8 pb-10 no-scrollbar">
               {Object.keys(groupedMenu).length > 0 ? (
                 Object.keys(groupedMenu).map((cat) => (
-                  <div key={cat} className="space-y-3">
-                    <p className="text-[10px] font-black uppercase text-primary tracking-widest">{cat}</p>
+                  <div key={cat} className="space-y-4">
+                    <div className="flex items-center gap-4">
+                      <p className="text-[10px] font-black uppercase text-primary tracking-[0.3em] shrink-0">{cat}</p>
+                      <div className="h-px flex-1 bg-primary/10" />
+                    </div>
                     {groupedMenu[cat].map((item: any) => (
-                      <button key={item.id} onClick={() => addMoreFood(item)} className="w-full flex justify-between items-center p-5 bg-white border border-orange-50 rounded-2xl shadow-sm active:scale-95 transition-all">
-                        <span className="text-sm font-bold text-slate-700">{item.name}</span>
-                        <span className="text-xs font-black text-slate-400">₹{item.price}</span>
+                      <button 
+                        key={item.id} 
+                        onClick={() => addMoreFood(item)} 
+                        className="w-full flex justify-between items-center p-6 bg-zinc-900/30 border border-primary/5 hover:border-primary/20 rounded-[1.5rem] transition-all active:scale-95 text-left group"
+                      >
+                        <span className="text-sm font-bold text-zinc-100 group-hover:text-primary transition-colors">{item.name}</span>
+                        <span className="text-xs font-black text-primary bg-primary/10 px-3 py-1 rounded-lg">₹{item.price}</span>
                       </button>
                     ))}
                   </div>
                 ))
               ) : (
-                <div className="text-center py-10">
-                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">No treats found</p>
+                <div className="text-center py-20">
+                  <p className="text-xs font-black text-zinc-600 uppercase tracking-widest">No treats found</p>
                 </div>
               )}
             </div>
