@@ -9,7 +9,7 @@ import {
 } from 'firebase/firestore';
 import { Order } from '@/lib/types';
 import { 
-  CheckCircle2, Printer, Square, CheckSquare, X, Check, Clock, ChevronRight
+  CheckCircle2, Printer, Square, CheckSquare, X, Check, Clock, ChevronRight, LayoutDashboard, Settings
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -84,7 +84,6 @@ export default function OrderManager() {
 
   const triggerFinalServed = async (orderId: string) => {
     if (!firestore) return;
-    // Archive specifically on completion
     const orderRef = doc(firestore, "orders", orderId);
     const snap = await getDoc(orderRef);
     if (!snap.exists()) return;
@@ -130,7 +129,7 @@ export default function OrderManager() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-      <style jsx global>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media print {
           body * { visibility: hidden; }
           #thermal-bill, #thermal-bill * { visibility: visible; }
@@ -140,7 +139,7 @@ export default function OrderManager() {
             font-family: monospace;
           }
         }
-      `}_</style>
+      ` }} />
 
       {/* THERMAL RECEIPT PREVIEW (HIDDEN) */}
       <div id="thermal-bill" className="hidden print:block">
@@ -242,7 +241,6 @@ export default function OrderManager() {
                   "bg-zinc-900 border-2 rounded-[2.5rem] p-8 relative flex flex-col transition-all shadow-2xl overflow-hidden",
                   order.helpRequested ? 'border-red-500 shadow-red-500/10' : 'border-zinc-800'
                 )}>
-                  {/* Status Overlay for served */}
                   {order.status === 'Served' && (
                     <div className="absolute top-4 right-4 bg-emerald-500/20 text-emerald-500 px-3 py-1 rounded-full text-[9px] font-black uppercase border border-emerald-500/30">
                       Already Served
