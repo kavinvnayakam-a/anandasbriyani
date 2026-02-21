@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect } from 'react';
@@ -9,7 +8,7 @@ import {
 } from 'firebase/firestore';
 import { Order } from '@/lib/types';
 import { 
-  CheckCircle2, Clock, Check, ChefHat, LayoutGrid
+  CheckCircle2, Clock, Check, ChefHat, User, Hash, Box, PackageCheck
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -21,6 +20,7 @@ export default function KotView() {
 
   useEffect(() => {
     if (!firestore) return;
+    // Show Received, Preparing, Served orders in KOT
     const q = query(collection(firestore, "orders"), orderBy("timestamp", "asc"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       setOrders(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Order[]);
@@ -28,13 +28,7 @@ export default function KotView() {
     return () => unsubscribe();
   }, [firestore]);
 
-  const approveOrder = async (orderId: string) => {
-    if (!firestore) return;
-    await updateDoc(doc(firestore, "orders", orderId), { status: "Received" });
-    toast({ title: "Order Approved" });
-  };
-
-  const markItemServed = async (orderId: string, itemIndex: number) => {
+  const markItemPacked = async (orderId: string, itemIndex: number) => {
     if (!firestore) return;
     const orderRef = doc(firestore, "orders", orderId);
     const orderSnap = await getDoc(orderRef);
@@ -42,10 +36,22 @@ export default function KotView() {
     
     const items = [...orderSnap.data().items];
     items[itemIndex].status = "Served";
-    await updateDoc(orderRef, { items });
+    
+    // Check if all items are packed
+    const allPacked = items.every(item => item.status === 'Served');
+    const newStatus = allPacked ? "Served" : "Preparing";
+
+    await updateDoc(orderRef, { items, status: newStatus });
+    toast({ title: allPacked ? "Order Fully Packed" : "Item Packed" });
   };
 
-  const completeTicket = async (orderId: string) => {
+  const markReadyForPickup = async (orderId: string) => {
+    if (!firestore) return;
+    await updateDoc(doc(firestore, "orders", orderId), { status: "Ready" });
+    toast({ title: "Ready for Pickup", description: "Customer notified & timer started." });
+  };
+
+  const archiveOrder = async (orderId: string) => {
     if (!firestore) return;
     const orderRef = doc(firestore, "orders", orderId);
     const snap = await getDoc(orderRef);
@@ -61,7 +67,7 @@ export default function KotView() {
     batch.delete(orderRef);
     await batch.commit();
 
-    toast({ title: "KOT Completed & Archived" });
+    toast({ title: "Order Archived" });
   };
 
   const formatOrderTime = (ts: any) => {
@@ -70,102 +76,124 @@ export default function KotView() {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  const activeOrders = orders.filter(o => o.status !== 'Completed');
+  const kitchenOrders = orders.filter(o => ['Received', 'Preparing', 'Served', 'Ready'].includes(o.status));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-4">
-          <div className="bg-primary p-3 rounded-2xl shadow-lg shadow-primary/20">
-            <ChefHat className="text-black" size={24} />
+          <div className="bg-[#b8582e] p-4 rounded-3xl shadow-lg shadow-[#b8582e]/20 text-white">
+            <Box size={32} />
           </div>
           <div>
-            <h3 className="text-2xl font-black italic uppercase text-white tracking-tighter">Production Queue</h3>
-            <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Active Kitchen Tickets</p>
+            <h3 className="text-3xl font-black italic uppercase text-zinc-900 tracking-tighter">Kitchen Packing Queue</h3>
+            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Active food preparation & packing</p>
           </div>
         </div>
         
-        <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl px-6 py-3">
-          <div className="flex items-center gap-3">
-            <span className="text-4xl font-black text-primary italic leading-none">{activeOrders.length}</span>
-            <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest leading-tight">Live<br/>Orders</span>
-          </div>
+        <div className="bg-white border border-zinc-200 rounded-3xl px-8 py-5 shadow-xl flex items-center gap-4">
+            <span className="text-5xl font-black text-[#b8582e] italic leading-none">{kitchenOrders.length}</span>
+            <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest leading-tight">Active<br/>Tickets</span>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {activeOrders.length > 0 ? (
-          activeOrders.map((order) => (
-            <div key={order.id} className={cn(
-              "bg-zinc-900/40 border-2 rounded-[2.5rem] p-8 relative flex flex-col transition-all shadow-2xl overflow-hidden group hover:border-primary/30",
-              order.helpRequested ? 'border-red-500 shadow-red-500/10' : 'border-zinc-800'
-            )}>
-              <div className="flex justify-between items-start mb-6">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="bg-primary/10 text-primary text-[10px] font-black uppercase px-2 py-0.5 rounded-lg border border-primary/20">
-                      {order.tableId}
-                    </span>
-                    <span className="text-zinc-500 text-[9px] font-bold uppercase">#{order.orderNumber}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-zinc-400 font-bold text-[10px] uppercase">
-                    <Clock size={12}/> {formatOrderTime(order.timestamp)}
-                  </div>
-                </div>
-                
-                <div className={cn(
-                  "px-3 py-1 rounded-full text-[9px] font-black uppercase border",
-                  order.status === 'Pending' ? 'bg-orange-500/20 text-orange-500 border-orange-500/30' : 'bg-emerald-500/20 text-emerald-500 border-emerald-500/30'
-                )}>
-                  {order.status}
-                </div>
-              </div>
-
-              <div className="space-y-3 flex-1 mb-8">
-                {order.items.map((item, idx) => (
-                  <div key={idx} className={cn(
-                    "flex justify-between items-center p-4 rounded-2xl border transition-all",
-                    item.status === 'Served' ? 'bg-emerald-500/5 border-emerald-500/10 opacity-40' : 'bg-black/20 border-zinc-800 group-hover:border-zinc-700'
-                  )}>
-                    <div className="flex items-center gap-3">
-                      <span className="text-primary font-black italic text-sm">{item.quantity}x</span>
-                      <span className={cn("text-xs font-bold uppercase italic", item.status === 'Served' ? 'line-through text-zinc-500' : 'text-zinc-100')}>
-                         {item.name}
-                      </span>
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+        {kitchenOrders.map((order) => (
+          <div key={order.id} className={cn(
+            "bg-white border-2 rounded-[3rem] p-8 flex flex-col transition-all shadow-xl hover:shadow-2xl relative overflow-hidden group",
+            order.status === 'Ready' ? 'border-emerald-500/50' : 'border-zinc-200'
+          )}>
+            <div className="flex justify-between items-start mb-6">
+              <div className="flex items-center gap-3">
+                 <div className="w-12 h-12 bg-zinc-50 rounded-2xl flex items-center justify-center border border-zinc-100">
+                    <Hash size={20} className="text-[#b8582e]" />
+                 </div>
+                 <div>
+                    <span className="text-2xl font-black italic text-zinc-900">#{order.orderNumber}</span>
+                    <div className="flex items-center gap-2 text-zinc-400 text-[10px] font-bold uppercase mt-1">
+                       <Clock size={12}/> {formatOrderTime(order.timestamp)}
                     </div>
-                    {item.status !== 'Served' && order.status !== 'Pending' && (
-                      <button 
-                        onClick={() => markItemServed(order.id, idx)} 
-                        className="bg-zinc-800 text-primary border border-primary/20 px-3 py-1 rounded-lg text-[9px] font-black uppercase italic hover:bg-primary hover:text-black transition-all"
-                      >
-                        Serve
-                      </button>
-                    )}
-                  </div>
-                ))}
+                 </div>
               </div>
-
-              <div className="space-y-3">
-                {order.status === 'Pending' ? (
-                  <button onClick={() => approveOrder(order.id)} className="w-full bg-primary text-black py-4 rounded-2xl font-black uppercase italic text-xs flex items-center justify-center gap-2 shadow-xl hover:scale-[1.02] transition-all">
-                    <Check size={18}/> Approve KOT
-                  </button>
-                ) : (
-                  <button 
-                    onClick={() => completeTicket(order.id)} 
-                    className="w-full bg-zinc-800 text-zinc-400 border border-zinc-700 py-4 rounded-2xl font-black uppercase italic text-[10px] tracking-widest flex items-center justify-center gap-2 hover:bg-emerald-500 hover:text-black hover:border-emerald-500 transition-all shadow-xl"
-                  >
-                    <CheckCircle2 size={16}/> Complete Ticket
-                  </button>
-                )}
+              
+              <div className={cn(
+                "px-4 py-1.5 rounded-full text-[10px] font-black uppercase border",
+                order.status === 'Received' ? 'bg-blue-100 text-blue-600 border-blue-200' : 
+                order.status === 'Preparing' ? 'bg-orange-100 text-orange-600 border-orange-200' :
+                order.status === 'Served' ? 'bg-emerald-100 text-emerald-600 border-emerald-200' :
+                'bg-emerald-500 text-white border-emerald-600'
+              )}>
+                {order.status === 'Served' ? 'Packed' : order.status}
               </div>
             </div>
-          ))
-        ) : (
-          <div className="col-span-full h-80 flex flex-col items-center justify-center bg-zinc-900/20 border-4 border-dashed border-zinc-800 rounded-[3rem] text-center">
-            <ChefHat size={48} className="text-zinc-800 mb-4" />
-            <h3 className="text-xl font-black uppercase italic text-zinc-700">Kitchen is Quiet</h3>
-            <p className="text-[10px] font-bold text-zinc-800 uppercase tracking-widest mt-2">Waiting for next blockbuster order</p>
+
+            <div className="mb-6 p-4 bg-zinc-50 rounded-2xl border border-zinc-100 flex items-center justify-between">
+               <div className="flex items-center gap-3">
+                 <User size={14} className="text-zinc-400" />
+                 <span className="text-[10px] font-black uppercase text-zinc-600">{order.customerName}</span>
+               </div>
+               <span className="text-[10px] font-black text-[#b8582e] uppercase italic">{order.items.length} Items</span>
+            </div>
+
+            <div className="space-y-3 flex-1 mb-8">
+              {order.items.map((item, idx) => (
+                <div key={idx} className={cn(
+                  "flex justify-between items-center p-4 rounded-2xl border transition-all",
+                  item.status === 'Served' ? 'bg-emerald-50 border-emerald-100 opacity-50' : 'bg-white border-zinc-100 shadow-sm'
+                )}>
+                  <div className="flex items-center gap-3">
+                    <span className="text-[#b8582e] font-black italic text-sm">{item.quantity}x</span>
+                    <span className={cn("text-xs font-bold uppercase italic", item.status === 'Served' ? 'line-through text-zinc-400' : 'text-zinc-900')}>
+                       {item.name}
+                    </span>
+                  </div>
+                  {item.status !== 'Served' && order.status !== 'Ready' && (
+                    <button 
+                      onClick={() => markItemPacked(order.id, idx)} 
+                      className="bg-[#b8582e] text-white px-4 py-1.5 rounded-xl text-[10px] font-black uppercase italic hover:bg-zinc-900 transition-all"
+                    >
+                      Pack
+                    </button>
+                  )}
+                  {item.status === 'Served' && (
+                    <PackageCheck className="text-emerald-500" size={18} />
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-auto space-y-3">
+              {order.status !== 'Ready' && (
+                <button 
+                  onClick={() => markReadyForPickup(order.id)}
+                  disabled={order.status !== 'Served'}
+                  className={cn(
+                    "w-full py-5 rounded-2xl font-black uppercase italic text-xs flex items-center justify-center gap-3 transition-all active:scale-95 shadow-xl",
+                    order.status === 'Served' 
+                    ? "bg-emerald-500 text-white hover:bg-emerald-600" 
+                    : "bg-zinc-100 text-zinc-400 cursor-not-allowed"
+                  )}
+                >
+                  <CheckCircle2 size={20}/> Ready for Pickup
+                </button>
+              )}
+
+              {order.status === 'Ready' && (
+                <button 
+                  onClick={() => archiveOrder(order.id)} 
+                  className="w-full py-5 bg-zinc-900 text-white rounded-2xl font-black uppercase italic text-[11px] tracking-widest flex items-center justify-center gap-3 hover:bg-[#b8582e] transition-all shadow-xl"
+                >
+                  <Check size={20}/> Handover & Archive
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
+
+        {kitchenOrders.length === 0 && (
+          <div className="col-span-full h-80 flex flex-col items-center justify-center bg-zinc-50 border-4 border-dashed border-zinc-200 rounded-[3rem] text-zinc-300">
+             <ChefHat size={48} className="mb-4 opacity-20" />
+             <p className="text-[10px] font-black uppercase tracking-[0.4em]">Kitchen is Quiet</p>
           </div>
         )}
       </div>

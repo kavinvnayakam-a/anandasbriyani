@@ -11,18 +11,19 @@ export interface MenuItem {
 
 export interface CartItem extends MenuItem {
   quantity: number;
+  status?: 'Pending' | 'Served';
 }
 
 export interface Order {
   id: string;
-  tableId: string; // Used as "Takeaway" for this app
-  customerName?: string;
-  customerPhone?: string;
-  paymentMethod?: 'Card' | 'Cash' | 'UPI';
+  tableId: string; // Used as "Takeaway"
+  customerName: string;
+  customerPhone: string;
+  paymentMethod: 'Card' | 'Cash' | 'UPI';
   items: CartItem[];
   totalPrice: number;
-  status: 'Pending' | 'Received' | 'Preparing' | 'Served' | 'Completed';
+  status: 'Pending' | 'Received' | 'Preparing' | 'Served' | 'Ready' | 'Completed';
   timestamp: any;
-  orderNumber?: string;
+  orderNumber: string;
   createdAt: number;
 }
