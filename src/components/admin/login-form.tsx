@@ -1,6 +1,7 @@
+
 "use client"
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { Button } from "@/components/ui/button";
@@ -14,25 +15,32 @@ const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/dasara-finedine.fi
 
 export default function LoginForm() {
   const router = useRouter();
-  const [, setAuth] = useLocalStorage('ravoyi-admin-auth', false);
+  const [auth, setAuth, isAuthLoaded] = useLocalStorage('ravoyi-admin-auth', false);
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  useEffect(() => {
+    if (isAuthLoaded && auth === true) {
+      router.push("/admin");
+    }
+  }, [auth, isAuthLoaded, router]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulated authentication logic
+    // Simulate authentication logic
     setTimeout(() => {
       if (email && password) {
         setAuth(true);
-        router.push("/admin");
       } else {
         setIsLoading(false);
       }
     }, 1200);
   };
+
+  if (!isAuthLoaded) return null;
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-[#b8582e] p-6 relative overflow-hidden">
@@ -44,14 +52,15 @@ export default function LoginForm() {
 
       <Card className="w-full max-w-md border-none bg-white shadow-[0_32px_64px_-12px_rgba(0,0,0,0.3)] rounded-[3.5rem] overflow-hidden relative z-10">
         <CardHeader className="text-center pt-14 pb-8">
-          <div className="relative mx-auto w-24 h-24 mb-8">
-            <div className="absolute -inset-3 bg-[#b8582e]/10 rounded-full blur-xl animate-pulse" />
-            <div className="relative bg-white p-1 rounded-full border-2 border-[#b8582e]/20 shadow-2xl overflow-hidden h-full w-full flex items-center justify-center">
+          <div className="relative mx-auto w-32 h-32 mb-8">
+            {/* Logo Highlight Glow */}
+            <div className="absolute -inset-4 bg-[#b8582e]/20 rounded-full blur-2xl animate-pulse" />
+            <div className="relative bg-white rounded-full border-4 border-[#b8582e]/10 shadow-2xl overflow-hidden h-full w-full">
               <Image 
                 src={LOGO_URL} 
                 alt="RAVOYI" 
                 fill 
-                className="object-cover p-1" 
+                className="object-cover" 
                 priority
               />
             </div>

@@ -117,9 +117,10 @@ export default function AdminDashboard() {
         <Sidebar collapsible="icon" className="border-r-0 bg-[#b8582e] text-white">
           <SidebarHeader className="py-10 px-4 flex flex-col items-center overflow-hidden">
             <div className="relative group flex items-center justify-center">
-              <div className="absolute -inset-3 bg-white/20 rounded-full blur-2xl opacity-80 animate-pulse group-hover:opacity-100 transition-opacity" />
-              <div className="relative bg-white rounded-full shadow-2xl overflow-hidden w-24 h-24 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:h-10 border-4 border-white/20 flex items-center justify-center transition-all duration-300">
-                 <Image src={LOGO_URL} alt="RAVOYI" fill className="object-cover p-0" />
+              {/* Logo Highlight Glow */}
+              <div className="absolute -inset-4 bg-white/20 rounded-full blur-2xl opacity-80 animate-pulse group-hover:opacity-100 transition-opacity" />
+              <div className="relative bg-white rounded-full shadow-2xl overflow-hidden w-28 h-28 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:h-10 border-4 border-white/20 flex items-center justify-center transition-all duration-300">
+                 <Image src={LOGO_URL} alt="RAVOYI" fill className="object-cover" />
               </div>
             </div>
             
