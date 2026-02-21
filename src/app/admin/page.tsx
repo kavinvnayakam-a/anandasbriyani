@@ -1,8 +1,8 @@
-
 "use client"
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import MenuManager from "@/components/admin/menu-manager"; 
 import OrderManager from "@/components/admin/order-manager"; 
 import KotView from "@/components/admin/kot-view";
@@ -10,9 +10,9 @@ import AnalyticsDashboard from "@/components/admin/analytics-dashboard";
 import OrderHistory from "@/components/admin/order-history"; 
 import AiMenuImporter from "@/components/admin/ai-menu-importer";
 import { useFirestore } from "@/firebase";
+import { useLocalStorage } from "@/hooks/use-local-storage";
 import { collection, onSnapshot, query } from "firebase/firestore";
 import { 
-  LayoutDashboard, 
   LogOut, 
   Bell,
   Clock,
@@ -24,8 +24,6 @@ import {
   ChefHat,
   Store,
   PanelLeft,
-  ChevronLeft,
-  ChevronRight
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
@@ -39,7 +37,6 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  useSidebar
 } from "@/components/ui/sidebar";
 
 const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/dasara-finedine.firebasestorage.app/o/RAVOYI%20LOGO.pdf.webp?alt=media&token=f09f33b3-b303-400e-bbc4-b5dca418c8af";
@@ -47,10 +44,19 @@ const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/dasara-finedine.fi
 type TabType = 'counter' | 'packing' | 'history' | 'menu' | 'analytics' | 'ai-import';
 
 export default function AdminDashboard() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabType>('counter');
   const [newOrderCount, setNewOrderCount] = useState(0);
+  const [auth, setAuth] = useLocalStorage('ravoyi-admin-auth', false);
   const firestore = useFirestore();
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    // Redirect if not authenticated
+    if (!auth) {
+      router.push("/admin/login");
+    }
+  }, [auth, router]);
 
   useEffect(() => {
     audioRef.current = new Audio('https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3');
@@ -79,6 +85,11 @@ export default function AdminDashboard() {
     return () => unsubSound();
   }, [firestore]);
 
+  const handleSignOut = () => {
+    setAuth(false);
+    router.push("/admin/login");
+  };
+
   const navItems: { id: TabType; label: string; icon: any; showBadge?: boolean }[] = [
     { id: 'counter', label: 'Counter Feed', icon: Store, showBadge: newOrderCount > 0 },
     { id: 'packing', label: 'Kitchen Packing', icon: ChefHat },
@@ -88,6 +99,8 @@ export default function AdminDashboard() {
     { id: 'analytics', label: 'Business', icon: TrendingUp },
   ];
 
+  if (!auth) return null;
+
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="flex h-screen w-full bg-zinc-50 font-sans selection:bg-[#b8582e] selection:text-white text-zinc-900">
@@ -96,7 +109,6 @@ export default function AdminDashboard() {
         <Sidebar collapsible="icon" className="border-r-0 bg-[#b8582e] text-white">
           <SidebarHeader className="py-10 px-4 flex flex-col items-center overflow-hidden">
             <div className="relative group flex items-center justify-center">
-              {/* Highlighted Logo Circle */}
               <div className="absolute -inset-2 bg-white/20 rounded-full blur-xl opacity-80 animate-pulse group-hover:opacity-100 transition-opacity" />
               <div className="relative bg-white rounded-full shadow-2xl overflow-hidden w-20 h-20 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:h-10 border-2 border-white/30 flex items-center justify-center transition-all duration-300">
                  <Image src={LOGO_URL} alt="RAVOYI" fill className="object-cover p-0" />
@@ -141,7 +153,10 @@ export default function AdminDashboard() {
           </SidebarContent>
 
           <SidebarFooter className="p-4 mt-auto">
-            <button className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-white/80 hover:text-white transition-all group w-full px-2 py-4">
+            <button 
+              onClick={handleSignOut}
+              className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-white/80 hover:text-white transition-all group w-full px-2 py-4"
+            >
               <div className="p-2 bg-black/10 rounded-xl group-hover:bg-red-500/20 group-hover:text-red-500 transition-colors">
                 <LogOut className="w-4 h-4" />
               </div>
@@ -189,44 +204,14 @@ export default function AdminDashboard() {
 
           <main className="flex-1 overflow-y-auto bg-zinc-50/50 p-8 custom-scrollbar">
             <div className="max-w-7xl mx-auto pb-20">
-              {activeTab === 'counter' && (
-                <div className="animate-in fade-in slide-in-from-bottom-6 duration-700">
-                  <OrderManager />
-                </div>
-              )}
-
-              {activeTab === 'packing' && (
-                <div className="animate-in fade-in slide-in-from-bottom-6 duration-700">
-                  <KotView />
-                </div>
-              )}
-
-              {activeTab === 'history' && (
-                <div className="animate-in fade-in slide-in-from-bottom-6 duration-700">
-                  <OrderHistory />
-                </div>
-              )}
-              
-              {activeTab === 'menu' && (
-                <div className="animate-in fade-in slide-in-from-bottom-6 duration-700">
-                  <MenuManager />
-                </div>
-              )}
-
-              {activeTab === 'ai-import' && (
-                <div className="animate-in fade-in slide-in-from-bottom-6 duration-700">
-                  <AiMenuImporter />
-                </div>
-              )}
-
-              {activeTab === 'analytics' && (
-                <div className="animate-in fade-in slide-in-from-bottom-6 duration-700">
-                  <AnalyticsDashboard />
-                </div>
-              )}
+              {activeTab === 'counter' && <OrderManager />}
+              {activeTab === 'packing' && <KotView />}
+              {activeTab === 'history' && <OrderHistory />}
+              {activeTab === 'menu' && <MenuManager />}
+              {activeTab === 'ai-import' && <AiMenuImporter />}
+              {activeTab === 'analytics' && <AnalyticsDashboard />}
             </div>
 
-            {/* Redesigned Footer Inside Scroll Area */}
             <footer className="mt-auto py-12 border-t border-zinc-200 flex flex-col md:flex-row items-center justify-between gap-8 opacity-60 hover:opacity-100 transition-opacity">
                 <div className="flex items-center gap-4">
                   <ShieldCheck className="text-[#b8582e] w-6 h-6" />
@@ -247,7 +232,6 @@ export default function AdminDashboard() {
           </main>
         </div>
 
-        {/* Floating Support Button */}
         <Link href="mailto:info@getpik.in" className="fixed bottom-10 right-10 z-50 bg-[#b8582e] text-white p-5 rounded-2xl shadow-2xl shadow-[#b8582e]/20 hover:scale-110 active:scale-95 transition-all hover:bg-zinc-900 group">
             <MessageCircleQuestion className="h-7 w-7" />
             <span className="absolute right-full mr-4 bg-zinc-900 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap">
