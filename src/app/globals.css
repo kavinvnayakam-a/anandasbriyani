@@ -9,24 +9,24 @@ body {
 @layer base {
   :root {
     --background: 0 0% 0%; /* Pure Black */
-    --foreground: 45 61% 95%;
+    --foreground: 19 60% 95%;
     --card: 240 10% 3.9%;
-    --card-foreground: 45 61% 95%;
+    --card-foreground: 19 60% 95%;
     --popover: 240 10% 3.9%;
-    --popover-foreground: 45 61% 95%;
-    --primary: 45 61% 52%;      /* Gold (#d4af37) */
-    --primary-foreground: 0 0% 0%;
+    --popover-foreground: 19 60% 95%;
+    --primary: 19 60% 45%;      /* Terracotta (#b8582e) */
+    --primary-foreground: 0 0% 100%;
     --secondary: 240 10% 10%;
-    --secondary-foreground: 45 61% 52%;
+    --secondary-foreground: 19 60% 45%;
     --muted: 240 10% 10%;
-    --muted-foreground: 45 20% 60%;
-    --accent: 45 61% 52%; 
-    --accent-foreground: 0 0% 0%;
+    --muted-foreground: 19 20% 60%;
+    --accent: 19 60% 45%; 
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 240 10% 15%;
     --input: 240 10% 15%;
-    --ring: 45 61% 52%;
+    --ring: 19 60% 45%;
     --radius: 0.75rem;
   }
 }
@@ -40,13 +40,6 @@ body {
   }
 }
 
-/* Custom Decorative Button Shape */
-.dasara-banner {
-  clip-path: polygon(
-    0% 25%, 4% 50%, 0% 75%, 
-    8% 75%, 8% 100%, 92% 100%, 
-    92% 75%, 100% 75%, 96% 50%, 
-    100% 25%, 92% 25%, 92% 0%, 
-    8% 0%, 8% 25%
-  );
+.ravoyi-highlight {
+  box-shadow: 0 0 25px rgba(184, 88, 46, 0.4);
 }

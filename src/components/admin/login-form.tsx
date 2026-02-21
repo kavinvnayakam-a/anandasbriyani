@@ -9,7 +9,7 @@ import { Loader2, Unlock, ShieldCheck } from "lucide-react";
 
 export default function LoginForm() {
   const router = useRouter();
-  const [, setAuth] = useLocalStorage('dasara-admin-auth', false);
+  const [, setAuth] = useLocalStorage('ravoyi-admin-auth', false);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleDevLogin = () => {
@@ -22,30 +22,30 @@ export default function LoginForm() {
   };
 
   return (
-    <Card className="w-full max-w-md border-4 border-slate-900 bg-white shadow-[12px_12px_0px_0px_#1e293b] rounded-[2.5rem] overflow-hidden">
+    <Card className="w-full max-w-md border-4 border-zinc-900 bg-white shadow-[12px_12px_0px_0px_#1e293b] rounded-[2.5rem] overflow-hidden">
       <CardHeader className="text-center pt-10 pb-6">
-        <div className="mx-auto bg-slate-900 p-4 rounded-2xl w-fit mb-4">
+        <div className="mx-auto bg-zinc-900 p-4 rounded-2xl w-fit mb-4">
           <ShieldCheck className="w-8 h-8 text-primary" />
         </div>
-        <CardTitle className="text-4xl font-black uppercase italic tracking-tighter text-slate-900 leading-none">
-          Cinema Portal
+        <CardTitle className="text-4xl font-black uppercase italic tracking-tighter text-zinc-900 leading-none">
+          RAVOYI
         </CardTitle>
-        <CardDescription className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-3">
-          ART Cinemas Management
+        <CardDescription className="text-xs font-bold text-zinc-400 uppercase tracking-widest mt-3">
+          Kitchen Management Portal
         </CardDescription>
       </CardHeader>
 
       <CardContent className="p-8 space-y-6">
-        <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-4 text-center">
-          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">
-            Login restricted to authorized ART Cinemas staff.
+        <div className="bg-zinc-50 border-2 border-dashed border-zinc-200 rounded-2xl p-4 text-center">
+          <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-tight">
+            Restricted access for RAVOYI kitchen staff only.
           </p>
         </div>
 
         <Button 
           onClick={handleDevLogin} 
           disabled={isLoading} 
-          className="w-full h-16 text-lg font-black uppercase tracking-widest bg-primary hover:bg-red-700 text-white rounded-2xl shadow-[4px_4px_0px_0px_#1e293b] active:shadow-none active:translate-y-1 transition-all border-none"
+          className="w-full h-16 text-lg font-black uppercase tracking-widest bg-primary hover:bg-zinc-800 text-white rounded-2xl shadow-[4px_4px_0px_0px_#1e293b] active:shadow-none active:translate-y-1 transition-all border-none"
         >
           {isLoading ? (
             <Loader2 className="mr-2 h-6 w-6 animate-spin" />
@@ -57,8 +57,8 @@ export default function LoginForm() {
           )}
         </Button>
         
-        <p className="text-[9px] text-center text-slate-400 font-bold uppercase tracking-widest">
-          ART Cinemas System v1.0
+        <p className="text-[9px] text-center text-zinc-400 font-bold uppercase tracking-widest">
+          RAVOYI System v2.0
         </p>
       </CardContent>
     </Card>

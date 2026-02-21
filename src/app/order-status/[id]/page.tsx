@@ -1,23 +1,18 @@
-
 "use client"
 
 import { useEffect, useState, useRef } from 'react';
 import { useFirestore } from '@/firebase';
 import { 
   doc, 
-  onSnapshot,
-  collection,
-  query,
-  orderBy
+  onSnapshot
 } from 'firebase/firestore';
 import { useParams, useRouter } from 'next/navigation';
 import { 
-  Film,
-  Ticket,
-  ChevronRight
+  ChefHat,
+  Flame,
+  ArrowRight
 } from 'lucide-react';
 import Image from 'next/image';
-import placeholderData from '@/app/lib/placeholder-images.json';
 import { useSessionTimer } from '@/hooks/use-session-timer';
 import SessionTimer from '@/components/session-timer';
 
@@ -29,25 +24,21 @@ export default function OrderStatusPage() {
 
   const [status, setStatus] = useState('Pending');
   const [orderData, setOrderData] = useState<any>(null);
-  const [liveMovies, setLiveMovies] = useState<any[]>([]);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const lastStatus = useRef<string>('');
 
-  // Automatically redirect to thank you page when timer hits zero
   const { timeLeft } = useSessionTimer(() => {
     router.push('/thanks');
   });
 
   useEffect(() => {
-    // PREVENT BACK NAVIGATION
     window.history.pushState(null, "", window.location.href);
     const handlePopState = () => {
       window.history.pushState(null, "", window.location.href);
     };
     window.addEventListener('popstate', handlePopState);
     
-    // Audio init
     audioRef.current = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
 
     return () => {
@@ -70,43 +61,28 @@ export default function OrderStatusPage() {
       }
     });
 
-    const unsubMovies = onSnapshot(query(collection(firestore, "theater_ads")), (snapshot) => {
-      const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-      setLiveMovies(docs);
-    });
-
-    return () => { unsubOrder(); unsubMovies(); };
+    return () => unsubOrder();
   }, [id, firestore]);
-
-  const movies = liveMovies.filter(m => m.type === 'movie');
-  const ads = liveMovies.filter(m => m.type === 'ad');
-
-  // Fallback to placeholders if no live data
-  const movieDisplay = movies.length > 0 ? movies : placeholderData.movies;
-  const adDisplay = ads.length > 0 ? ads[0] : placeholderData.ads[0];
 
   return (
     <div className="fixed inset-0 bg-black font-sans overflow-hidden select-none">
       
-      {/* Background Cinematic Glow */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent opacity-30" />
 
-      {/* Main Content Area (Scrollable part) */}
       <div className="absolute inset-0 overflow-y-auto pb-20 no-scrollbar">
         <div className="max-w-md mx-auto px-6 pt-12 space-y-10">
           
-          {/* Order Status Header */}
           <div className="bg-zinc-900/80 backdrop-blur-xl border border-primary/20 p-8 rounded-[2.5rem] shadow-2xl space-y-6 relative overflow-hidden">
             <div className="flex justify-between items-center relative z-10">
               <div className="flex flex-col">
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-1">Live Ticket</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-1">Kitchen Ticket</span>
                 <span className="text-xl font-black italic uppercase text-white">#{orderData?.orderNumber}</span>
               </div>
               <div className="flex flex-col items-end gap-1">
                 <div className="bg-primary/10 px-4 py-2 rounded-xl border border-primary/20">
-                  <span className="text-[10px] font-black uppercase text-primary tracking-widest">{orderData?.tableId}</span>
+                  <span className="text-[10px] font-black uppercase text-primary tracking-widest">Takeaway</span>
                 </div>
-                <div className="flex items-center gap-2 mt-2 px-3 py-1 bg-black/40 rounded-full border border-primary/10 shadow-[0_0_10px_rgba(212,175,55,0.2)]">
+                <div className="flex items-center gap-2 mt-2 px-3 py-1 bg-black/40 rounded-full border border-primary/10 shadow-[0_0_10px_rgba(184,88,46,0.2)]">
                   <SessionTimer timeLeft={timeLeft} />
                 </div>
               </div>
@@ -114,14 +90,14 @@ export default function OrderStatusPage() {
 
             <div className="relative h-2 w-full bg-zinc-800 rounded-full overflow-hidden">
               <div 
-                className="h-full bg-primary transition-all duration-1000 shadow-[0_0_10px_rgba(212,175,55,0.5)]"
+                className="h-full bg-primary transition-all duration-1000 shadow-[0_0_10px_rgba(184,88,46,0.5)]"
                 style={{ width: status === 'Pending' ? '30%' : status === 'Served' ? '100%' : '65%' }}
               />
             </div>
 
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">
-                {status === 'Pending' ? 'Theater Approval' : status === 'Served' ? 'Enjoy the show!' : 'Treats Incoming'}
+                {status === 'Pending' ? 'Waiting for Kitchen' : status === 'Served' ? 'Ready for pickup!' : 'Flames Active'}
               </span>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-primary uppercase italic">{status}</span>
@@ -130,74 +106,30 @@ export default function OrderStatusPage() {
             </div>
           </div>
 
-          {/* Ad Banner */}
-          {adDisplay && (
-            <div className="relative group overflow-hidden rounded-[2rem] border border-primary/20 aspect-[2/1] bg-zinc-900 shadow-2xl">
-              <Image 
-                src={adDisplay.url} 
-                alt={adDisplay.title} 
-                fill 
-                className="object-cover opacity-60 group-hover:scale-105 transition-transform duration-700" 
-                data-ai-hint={adDisplay.hint || "cinema luxury"}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
-              <div className="absolute bottom-6 left-6 right-6">
-                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary mb-1">ART Exclusive</p>
-                <h4 className="text-lg font-black italic uppercase text-white tracking-tight leading-none truncate">{adDisplay.title}</h4>
-                {adDisplay.details ? (
-                  <p className="text-[9px] font-bold text-zinc-300 uppercase mt-2 line-clamp-2">{adDisplay.details}</p>
-                ) : (
-                  <p className="text-[9px] font-bold text-zinc-400 uppercase mt-2">Visit the concierge for more details</p>
-                )}
+          <div className="bg-primary/5 border border-primary/10 p-10 rounded-[3rem] text-center space-y-6">
+            <div className="relative inline-block">
+              <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full" />
+              <div className="relative bg-zinc-900 p-6 rounded-full border border-primary/20">
+                <ChefHat className="h-10 w-10 text-primary animate-bounce" />
               </div>
             </div>
-          )}
-
-          {/* Upcoming Movies Section */}
-          <div className="space-y-6">
-            <div className="flex items-center justify-between px-2">
-              <h3 className="text-sm font-black italic uppercase tracking-widest text-white flex items-center gap-2">
-                <Film size={16} className="text-primary" /> Coming Soon
-              </h3>
-              <button className="text-[9px] font-black uppercase text-primary tracking-widest flex items-center gap-1 hover:text-white transition-colors">
-                View All <ChevronRight size={10} />
-              </button>
-            </div>
-
-            <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4 -mx-2 px-2">
-              {movieDisplay.map((movie: any) => (
-                <div key={movie.id} className="shrink-0 w-40 space-y-3">
-                  <div className="relative aspect-[2/3] rounded-2xl overflow-hidden border border-white/10 shadow-xl group">
-                    <Image 
-                      src={movie.url} 
-                      alt={movie.title} 
-                      fill 
-                      className="object-cover transition-transform duration-500 group-hover:scale-110" 
-                      data-ai-hint={movie.hint || "movie poster"}
-                    />
-                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors" />
-                    <div className="absolute top-2 right-2">
-                       <div className="bg-black/60 backdrop-blur-md p-1.5 rounded-full border border-white/10">
-                          <Ticket size={12} className="text-primary" />
-                       </div>
-                    </div>
-                  </div>
-                  <div className="px-1 text-center">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-zinc-200 truncate">
-                      {movie.title}
-                    </p>
-                    {movie.details && <p className="text-[8px] text-zinc-500 font-bold uppercase mt-1 truncate">{movie.details}</p>}
-                  </div>
-                </div>
-              ))}
+            <div className="space-y-2">
+              <h3 className="text-xl font-black italic uppercase text-white">We're on it!</h3>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-primary/60 leading-relaxed">
+                Our chefs are crafting your Telangana kitchen specialties with authentic spice blends. Please wait at the counter.
+              </p>
             </div>
           </div>
 
-          {/* Simple Info Message */}
-          <div className="bg-primary/5 border border-primary/10 p-6 rounded-3xl text-center">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-primary/40">
-              Your cinematic treats are on the way. Please stay in your seat and enjoy the pre-show.
-            </p>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-zinc-900/50 p-6 rounded-3xl border border-primary/10 flex flex-col items-center gap-3 text-center">
+              <Flame size={20} className="text-primary" />
+              <span className="text-[8px] font-black uppercase tracking-widest text-zinc-500">Authentic Preparation</span>
+            </div>
+            <div className="bg-zinc-900/50 p-6 rounded-3xl border border-primary/10 flex flex-col items-center gap-3 text-center">
+              <ChefHat size={20} className="text-primary" />
+              <span className="text-[8px] font-black uppercase tracking-widest text-zinc-500">Handcrafted Spices</span>
+            </div>
           </div>
 
         </div>

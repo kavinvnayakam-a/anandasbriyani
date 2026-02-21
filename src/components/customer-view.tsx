@@ -1,9 +1,6 @@
-
 "use client"
 
 import { useState, useMemo, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useSessionTimer } from '@/hooks/use-session-timer';
 import { useCart } from '@/hooks/use-cart';
 import { useFirestore } from '@/firebase'; 
 import { collection, onSnapshot, query } from 'firebase/firestore'; 
@@ -11,7 +8,6 @@ import { Header } from '@/components/header';
 import { MenuItemCard } from '@/components/menu-item-card';
 import { CartSheet } from '@/components/cart-sheet';
 import { CartIcon } from '@/components/cart-icon';
-import TableSelection from '@/components/table-selection';
 import type { MenuItem } from '@/lib/types';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -19,15 +15,15 @@ import {
   Search, 
   ArrowUp, 
   X,
-  Film
+  ChefHat,
+  Flame
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
-const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/dasara-finedine.firebasestorage.app/o/Art%20Cinemas%20Logo.jpeg?alt=media&token=0e8ee706-4ba1-458d-b2b9-d85434f8f2ba";
+const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/dasara-finedine.firebasestorage.app/o/RAVOYI%20LOGO.pdf.webp?alt=media&token=f09f33b3-b303-400e-bbc4-b5dca418c8af";
 
 export default function CustomerView({ tableId }: { tableId: string | null, mode: 'dine-in' | 'takeaway' }) {
-  const router = useRouter();
-  const { clearCart, addToCart } = useCart();
+  const { addToCart } = useCart();
   const [isCartOpen, setCartOpen] = useState(false);
   const firestore = useFirestore();
 
@@ -60,14 +56,8 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Session timer active for tracking demo conclude
-  const { timeLeft } = useSessionTimer(() => {
-    console.log("Demo session concluded");
-  });
-
   const categorizedMenu = useMemo(() => {
-    // Cinematic Combos ALWAYS at the first line
-    const categoryOrder = ['Cinematic Combos', 'Combo', 'Cinematic Specials', 'Popcorn & Snacks', 'Appetizers', 'Main Course', 'Desserts', 'Beverages'];
+    const categoryOrder = ['Cinematic Combos', 'Combo', 'Specialties', 'Appetizers', 'Main Course', 'Biryani', 'Desserts', 'Beverages'];
     
     const filtered = menuItems.filter(item => 
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -96,16 +86,12 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  if (!tableId) {
-    return <TableSelection />;
-  }
-
   if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="relative flex flex-col items-center">
           <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-          <p className="mt-4 text-sm font-black text-primary animate-pulse tracking-widest uppercase">ART Cinemas</p>
+          <p className="mt-4 text-sm font-black text-primary animate-pulse tracking-widest uppercase">RAVOYI</p>
         </div>
       </div>
     );
@@ -113,7 +99,7 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
 
   return (
     <div className="min-h-screen bg-black overflow-x-hidden">
-      <Header tableId={tableId} onCartClick={() => setCartOpen(true)} timeLeft={timeLeft} />
+      <Header tableId={tableId} onCartClick={() => setCartOpen(true)} timeLeft={0} />
       
       <div className="sticky top-20 z-30 bg-black/95 backdrop-blur-xl border-b border-primary/10 px-4 py-4 md:py-6 space-y-4">
         <div className="max-w-5xl mx-auto flex flex-col gap-4">
@@ -121,7 +107,7 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={18} />
             <input 
               type="text"
-              placeholder="Search cinematic treats..."
+              placeholder="Search kitchen specialties..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full h-12 md:h-14 pl-12 pr-12 bg-zinc-900/50 border border-primary/10 rounded-full text-xs md:text-sm font-bold text-primary focus:ring-2 ring-primary/20 transition-all outline-none"
@@ -148,7 +134,7 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
                   className={cn(
                     "shrink-0 px-4 md:px-6 py-2 rounded-full transition-all duration-300 font-bold uppercase tracking-widest text-[8px] md:text-[10px] border",
                     activeCategory === category 
-                      ? "bg-primary text-black border-primary shadow-lg shadow-primary/20" 
+                      ? "bg-primary text-white border-primary shadow-lg shadow-primary/20" 
                       : "bg-transparent text-primary/60 border-primary/20 hover:border-primary/40 hover:text-primary"
                   )}
                 >
@@ -164,18 +150,18 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
         <header className="mb-8 md:mb-16 text-center md:text-left flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-2 md:space-y-4">
             <h1 className="text-4xl md:text-7xl font-black text-white tracking-tighter uppercase italic">
-              {searchQuery ? `Searching...` : "The Menu"}
+              {searchQuery ? `Searching...` : "Kitchen Menu"}
             </h1>
             <div className="flex items-center justify-center md:justify-start gap-4">
               <span className="w-12 md:w-16 h-1 bg-primary rounded-full" />
               <p className="text-primary font-black text-[10px] md:text-xs uppercase tracking-[0.4em]">
-                {tableId}
+                A Telangana Kitchen
               </p>
             </div>
           </div>
           <div className="flex items-center justify-center md:justify-start gap-3 bg-zinc-900/50 px-4 md:px-6 py-2 md:py-3 rounded-full border border-primary/10 shadow-xl">
-             <Film className="text-primary" size={14} />
-             <span className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-primary/60">Premium Cinematic Dining</span>
+             <ChefHat className="text-primary" size={14} />
+             <span className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-primary/60">Authentic Flavors</span>
           </div>
         </header>
 
@@ -211,7 +197,7 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
               </div>
               <button 
                 onClick={() => setSearchQuery("")} 
-                className="inline-flex items-center gap-3 bg-primary text-black px-8 md:px-12 py-3 md:py-4 rounded-full font-black text-[10px] md:text-xs uppercase tracking-widest hover:bg-white transition-all shadow-lg"
+                className="inline-flex items-center gap-3 bg-primary text-white px-8 md:px-12 py-3 md:py-4 rounded-full font-black text-[10px] md:text-xs uppercase tracking-widest hover:bg-white hover:text-primary transition-all shadow-lg"
               >
                 Clear Search <X size={14} />
               </button>
@@ -223,7 +209,7 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
       <button
         onClick={scrollToTop}
         className={cn(
-          "fixed bottom-24 md:bottom-28 right-6 md:right-8 z-[60] p-4 md:p-5 bg-zinc-900 border border-primary/30 shadow-2xl rounded-full text-primary transition-all duration-500 hover:bg-primary hover:text-black",
+          "fixed bottom-24 md:bottom-28 right-6 md:right-8 z-[60] p-4 md:p-5 bg-zinc-900 border border-primary/30 shadow-2xl rounded-full text-primary transition-all duration-500 hover:bg-primary hover:text-white",
           showBackToTop ? "translate-y-0 opacity-100 scale-100" : "translate-y-20 opacity-0 scale-50"
         )}
       >
@@ -232,12 +218,12 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
 
       <footer className="bg-zinc-950 border-t border-primary/10 py-16 md:py-24 px-6 md:px-8">
         <div className="max-w-5xl mx-auto flex flex-col items-center gap-8 md:gap-12">
-          <div className="relative p-1 bg-primary rounded-full shadow-2xl shadow-primary/20">
+          <div className="relative p-2 bg-white rounded-full ravoyi-highlight">
             <Image 
               src={LOGO_URL} 
-              alt="ART Cinemas Logo" 
-              width={64} 
-              height={64} 
+              alt="RAVOYI Logo" 
+              width={80} 
+              height={80} 
               className="rounded-full" 
             />
           </div>
@@ -245,7 +231,7 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
           <div className="flex flex-col items-center gap-6 md:gap-8 text-center">
              <div className="flex items-center gap-3 md:gap-4">
                <span className="h-px w-8 md:w-10 bg-primary/20" />
-               <p className="font-medium text-primary/40 text-[10px] md:text-sm tracking-wide">ELITE CINEMATIC DINING EXPERIENCE</p>
+               <p className="font-medium text-primary/40 text-[10px] md:text-sm tracking-wide">A TELANGANA KITCHEN EXPERIENCE</p>
                <span className="h-px w-8 md:w-10 bg-primary/20" />
              </div>
              
