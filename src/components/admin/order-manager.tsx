@@ -8,7 +8,7 @@ import {
 } from 'firebase/firestore';
 import { Order } from '@/lib/types';
 import { 
-  Printer, Square, CheckSquare, Settings, Check, Clock, User, Phone, Banknote
+  Printer, Square, CheckSquare, Settings, Check, Clock, User, Phone, Banknote, Store
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
