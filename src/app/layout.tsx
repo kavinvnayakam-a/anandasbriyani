@@ -7,6 +7,9 @@ import { FirebaseClientProvider } from '@/firebase/client-provider';
 export const metadata: Metadata = {
   title: 'RAVOYI - A Telangana Kitchen',
   description: 'Premium dining experience.',
+  icons: {
+    icon: 'https://firebasestorage.googleapis.com/v0/b/dasara-finedine.firebasestorage.app/o/RAVOYI%20LOGO.pdf.webp?alt=media&token=f09f33b3-b303-400e-bbc4-b5dca418c8af',
+  },
   // Strictly prevent indexing and crawling across all search engines
   robots: {
     index: false,
