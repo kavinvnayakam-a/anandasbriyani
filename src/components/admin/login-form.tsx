@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect } from "react";
@@ -9,12 +8,14 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Unlock, Mail, Lock, ShieldCheck } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 
 const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/dasara-finedine.firebasestorage.app/o/RAVOYI%20LOGO.pdf.webp?alt=media&token=f09f33b3-b303-400e-bbc4-b5dca418c8af";
 
 export default function LoginForm() {
   const router = useRouter();
+  const { toast } = useToast();
   const [auth, setAuth, isAuthLoaded] = useLocalStorage('ravoyi-admin-auth', false);
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
@@ -30,12 +31,21 @@ export default function LoginForm() {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate authentication logic
+    // Simulate authentication logic with strict email check
     setTimeout(() => {
-      if (email && password) {
+      if (email === "info@getpik.in" && password.length >= 4) {
         setAuth(true);
+        toast({
+          title: "Authentication Successful",
+          description: "Welcome back to the RAVOYI Kitchen Console.",
+        });
       } else {
         setIsLoading(false);
+        toast({
+          variant: "destructive",
+          title: "Access Denied",
+          description: "Invalid administrator credentials provided.",
+        });
       }
     }, 1200);
   };
@@ -81,7 +91,7 @@ export default function LoginForm() {
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300 w-4 h-4" />
                 <Input 
                   type="email" 
-                  placeholder="admin@ravoyi.kitchen" 
+                  placeholder="info@getpik.in" 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="pl-12 h-14 bg-zinc-50 border-zinc-100 rounded-2xl font-bold text-black placeholder:text-zinc-300 focus:ring-[#b8582e]/20 focus:border-[#b8582e] transition-all"
