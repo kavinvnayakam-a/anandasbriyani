@@ -30,6 +30,12 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const firestore = useFirestore();
 
+  // GST Calculations
+  const subtotal = cartTotal;
+  const cgst = subtotal * 0.025;
+  const sgst = subtotal * 0.025;
+  const grandTotal = subtotal + cgst + sgst;
+
   // Checkout Form State
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
@@ -80,7 +86,10 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
           quantity: item.quantity,
           image: item.image
         })),
-        totalPrice: cartTotal,
+        subtotal: subtotal,
+        cgst: cgst,
+        sgst: sgst,
+        totalPrice: grandTotal,
         status: 'Pending',
         timestamp: serverTimestamp(),
         createdAt: Date.now(),
@@ -196,13 +205,29 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
           </div>
 
           {cartItems.length > 0 && (
-            <SheetFooter className="p-10 bg-black/20 border-t border-white/10 mt-auto">
-              <div className="w-full space-y-10">
-                <div className="flex justify-between items-end">
+            <SheetFooter className="p-8 bg-black/20 border-t border-white/10 mt-auto">
+              <div className="w-full space-y-4">
+                {/* Tax Breakdown */}
+                <div className="space-y-2 border-b border-white/10 pb-4">
+                  <div className="flex justify-between items-center text-xs font-bold uppercase tracking-widest text-white/60">
+                    <span>Subtotal</span>
+                    <span>{formatCurrency(subtotal)}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-xs font-bold uppercase tracking-widest text-white/60">
+                    <span>CGST @ 2.5%</span>
+                    <span>{formatCurrency(cgst)}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-xs font-bold uppercase tracking-widest text-white/60">
+                    <span>SGST @ 2.5%</span>
+                    <span>{formatCurrency(sgst)}</span>
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-end pt-2">
                   <div className="flex flex-col">
-                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">Total Amount</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">Grand Total</span>
                     <div className="text-4xl font-black text-white tracking-tighter tabular-nums mt-1">
-                      {formatCurrency(cartTotal)}
+                      {formatCurrency(grandTotal)}
                     </div>
                   </div>
                   <div className="h-10 w-0.5 bg-white/20 rounded-full" />
@@ -210,7 +235,7 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
                 
                 <Button
                   onClick={handleOpenCheckout}
-                  className="w-full h-16 text-[10px] font-black uppercase tracking-[0.3em] bg-white text-[#b8582e] hover:bg-black hover:text-white rounded-full transition-all flex items-center justify-center gap-4 shadow-2xl active:scale-95 border-none"
+                  className="w-full h-16 text-[10px] font-black uppercase tracking-[0.3em] bg-white text-[#b8582e] hover:bg-black hover:text-white rounded-full transition-all flex items-center justify-center gap-4 shadow-2xl active:scale-95 border-none mt-4"
                 >
                   Confirm Order
                   <ShoppingBag className="h-4 w-4" />
