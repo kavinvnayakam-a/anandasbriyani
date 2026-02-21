@@ -93,25 +93,26 @@ export default function AdminDashboard() {
       <div className="flex h-screen w-full bg-zinc-50 font-sans selection:bg-[#b8582e] selection:text-white text-zinc-900">
         
         {/* COLLAPSIBLE SIDEBAR */}
-        <Sidebar className="border-r-0 bg-[#b8582e] text-white">
-          <SidebarHeader className="py-12 px-6 flex flex-col items-center">
-            <div className="relative group mb-4">
+        <Sidebar collapsible="icon" className="border-r-0 bg-[#b8582e] text-white">
+          <SidebarHeader className="py-10 px-4 flex flex-col items-center overflow-hidden">
+            <div className="relative group flex items-center justify-center">
               {/* Highlighted Logo Circle */}
-              <div className="absolute -inset-4 bg-white/20 rounded-full blur-2xl opacity-80 animate-pulse group-hover:opacity-100 transition-opacity" />
-              <div className="relative bg-white p-2 rounded-full shadow-2xl overflow-hidden w-24 h-24 border-4 border-white/30 flex items-center justify-center">
-                 <Image src={LOGO_URL} alt="RAVOYI" width={80} height={80} className="object-cover p-1" />
+              <div className="absolute -inset-2 bg-white/20 rounded-full blur-xl opacity-80 animate-pulse group-hover:opacity-100 transition-opacity" />
+              <div className="relative bg-white rounded-full shadow-2xl overflow-hidden w-20 h-20 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:h-10 border-2 border-white/30 flex items-center justify-center transition-all duration-300">
+                 <Image src={LOGO_URL} alt="RAVOYI" fill className="object-cover p-0" />
               </div>
             </div>
-            <div className="group-data-[collapsible=icon]:hidden text-center">
-              <h1 className="text-xl font-black uppercase tracking-[0.2em] text-white mt-4">RAVOYI</h1>
+            
+            <div className="group-data-[collapsible=icon]:hidden text-center transition-all duration-300">
+              <h1 className="text-xl font-black uppercase tracking-[0.2em] text-white mt-6">RAVOYI</h1>
               <div className="flex items-center gap-2 mt-2 px-3 py-1 bg-black/10 rounded-full border border-white/10">
                 <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                <span className="text-[10px] font-bold text-white/80 uppercase tracking-widest">Kitchen Management</span>
+                <span className="text-[9px] font-bold text-white/80 uppercase tracking-widest">Management</span>
               </div>
             </div>
           </SidebarHeader>
 
-          <SidebarContent className="px-4 py-2">
+          <SidebarContent className="px-3 py-4">
             <SidebarMenu>
               {navItems.map((item) => (
                 <SidebarMenuItem key={item.id} className="mb-2">
@@ -122,16 +123,16 @@ export default function AdminDashboard() {
                     }}
                     isActive={activeTab === item.id}
                     className={cn(
-                      "flex items-center gap-4 px-6 py-7 rounded-2xl text-[11px] font-black uppercase tracking-[0.1em] transition-all relative w-full h-auto",
+                      "flex items-center gap-4 px-4 py-6 rounded-2xl text-[11px] font-black uppercase tracking-[0.1em] transition-all relative w-full h-auto",
                       activeTab === item.id 
-                      ? "bg-white text-[#b8582e] shadow-xl hover:bg-white/90" 
-                      : "text-white/60 hover:bg-white/10 hover:text-white"
+                      ? "bg-white text-[#b8582e] shadow-xl hover:bg-white/95" 
+                      : "text-white hover:bg-white/10"
                     )}
                   >
-                    <item.icon className="w-5 h-5 shrink-0" />
+                    <item.icon className={cn("w-5 h-5 shrink-0 transition-colors", activeTab === item.id ? "text-[#b8582e]" : "text-white")} />
                     <span className="group-data-[collapsible=icon]:hidden">{item.label}</span>
                     {item.showBadge && activeTab !== item.id && (
-                      <span className="absolute top-4 right-4 w-2 h-2 bg-white rounded-full animate-ping" />
+                      <span className="absolute top-3 right-3 w-2 h-2 bg-white rounded-full animate-ping" />
                     )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -139,12 +140,12 @@ export default function AdminDashboard() {
             </SidebarMenu>
           </SidebarContent>
 
-          <SidebarFooter className="p-6 mt-auto">
-            <button className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-all group w-full px-2">
-              <div className="p-3 bg-black/10 rounded-xl group-hover:bg-red-500/20 group-hover:text-red-500 transition-colors">
+          <SidebarFooter className="p-4 mt-auto">
+            <button className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-white/80 hover:text-white transition-all group w-full px-2 py-4">
+              <div className="p-2 bg-black/10 rounded-xl group-hover:bg-red-500/20 group-hover:text-red-500 transition-colors">
                 <LogOut className="w-4 h-4" />
               </div>
-              <span className="group-data-[collapsible=icon]:hidden">Terminate Session</span>
+              <span className="group-data-[collapsible=icon]:hidden">Terminate</span>
             </button>
           </SidebarFooter>
         </Sidebar>
