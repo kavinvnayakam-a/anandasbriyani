@@ -55,7 +55,7 @@ export default function LoginForm() {
           <div className="relative mx-auto w-32 h-32 mb-8">
             {/* Logo Highlight Glow */}
             <div className="absolute -inset-4 bg-[#b8582e]/20 rounded-full blur-2xl animate-pulse" />
-            <div className="relative bg-white rounded-full border-4 border-[#b8582e]/10 shadow-2xl overflow-hidden h-full w-full">
+            <div className="relative bg-white rounded-full border-4 border-[#b8582e]/10 shadow-2xl overflow-hidden h-full w-full flex items-center justify-center">
               <Image 
                 src={LOGO_URL} 
                 alt="RAVOYI" 
@@ -84,7 +84,7 @@ export default function LoginForm() {
                   placeholder="admin@ravoyi.kitchen" 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="pl-12 h-14 bg-zinc-50 border-zinc-100 rounded-2xl font-bold text-zinc-900 placeholder:text-zinc-300 focus:ring-[#b8582e]/20 focus:border-[#b8582e] transition-all"
+                  className="pl-12 h-14 bg-zinc-50 border-zinc-100 rounded-2xl font-bold text-black placeholder:text-zinc-300 focus:ring-[#b8582e]/20 focus:border-[#b8582e] transition-all"
                   required
                 />
               </div>
@@ -99,7 +99,7 @@ export default function LoginForm() {
                   placeholder="••••••••" 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-12 h-14 bg-zinc-50 border-zinc-100 rounded-2xl font-bold text-zinc-900 placeholder:text-zinc-300 focus:ring-[#b8582e]/20 focus:border-[#b8582e] transition-all"
+                  className="pl-12 h-14 bg-zinc-50 border-zinc-100 rounded-2xl font-bold text-black placeholder:text-zinc-300 focus:ring-[#b8582e]/20 focus:border-[#b8582e] transition-all"
                   required
                 />
               </div>
