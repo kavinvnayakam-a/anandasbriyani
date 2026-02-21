@@ -22,7 +22,7 @@ export interface Order {
   paymentMethod: 'Card' | 'Cash' | 'UPI';
   items: CartItem[];
   totalPrice: number;
-  status: 'Pending' | 'Received' | 'Preparing' | 'Served' | 'Ready' | 'Completed';
+  status: 'Pending' | 'Received' | 'Preparing' | 'Served' | 'Ready' | 'Handover' | 'Completed';
   timestamp: any;
   orderNumber: string;
   createdAt: number;

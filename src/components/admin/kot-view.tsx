@@ -8,7 +8,7 @@ import {
 } from 'firebase/firestore';
 import { Order } from '@/lib/types';
 import { 
-  CheckCircle2, Clock, Check, ChefHat, User, Hash, Box, PackageCheck
+  CheckCircle2, Clock, Check, ChefHat, User, Hash, Box, PackageCheck, Handshake
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -20,7 +20,6 @@ export default function KotView() {
 
   useEffect(() => {
     if (!firestore) return;
-    // Show Received, Preparing, Served orders in KOT
     const q = query(collection(firestore, "orders"), orderBy("timestamp", "asc"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       setOrders(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Order[]);
@@ -37,7 +36,6 @@ export default function KotView() {
     const items = [...orderSnap.data().items];
     items[itemIndex].status = "Served";
     
-    // Check if all items are packed
     const allPacked = items.every(item => item.status === 'Served');
     const newStatus = allPacked ? "Served" : "Preparing";
 
@@ -49,6 +47,12 @@ export default function KotView() {
     if (!firestore) return;
     await updateDoc(doc(firestore, "orders", orderId), { status: "Ready" });
     toast({ title: "Ready for Pickup", description: "Customer notified & timer started." });
+  };
+
+  const markHandover = async (orderId: string) => {
+    if (!firestore) return;
+    await updateDoc(doc(firestore, "orders", orderId), { status: "Handover" });
+    toast({ title: "Order Handovered", description: "Marked as collected in queue." });
   };
 
   const archiveOrder = async (orderId: string) => {
@@ -76,7 +80,7 @@ export default function KotView() {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  const kitchenOrders = orders.filter(o => ['Received', 'Preparing', 'Served', 'Ready'].includes(o.status));
+  const kitchenOrders = orders.filter(o => ['Received', 'Preparing', 'Served', 'Ready', 'Handover'].includes(o.status));
 
   return (
     <div className="space-y-8">
@@ -101,7 +105,9 @@ export default function KotView() {
         {kitchenOrders.map((order) => (
           <div key={order.id} className={cn(
             "bg-white border-2 rounded-[3rem] p-8 flex flex-col transition-all shadow-xl hover:shadow-2xl relative overflow-hidden group",
-            order.status === 'Ready' ? 'border-emerald-500/50' : 'border-zinc-200'
+            order.status === 'Ready' ? 'border-emerald-500/50' : 
+            order.status === 'Handover' ? 'border-[#b8582e] bg-[#b8582e]/5 ravoyi-highlight' : 
+            'border-zinc-200'
           )}>
             <div className="flex justify-between items-start mb-6">
               <div className="flex items-center gap-3">
@@ -121,9 +127,10 @@ export default function KotView() {
                 order.status === 'Received' ? 'bg-blue-100 text-blue-600 border-blue-200' : 
                 order.status === 'Preparing' ? 'bg-orange-100 text-orange-600 border-orange-200' :
                 order.status === 'Served' ? 'bg-emerald-100 text-emerald-600 border-emerald-200' :
+                order.status === 'Handover' ? 'bg-[#b8582e] text-white border-[#b8582e]' :
                 'bg-emerald-500 text-white border-emerald-600'
               )}>
-                {order.status === 'Served' ? 'Packed' : order.status}
+                {order.status === 'Served' ? 'Packed' : order.status === 'Handover' ? 'Collected' : order.status}
               </div>
             </div>
 
@@ -147,7 +154,7 @@ export default function KotView() {
                        {item.name}
                     </span>
                   </div>
-                  {item.status !== 'Served' && order.status !== 'Ready' && (
+                  {item.status !== 'Served' && order.status !== 'Ready' && order.status !== 'Handover' && (
                     <button 
                       onClick={() => markItemPacked(order.id, idx)} 
                       className="bg-[#b8582e] text-white px-4 py-1.5 rounded-xl text-[10px] font-black uppercase italic hover:bg-zinc-900 transition-all"
@@ -163,7 +170,7 @@ export default function KotView() {
             </div>
 
             <div className="mt-auto space-y-3">
-              {order.status !== 'Ready' && (
+              {order.status !== 'Ready' && order.status !== 'Handover' && (
                 <button 
                   onClick={() => markReadyForPickup(order.id)}
                   disabled={order.status !== 'Served'}
@@ -180,10 +187,19 @@ export default function KotView() {
 
               {order.status === 'Ready' && (
                 <button 
-                  onClick={() => archiveOrder(order.id)} 
-                  className="w-full py-5 bg-zinc-900 text-white rounded-2xl font-black uppercase italic text-[11px] tracking-widest flex items-center justify-center gap-3 hover:bg-[#b8582e] transition-all shadow-xl"
+                  onClick={() => markHandover(order.id)} 
+                  className="w-full py-5 bg-[#b8582e] text-white rounded-2xl font-black uppercase italic text-[11px] tracking-widest flex items-center justify-center gap-3 hover:bg-zinc-900 transition-all shadow-xl"
                 >
-                  <Check size={20}/> Handover & Archive
+                  <Handshake size={20}/> Customer Handover
+                </button>
+              )}
+
+              {order.status === 'Handover' && (
+                <button 
+                  onClick={() => archiveOrder(order.id)} 
+                  className="w-full py-5 bg-zinc-900 text-white rounded-2xl font-black uppercase italic text-[11px] tracking-widest flex items-center justify-center gap-3 hover:bg-emerald-600 transition-all shadow-xl"
+                >
+                  <Check size={20}/> Complete & Archive
                 </button>
               )}
             </div>

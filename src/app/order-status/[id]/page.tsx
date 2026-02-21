@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useEffect, useState, useRef } from 'react';
@@ -9,10 +8,8 @@ import { doc } from 'firebase/firestore';
 import { 
   CheckCircle2, 
   ChefHat, 
-  MapPin,
   Star,
   PackageCheck,
-  Clock,
   ShieldAlert,
   BellRing
 } from 'lucide-react';
@@ -54,7 +51,6 @@ export default function OrderStatusPage() {
   useEffect(() => {
     if (order?.status === 'Ready') {
       setIsTimerActive(true);
-      // Play beep sound once when status changes to Ready
       if (!audioPlayed.current) {
         const audio = new Audio(BEEP_SOUND_URL);
         audio.play().catch(e => console.log("Audio play blocked by browser:", e));
@@ -83,40 +79,32 @@ export default function OrderStatusPage() {
       { 
         id: 1, 
         label: 'Waiting for Approval', 
-        time: 'Pending', 
-        completed: ['Received', 'Preparing', 'Served', 'Ready'].includes(status), 
+        time: 'Order Pending', 
+        completed: ['Received', 'Preparing', 'Served', 'Ready', 'Handover'].includes(status), 
         active: status === 'Pending', 
         icon: ShieldAlert 
       },
       { 
         id: 2, 
         label: 'Order Confirmed', 
-        time: 'Received', 
-        completed: ['Preparing', 'Served', 'Ready'].includes(status), 
+        time: 'Payment Received', 
+        completed: ['Preparing', 'Served', 'Ready', 'Handover'].includes(status), 
         active: status === 'Received', 
         icon: CheckCircle2 
       },
       { 
         id: 3, 
-        label: 'Preparing Food', 
+        label: 'Preparing & Quality Check', 
         time: 'In Kitchen', 
-        completed: ['Served', 'Ready'].includes(status), 
-        active: status === 'Preparing', 
+        completed: ['Ready', 'Handover'].includes(status), 
+        active: ['Preparing', 'Served'].includes(status), 
         icon: ChefHat 
       },
       { 
         id: 4, 
-        label: 'Quality Checked', 
-        time: 'Packed', 
-        completed: ['Ready'].includes(status), 
-        active: status === 'Served', 
-        icon: PackageCheck 
-      },
-      { 
-        id: 5, 
         label: 'Ready for Pickup', 
         time: isTimerActive ? formatTimer(timeLeft) : 'Pending', 
-        completed: status === 'Ready', 
+        completed: ['Ready', 'Handover'].includes(status), 
         active: status === 'Ready', 
         icon: BellRing 
       },
@@ -239,4 +227,3 @@ export default function OrderStatusPage() {
     </div>
   );
 }
-
