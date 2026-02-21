@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useEffect, useState, useRef } from 'react';
@@ -49,13 +50,18 @@ export default function OrderStatusPage() {
   }, []);
 
   useEffect(() => {
+    // Beep when order is Ready for the customer to hear
     if (order?.status === 'Ready') {
-      setIsTimerActive(true);
       if (!audioPlayed.current) {
         const audio = new Audio(BEEP_SOUND_URL);
         audio.play().catch(e => console.log("Audio play blocked by browser:", e));
         audioPlayed.current = true;
       }
+    }
+
+    // Start 3-min timer ONLY when Handover is clicked in Admin
+    if (order?.status === 'Handover') {
+      setIsTimerActive(true);
     }
   }, [order?.status]);
 
@@ -102,10 +108,10 @@ export default function OrderStatusPage() {
       },
       { 
         id: 4, 
-        label: 'Ready for Pickup', 
-        time: isTimerActive ? formatTimer(timeLeft) : 'Pending', 
-        completed: ['Ready', 'Handover'].includes(status), 
-        active: status === 'Ready', 
+        label: 'Final Ready for Pickup', 
+        time: isTimerActive ? `Closing in ${formatTimer(timeLeft)}` : (status === 'Ready' ? 'Collect at Counter' : 'Pending'), 
+        completed: status === 'Handover', 
+        active: ['Ready', 'Handover'].includes(status), 
         icon: BellRing 
       },
     ];
@@ -156,7 +162,7 @@ export default function OrderStatusPage() {
             </div>
             {isTimerActive && (
               <div className="bg-black/20 px-6 py-4 rounded-[2rem] border border-white/10 flex flex-col items-center animate-pulse">
-                 <p className="text-[8px] font-black uppercase tracking-widest text-white/60">Collect Now</p>
+                 <p className="text-[8px] font-black uppercase tracking-widest text-white/60">Collection Done</p>
                  <p className="text-3xl font-black text-white tabular-nums">{formatTimer(timeLeft)}</p>
               </div>
             )}
