@@ -1,6 +1,7 @@
+
 "use client"
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
@@ -10,13 +11,17 @@ import {
   ChefHat, 
   MapPin,
   Star,
-  PackageCheck
+  PackageCheck,
+  Clock,
+  ShieldAlert,
+  BellRing
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { Order } from '@/lib/types';
 
 const HALEEM_HERO = "https://firebasestorage.googleapis.com/v0/b/dasara-finedine.firebasestorage.app/o/Haleem.webp?alt=media&token=be38e4df-e859-48e5-8811-14b5142bc2b5";
 const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/dasara-finedine.firebasestorage.app/o/RAVOYI%20LOGO.pdf.webp?alt=media&token=f09f33b3-b303-400e-bbc4-b5dca418c8af";
+const BEEP_SOUND_URL = "https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3";
 
 const PICKUP_TIMER_DURATION = 3 * 60; // 3 minutes in seconds
 
@@ -35,6 +40,7 @@ export default function OrderStatusPage() {
 
   const [timeLeft, setTimeLeft] = useState(PICKUP_TIMER_DURATION);
   const [isTimerActive, setIsTimerActive] = useState(false);
+  const audioPlayed = useRef(false);
 
   useEffect(() => {
     window.history.pushState(null, "", window.location.href);
@@ -48,6 +54,12 @@ export default function OrderStatusPage() {
   useEffect(() => {
     if (order?.status === 'Ready') {
       setIsTimerActive(true);
+      // Play beep sound once when status changes to Ready
+      if (!audioPlayed.current) {
+        const audio = new Audio(BEEP_SOUND_URL);
+        audio.play().catch(e => console.log("Audio play blocked by browser:", e));
+        audioPlayed.current = true;
+      }
     }
   }, [order?.status]);
 
@@ -68,10 +80,46 @@ export default function OrderStatusPage() {
   const getStatusSteps = () => {
     const status = order?.status || 'Pending';
     return [
-      { id: 1, label: 'Order Confirmed', time: 'Received', completed: ['Pending', 'Received', 'Preparing', 'Served', 'Ready'].includes(status), active: false, icon: CheckCircle2 },
-      { id: 2, label: 'Preparing Food', time: 'In Kitchen', completed: ['Preparing', 'Served', 'Ready'].includes(status), active: status === 'Received', icon: ChefHat },
-      { id: 3, label: 'Quality Checked', time: 'Packing', completed: ['Served', 'Ready'].includes(status), active: status === 'Preparing', icon: PackageCheck },
-      { id: 4, label: 'Ready for Pickup', time: isTimerActive ? formatTimer(timeLeft) : 'Pending', completed: status === 'Ready', active: status === 'Served', icon: MapPin },
+      { 
+        id: 1, 
+        label: 'Waiting for Approval', 
+        time: 'Pending', 
+        completed: ['Received', 'Preparing', 'Served', 'Ready'].includes(status), 
+        active: status === 'Pending', 
+        icon: ShieldAlert 
+      },
+      { 
+        id: 2, 
+        label: 'Order Confirmed', 
+        time: 'Received', 
+        completed: ['Preparing', 'Served', 'Ready'].includes(status), 
+        active: status === 'Received', 
+        icon: CheckCircle2 
+      },
+      { 
+        id: 3, 
+        label: 'Preparing Food', 
+        time: 'In Kitchen', 
+        completed: ['Served', 'Ready'].includes(status), 
+        active: status === 'Preparing', 
+        icon: ChefHat 
+      },
+      { 
+        id: 4, 
+        label: 'Quality Checked', 
+        time: 'Packed', 
+        completed: ['Ready'].includes(status), 
+        active: status === 'Served', 
+        icon: PackageCheck 
+      },
+      { 
+        id: 5, 
+        label: 'Ready for Pickup', 
+        time: isTimerActive ? formatTimer(timeLeft) : 'Pending', 
+        completed: status === 'Ready', 
+        active: status === 'Ready', 
+        icon: BellRing 
+      },
     ];
   };
 
@@ -86,7 +134,7 @@ export default function OrderStatusPage() {
   return (
     <div className="min-h-screen bg-[#0a0500] text-white pb-10 overflow-hidden">
       
-      <div className="relative h-[45vh] w-full overflow-hidden">
+      <div className="relative h-[40vh] w-full overflow-hidden">
         <Image 
           src={HALEEM_HERO} 
           alt="Ravoyi Haleem"
@@ -110,29 +158,29 @@ export default function OrderStatusPage() {
         </div>
       </div>
 
-      <div className="relative -mt-32 px-4 md:px-6 z-20">
+      <div className="relative -mt-24 px-4 md:px-6 z-20">
         <div className="bg-[#b8582e] rounded-[3rem] p-8 md:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
           
           <div className="mb-10 pb-6 border-b border-white/10 flex justify-between items-end">
             <div>
-              <p className="text-white/40 text-[9px] font-black uppercase tracking-[0.4em] mb-1">Order Token</p>
+              <p className="text-white/40 text-[9px] font-black uppercase tracking-[0.4em] mb-1">Takeaway Token</p>
               <h2 className="text-6xl font-black text-white italic tracking-tighter">#{order?.orderNumber || '---'}</h2>
             </div>
             {isTimerActive && (
-              <div className="bg-black/20 px-6 py-4 rounded-[2rem] border border-white/10 flex flex-col items-center">
-                 <p className="text-[8px] font-black uppercase tracking-widest text-white/60">Collection Window</p>
+              <div className="bg-black/20 px-6 py-4 rounded-[2rem] border border-white/10 flex flex-col items-center animate-pulse">
+                 <p className="text-[8px] font-black uppercase tracking-widest text-white/60">Collect Now</p>
                  <p className="text-3xl font-black text-white tabular-nums">{formatTimer(timeLeft)}</p>
               </div>
             )}
           </div>
 
-          <div className="space-y-12">
+          <div className="space-y-10">
             {steps.map((step, idx) => (
               <div key={step.id} className="relative flex gap-8">
                 
                 {idx !== steps.length - 1 && (
                   <div className={cn(
-                    "absolute left-[21px] top-12 w-[2px] h-12",
+                    "absolute left-[21px] top-12 w-[2px] h-10 transition-colors duration-500",
                     step.completed ? "bg-white" : "bg-white/10"
                   )} />
                 )}
@@ -191,3 +239,4 @@ export default function OrderStatusPage() {
     </div>
   );
 }
+
