@@ -20,7 +20,8 @@ export default function KotView() {
 
   useEffect(() => {
     if (!firestore) return;
-    const q = query(collection(firestore, "orders"), orderBy("timestamp", "asc"));
+    // Changed ordering to "desc" so new orders appear at the top of the packing queue
+    const q = query(collection(firestore, "orders"), orderBy("timestamp", "desc"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       setOrders(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Order[]);
     });
