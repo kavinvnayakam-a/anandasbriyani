@@ -1,5 +1,3 @@
-
-
 "use client"
 
 import { useState, useEffect } from 'react';
@@ -95,7 +93,6 @@ export default function OrderManager() {
 
   return (
     <div className="space-y-6">
-      {/* 1. HEADER */}
       <div className="flex justify-between items-center bg-white p-8 rounded-[2.5rem] border border-zinc-200 shadow-xl">
         <div>
           <h2 className="text-3xl font-black italic uppercase tracking-tighter text-zinc-900">Takeaway Counter Feed</h2>
@@ -108,7 +105,6 @@ export default function OrderManager() {
         </div>
       </div>
 
-      {/* 2. ORDER GRID */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {pendingOrders.map((order) => (
           <div key={order.id} className="bg-white border border-zinc-200 rounded-[2.5rem] p-8 flex flex-col transition-all shadow-lg hover:shadow-2xl hover:border-[#b8582e]/30 group">
@@ -148,7 +144,7 @@ export default function OrderManager() {
               <div className="flex items-center gap-3 p-4 bg-[#b8582e]/5 rounded-2xl border border-[#b8582e]/10">
                 <Banknote size={16} className="text-[#b8582e]" />
                 <div className="flex flex-col">
-                  <span className="text-[9px] font-black uppercase text-zinc-400 tracking-widest leading-none">Payment / Total</span>
+                  <span className="text-[9px] font-black uppercase text-zinc-400 tracking-widest leading-none">Total (Incl. 5% GST)</span>
                   <span className="text-lg font-black italic text-[#b8582e] leading-none">₹{order.totalPrice} ({order.paymentMethod})</span>
                 </div>
               </div>
@@ -171,7 +167,6 @@ export default function OrderManager() {
         )}
       </div>
 
-      {/* 3. PRINT SETTINGS DIALOG */}
       <Dialog open={showSettings} onOpenChange={setShowSettings}>
         <DialogContent className="max-w-md bg-white rounded-[2rem] p-8 border-4 border-[#b8582e]">
           <DialogHeader>
@@ -231,7 +226,6 @@ export default function OrderManager() {
         </DialogContent>
       </Dialog>
 
-      {/* 4. HIDDEN PRINTABLE RECEIPT (Thermal Optimized) */}
       <div id="printable-receipt" className="hidden print:block font-mono text-black" style={{ width: printSettings.paperWidth }}>
         <div className="p-4 text-center border-b border-dashed border-black">
           <h1 className="text-xl font-black uppercase">{printSettings.storeName}</h1>
@@ -255,7 +249,7 @@ export default function OrderManager() {
               <div className="grid grid-cols-12 gap-1 font-bold mb-1 border-b border-dashed border-black pb-1">
                 <span className="col-span-1">#</span>
                 <span className="col-span-7">ITEM</span>
-                <span className="col-span-4 text-right">TOTAL</span>
+                <span className="col-span-4 text-right">PRICE</span>
               </div>
               {printingOrder.items.map((item, idx) => (
                 <div key={idx} className="grid grid-cols-12 gap-1 mb-1">
@@ -264,6 +258,21 @@ export default function OrderManager() {
                   <span className="col-span-4 text-right">₹{item.price * item.quantity}</span>
                 </div>
               ))}
+            </div>
+
+            <div className="py-2 text-right text-[10px] border-b border-dashed border-black">
+               <div className="flex justify-between">
+                  <span>Subtotal:</span>
+                  <span>₹{printingOrder.subtotal?.toFixed(0) || (printingOrder.totalPrice / 1.05).toFixed(0)}</span>
+               </div>
+               <div className="flex justify-between">
+                  <span>CGST @ 2.5%:</span>
+                  <span>₹{printingOrder.cgst?.toFixed(0) || (printingOrder.totalPrice * 0.025 / 1.05).toFixed(0)}</span>
+               </div>
+               <div className="flex justify-between">
+                  <span>SGST @ 2.5%:</span>
+                  <span>₹{printingOrder.sgst?.toFixed(0) || (printingOrder.totalPrice * 0.025 / 1.05).toFixed(0)}</span>
+               </div>
             </div>
 
             <div className="py-4 text-right">
@@ -305,4 +314,3 @@ export default function OrderManager() {
     </div>
   );
 }
-

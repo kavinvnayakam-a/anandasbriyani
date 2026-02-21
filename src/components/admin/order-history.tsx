@@ -43,7 +43,7 @@ export default function OrderHistory() {
 
 
   const filteredHistory = history.filter(h => 
-    h.tableId?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+    h.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     h.orderNumber?.toString().includes(searchTerm)
   );
 
@@ -56,14 +56,13 @@ export default function OrderHistory() {
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       
-      {/* 1. FILTER BAR */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-8 rounded-[2.5rem] border-4 border-zinc-900 shadow-[8px_8px_0_0_#000]">
         <div className="relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={20} />
           <input 
             type="text" 
-            placeholder="Search Table ID or Order #..." 
-            className="w-full pl-12 pr-4 py-4 bg-zinc-50 border-4 border-zinc-100 rounded-2xl font-black uppercase italic outline-none focus:border-[#d4af37] transition-all"
+            placeholder="Search Customer or Order #..." 
+            className="w-full pl-12 pr-4 py-4 bg-zinc-50 border-4 border-zinc-100 rounded-2xl font-black uppercase italic outline-none focus:border-[#b8582e] transition-all"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -72,14 +71,13 @@ export default function OrderHistory() {
           <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={20} />
           <input 
             type="date" 
-            className="w-full pl-12 pr-4 py-4 bg-zinc-50 border-4 border-zinc-100 rounded-2xl font-black uppercase outline-none focus:border-[#d4af37] transition-all"
+            className="w-full pl-12 pr-4 py-4 bg-zinc-50 border-4 border-zinc-100 rounded-2xl font-black uppercase outline-none focus:border-[#b8582e] transition-all"
             value={selectedDate}
             onChange={(e) => setSelectedDate(e.target.value)}
           />
         </div>
       </div>
 
-      {/* 2. HISTORY LIST */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {isLoading ? (
           <div className="col-span-full py-20 text-center font-black uppercase italic text-zinc-400 animate-pulse">
@@ -89,8 +87,7 @@ export default function OrderHistory() {
           filteredHistory.map((order) => (
             <div key={order.id} className="bg-white border-4 border-zinc-900 p-8 rounded-[3rem] shadow-xl relative overflow-hidden group hover:-translate-y-1 transition-all">
               
-              {/* --- FIXED BADGE: TUCKED INTO THE CORNER --- */}
-              <div className="absolute top-0 right-0 bg-zinc-900 text-[#d4af37] px-6 py-2.5 font-black italic border-b-4 border-l-4 border-zinc-900 rounded-bl-[2rem] text-sm z-10 shadow-sm">
+              <div className="absolute top-0 right-0 bg-zinc-900 text-white px-6 py-2.5 font-black italic border-b-4 border-l-4 border-zinc-900 rounded-bl-[2rem] text-sm z-10 shadow-sm">
                 #{order.orderNumber}
               </div>
 
@@ -100,12 +97,11 @@ export default function OrderHistory() {
                 <Utensils size={14}/> {order.tableId === 'Takeaway' ? 'Collection' : `Table ${order.tableId}`}
               </div>
 
-              {/* Items Table */}
               <div className="space-y-3 mb-8 min-h-[100px]">
                 {order.items?.map((item: any, i: number) => (
                   <div key={i} className="flex justify-between items-center bg-zinc-50 p-3 rounded-xl border-2 border-zinc-100 font-black uppercase italic text-[11px]">
                     <span className="truncate pr-4">
-                      <span className="text-[#d4af37] mr-2">{item.quantity}x</span>
+                      <span className="text-[#b8582e] mr-2">{item.quantity}x</span>
                       {item.name}
                     </span>
                     <span className="text-zinc-400 shrink-0 font-bold">₹{item.price * item.quantity}</span>
@@ -113,15 +109,14 @@ export default function OrderHistory() {
                 ))}
               </div>
 
-              {/* Footer */}
               <div className="pt-6 border-t-4 border-zinc-900 flex justify-between items-end">
                 <div>
-                  <p className="text-[10px] font-black uppercase text-zinc-400 leading-none mb-1 text-left">Total Settled</p>
+                  <p className="text-[10px] font-black uppercase text-zinc-400 leading-none mb-1 text-left">Total (Incl. Tax)</p>
                   <p className="text-3xl font-black italic text-zinc-900 leading-none tracking-tighter">₹{order.totalPrice}</p>
                 </div>
                 <button 
                   onClick={() => window.print()} 
-                  className="p-4 bg-[#d4af37] text-zinc-900 rounded-2xl border-2 border-zinc-900 shadow-[4px_4px_0_0_#000] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all"
+                  className="p-4 bg-[#b8582e] text-white rounded-2xl border-2 border-zinc-900 shadow-[4px_4px_0_0_#000] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all"
                 >
                   <Printer size={20} />
                 </button>
