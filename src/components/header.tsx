@@ -12,52 +12,56 @@ type HeaderProps = {
 
 export function Header({ tableId }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-50 w-full h-20 bg-background/80 backdrop-blur-xl border-b border-white/20 shadow-2xl">
-      <div className="container mx-auto h-full flex items-center justify-between px-6">
+    <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur-xl border-b border-white/5 py-4 shadow-xl">
+      <div className="container mx-auto flex items-center justify-between px-6">
         
-        <div className="flex items-center gap-4">
+        {/* Brand Section: Circular Logo + Tagline */}
+        <div className="flex flex-col items-center gap-2">
+          {/* Large Rounded Logo with White Border */}
           <div className="
             relative 
-            bg-white 
-            h-12 w-12 
+            h-20 w-20           /* Bigger size (80px) */
             rounded-full 
-            ravoyi-highlight
-            flex items-center justify-center
+            border-[3px] border-white  /* Distinct white border */
+            bg-white
+            shadow-[0_0_15px_rgba(255,255,255,0.2)] /* Soft outer glow */
             overflow-hidden
-            border-2 border-white
+            flex items-center justify-center
           ">
             <Image 
               src={LOGO_URL} 
               alt="RAVOYI Logo" 
-              width={48} 
-              height={48} 
-              className="object-cover"
+              width={80} 
+              height={80} 
+              className="object-contain"
               priority
             />
           </div>
-          <div className="flex flex-col">
-            <h1 className="text-2xl font-black italic uppercase tracking-tighter text-white leading-none">
-              RAVOYI
-            </h1>
-            <span className="text-[8px] font-bold text-white/60 uppercase tracking-[0.3em] mt-0.5">A Telangana Kitchen</span>
-          </div>
+          
+          {/* Centered Tagline */}
+          <p className="text-[8px] font-black text-white/70 uppercase tracking-[0.45em] leading-none text-center">
+            A Telangana Kitchen
+          </p>
         </div>
 
+        {/* Action Button Section */}
         <div className="flex items-center">
           <div className="
-            relative
-            flex items-center 
-            bg-black/10 
-            rounded-2xl 
-            p-1.5 
-            border border-white/30
-            shadow-inner
+            group relative
+            bg-white text-black 
+            h-10 px-6 rounded-full 
+            flex items-center justify-center 
+            cursor-pointer
+            transition-all duration-300
+            hover:shadow-[0_0_20px_rgba(255,255,255,0.3)]
+            active:scale-95
           ">
-            <div className="relative z-10 h-10 px-6 rounded-xl flex flex-col items-center justify-center bg-white text-background border border-white shadow-lg">
-               <span className="text-xs font-black tracking-tight uppercase italic">ORDER TAKEAWAY</span>
-            </div>
+            <span className="text-[10px] font-black tracking-widest uppercase italic">
+              Order Takeaway
+            </span>
           </div>
         </div>
+        
       </div>
     </header>
   );

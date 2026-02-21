@@ -15,13 +15,14 @@ export interface CartItem extends MenuItem {
 
 export interface Order {
   id: string;
-  tableId: string; // Used as composite "Screen X - Seat Y"
-  screenId?: string;
-  seatId?: string;
+  tableId: string; // Used as "Takeaway" for this app
+  customerName?: string;
+  customerPhone?: string;
+  paymentMethod?: 'Card' | 'Cash' | 'UPI';
   items: CartItem[];
   totalPrice: number;
   status: 'Pending' | 'Received' | 'Preparing' | 'Served' | 'Completed';
   timestamp: any;
   orderNumber?: string;
-  helpRequested?: boolean;
+  createdAt: number;
 }

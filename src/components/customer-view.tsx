@@ -11,36 +11,59 @@ import { CartIcon } from '@/components/cart-icon';
 import type { MenuItem } from '@/lib/types';
 import Link from 'next/link';
 import Image from 'next/image';
-import { 
-  Search, 
-  ArrowUp, 
-  X,
-  ChefHat
-} from 'lucide-react';
+import { ArrowUp, Moon, Star } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
 const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/dasara-finedine.firebasestorage.app/o/RAVOYI%20LOGO.pdf.webp?alt=media&token=f09f33b3-b303-400e-bbc4-b5dca418c8af";
+
+// High-Fidelity Ramadan Decoration Component
+const HangingDecoration = ({ className, delay = "0s", height = "h-32", type = "lantern" }: { className?: string, delay?: string, height?: string, type?: "lantern" | "moon" | "star" }) => (
+  <div 
+    className={cn("absolute flex flex-col items-center z-10", className)}
+    style={{ animation: `sway 4s ease-in-out infinite alternate ${delay}` }}
+  >
+    {/* Silk Golden Thread */}
+    <div className={cn("w-[1px] bg-gradient-to-b from-transparent via-orange-400 to-orange-300", height)} />
+    
+    {type === "lantern" && (
+      <div className="relative w-7 h-10">
+        {/* Dome Top */}
+        <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-5 h-4 bg-gradient-to-b from-amber-300 to-amber-500 rounded-t-full border border-amber-200" />
+        {/* Navy Body with Gold Frame */}
+        <div className="w-full h-full bg-[#0c1a2b] rounded-sm border border-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.2)] relative overflow-hidden">
+          <div className="absolute inset-x-1 top-1 bottom-1 bg-gradient-to-t from-orange-600 via-orange-400 to-amber-200 rounded-t-full flex items-center justify-center">
+             <div className="w-1.5 h-3 bg-white rounded-full blur-[2px] opacity-80 animate-pulse" />
+          </div>
+        </div>
+        {/* Pedestal Base */}
+        <div className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-9 h-1.5 bg-amber-600 rounded-sm border-t border-amber-300" />
+      </div>
+    )}
+
+    {type === "moon" && (
+      <Moon size={48} className="text-amber-400 fill-amber-400/20 drop-shadow-[0_0_15px_rgba(251,191,36,0.6)]" />
+    )}
+
+    {type === "star" && (
+      <Star size={16} className="text-amber-300 fill-amber-300 drop-shadow-[0_0_8px_rgba(251,191,36,0.4)]" />
+    )}
+  </div>
+);
 
 export default function CustomerView({ tableId }: { tableId: string | null, mode: 'dine-in' | 'takeaway' }) {
   const { addToCart } = useCart();
   const [isCartOpen, setCartOpen] = useState(false);
   const firestore = useFirestore();
-
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('');
-  
-  const [searchQuery, setSearchQuery] = useState("");
   const [showBackToTop, setShowBackToTop] = useState(false);
 
   useEffect(() => {
     if (!firestore) return;
     const q = query(collection(firestore, "menu_items")); 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const items = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as MenuItem[];
+      const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as MenuItem[];
       setMenuItems(items);
       setLoading(false);
     }, () => setLoading(false));
@@ -48,22 +71,14 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
   }, [firestore]);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setShowBackToTop(window.scrollY > 400);
-    };
+    const handleScroll = () => setShowBackToTop(window.scrollY > 400);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const categorizedMenu = useMemo(() => {
-    const categoryOrder = ['Cinematic Combos', 'Combo', 'Specialties', 'Appetizers', 'Main Course', 'Biryani', 'Desserts', 'Beverages'];
-    
-    const filtered = menuItems.filter(item => 
-      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.category?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
-    const grouped = filtered.reduce((acc, item) => {
+    const categoryOrder = ['Iftar Specials', 'Cinematic Combos', 'Combo', 'Specialties', 'Appetizers', 'Main Course', 'Biryani', 'Desserts', 'Beverages'];
+    const grouped = menuItems.reduce((acc, item) => {
       const category = item.category || 'Other';
       if (!acc[category]) acc[category] = [];
       acc[category].push(item);
@@ -71,182 +86,121 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
     }, {} as Record<string, MenuItem[]>);
 
     return Object.keys(grouped).sort((a, b) => {
-      const indexA = categoryOrder.findIndex(cat => a.toLowerCase().includes(cat.toLowerCase()));
-      const indexB = categoryOrder.findIndex(cat => b.toLowerCase().includes(cat.toLowerCase()));
-      
-      const posA = indexA === -1 ? 999 : indexA;
-      const posB = indexB === -1 ? 999 : indexB;
-      
-      return posA - posB;
+      const indexA = categoryOrder.indexOf(a);
+      const indexB = categoryOrder.indexOf(b);
+      return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
     }).map(cat => ({ category: cat, items: grouped[cat] }));
-  }, [menuItems, searchQuery]);
+  }, [menuItems]);
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="relative flex flex-col items-center">
-          <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin" />
-          <p className="mt-4 text-sm font-black text-white animate-pulse tracking-widest uppercase">RAVOYI</p>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return null;
 
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden">
+    <div className="min-h-screen bg-background overflow-x-hidden relative">
+      <style jsx global>{`
+        @keyframes sway {
+          0% { transform: rotate(-2.5deg); transform-origin: top center; }
+          100% { transform: rotate(2.5deg); transform-origin: top center; }
+        }
+      `}</style>
+
       <Header tableId={tableId} onCartClick={() => setCartOpen(true)} timeLeft={0} />
-      
-      <div className="sticky top-20 z-30 bg-background/95 backdrop-blur-xl border-b border-white/10 px-4 py-4 md:py-6 space-y-4">
-        <div className="max-w-5xl mx-auto flex flex-col gap-4">
-          <div className="relative group">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-white/40 group-focus-within:text-white transition-colors" size={18} />
-            <input 
-              type="text"
-              placeholder="Search kitchen specialties..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-12 md:h-14 pl-12 pr-12 bg-black/10 border border-white/20 rounded-full text-xs md:text-sm font-bold text-white placeholder:text-white/40 focus:ring-2 ring-white/20 transition-all outline-none"
-            />
-            {searchQuery && (
-              <button 
-                onClick={() => setSearchQuery("")}
-                className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 bg-white/20 rounded-full hover:bg-white/30 transition-colors"
-              >
-                <X size={14} className="text-white" />
-              </button>
-            )}
-          </div>
 
-          {!searchQuery && (
-            <div className="flex flex-wrap gap-2 md:gap-3 items-center justify-start md:justify-center">
-              {categorizedMenu.map(({ category }) => (
-                <button
-                  key={category}
-                  onClick={() => {
-                    document.getElementById(category)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    setActiveCategory(category);
-                  }}
-                  className={cn(
-                    "shrink-0 px-4 md:px-6 py-2 rounded-full transition-all duration-300 font-bold uppercase tracking-widest text-[8px] md:text-[10px] border",
-                    activeCategory === category 
-                      ? "bg-white text-background border-white shadow-lg" 
-                      : "bg-transparent text-white border-white/20 hover:border-white hover:bg-white/10"
-                  )}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+      {/* 🏮 DECORATION SEQUENCE: 1 Moon, 2 Star, 3 Star, 4 Lantern, 5 Star */}
+      <div className="absolute top-20 left-0 w-full h-[400px] overflow-hidden pointer-events-none z-10">
+        <HangingDecoration className="left-[10%]" height="h-32" type="moon" delay="0s" />
+        <HangingDecoration className="left-[28%]" height="h-24" type="star" delay="1.2s" />
+        <HangingDecoration className="left-[50%]" height="h-44" type="star" delay="0.6s" />
+        <HangingDecoration className="right-[22%]" height="h-36" type="lantern" delay="2s" />
+        <HangingDecoration className="right-[8%]" height="h-20" type="star" delay="1.5s" />
       </div>
+      
+      <main className="max-w-5xl mx-auto px-4 md:px-6 py-24 md:py-40 relative z-20">
+        <header className="mb-24 text-center space-y-8">
+          <div className="flex items-center justify-center gap-3 text-orange-500">
+             <Star size={14} fill="currentColor" className="animate-pulse" />
+             <span className="text-[11px] font-black uppercase tracking-[0.5em] text-orange-200">Ramadan Mubarak</span>
+             <Star size={14} fill="currentColor" className="animate-pulse" />
+          </div>
+          
+          <h1 className="text-6xl md:text-[9rem] font-black text-white tracking-tighter uppercase italic leading-none">
+            Iftar <span className="text-orange-500">Special</span>
+          </h1>
 
-      <main className="max-w-5xl mx-auto px-4 md:px-6 py-8 md:py-16 pb-40">
-        <header className="mb-8 md:mb-16 text-center md:text-left flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div className="space-y-2 md:space-y-4">
-            <h1 className="text-4xl md:text-7xl font-black text-white tracking-tighter uppercase italic">
-              {searchQuery ? `Searching...` : "Kitchen Menu"}
-            </h1>
-            <div className="flex items-center justify-center md:justify-start gap-4">
-              <span className="w-12 md:w-16 h-1 bg-white rounded-full" />
-              <p className="text-white font-black text-[10px] md:text-xs uppercase tracking-[0.4em]">
-                A Telangana Kitchen
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center justify-center md:justify-start gap-3 bg-black/10 px-4 md:px-6 py-2 md:py-3 rounded-full border border-white/10 shadow-xl">
-             <ChefHat className="text-white" size={14} />
-             <span className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-white/80">Authentic Flavors</span>
-          </div>
+          <p className="text-white/60 font-medium text-sm md:text-xl italic max-w-lg mx-auto leading-relaxed">
+            "Blessings in every bite, traditions in every spice."
+          </p>
         </header>
 
-        <div className="space-y-16 md:space-y-24">
-          {categorizedMenu.length > 0 ? (
-            categorizedMenu.map(({ category, items }) => (
-              <section key={category} id={category} className="scroll-mt-64 md:scroll-mt-72">
-                <div className="flex items-center gap-4 md:gap-8 mb-8 md:mb-12">
-                  <h3 className="text-xl md:text-2xl font-black italic uppercase tracking-widest text-white shrink-0">
+        {/* MENU CATEGORIES */}
+        <div className="space-y-40">
+          {categorizedMenu.map(({ category, items }) => (
+            <section key={category} id={category} className="scroll-mt-52">
+              <div className="flex flex-col gap-4 mb-16">
+                <span className="text-orange-500/60 font-black text-[10px] uppercase tracking-[0.4em]">Experience</span>
+                <div className="flex items-center gap-8">
+                    <h3 className="text-3xl md:text-5xl font-black italic uppercase tracking-tighter text-white">
                     {category}
-                  </h3>
-                  <div className="h-0.5 flex-1 bg-gradient-to-r from-white/40 to-transparent" />
-                </div>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
-                  {items.map((item) => (
-                    <MenuItemCard key={item.id} item={item} onAddToCart={addToCart} />
-                  ))}
-                </div>
-              </section>
-            ))
-          ) : (
-            <div className="py-16 md:py-24 text-center space-y-8 bg-black/10 rounded-[2rem] md:rounded-[4rem] border border-dashed border-white/20">
-              <div className="relative inline-block">
-                <div className="absolute inset-0 bg-white/10 blur-3xl rounded-full" />
-                <div className="relative p-8 md:p-12 bg-black/20 rounded-full border border-white/20 shadow-2xl">
-                  <Search className="w-8 h-8 md:w-12 md:h-12 text-white/10" />
+                    </h3>
+                    <div className="h-[1px] flex-1 bg-gradient-to-r from-orange-500/40 via-orange-500/10 to-transparent" />
                 </div>
               </div>
-              <div className="space-y-2">
-                <p className="text-white font-bold text-xl md:text-2xl">No items found</p>
-                <p className="text-white/40 text-[10px] md:text-sm font-bold uppercase tracking-widest">Try another search keyword</p>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+                {items.map((item) => (
+                  <MenuItemCard key={item.id} item={item} onAddToCart={addToCart} />
+                ))}
               </div>
-              <button 
-                onClick={() => setSearchQuery("")} 
-                className="inline-flex items-center gap-3 bg-white text-background px-8 md:px-12 py-3 md:py-4 rounded-full font-black text-[10px] md:text-xs uppercase tracking-widest hover:bg-black hover:text-white transition-all shadow-lg"
-              >
-                Clear Search <X size={14} />
-              </button>
-            </div>
-          )}
+            </section>
+          ))}
         </div>
       </main>
 
-      <button
-        onClick={scrollToTop}
-        className={cn(
-          "fixed bottom-24 md:bottom-28 right-6 md:right-8 z-[60] p-4 md:p-5 bg-white border border-background shadow-2xl rounded-full text-background transition-all duration-500 hover:bg-black hover:text-white",
-          showBackToTop ? "translate-y-0 opacity-100 scale-100" : "translate-y-20 opacity-0 scale-50"
-        )}
-      >
-        <ArrowUp className="w-5 h-5 md:w-6 md:h-6" strokeWidth={4} />
-      </button>
-
-      <footer className="bg-black/20 border-t border-white/10 py-16 md:py-24 px-6 md:px-8">
-        <div className="max-w-5xl mx-auto flex flex-col items-center gap-8 md:gap-12">
-          <div className="relative p-2 bg-white rounded-full ravoyi-highlight">
-            <Image 
-              src={LOGO_URL} 
-              alt="RAVOYI Logo" 
-              width={80} 
-              height={80} 
-              className="rounded-full" 
-            />
+      {/* FOOTER */}
+      <footer className="bg-black/60 border-t border-white/5 py-32 px-6">
+        <div className="max-w-5xl mx-auto flex flex-col items-center gap-12">
+          {/* Ravoyi Brand Seal */}
+          <div className="h-28 w-28 rounded-full border-2 border-orange-500/30 p-1 bg-white">
+            <Image src={LOGO_URL} alt="RAVOYI Logo" width={112} height={112} className="rounded-full" />
           </div>
           
-          <div className="flex flex-col items-center gap-6 md:gap-8 text-center">
-             <div className="flex items-center gap-3 md:gap-4">
-               <span className="h-px w-8 md:w-10 bg-white/20" />
-               <p className="font-medium text-white/60 text-[10px] md:text-sm tracking-wide">A TELANGANA KITCHEN EXPERIENCE</p>
-               <span className="h-px w-8 md:w-10 bg-white/20" />
+          <div className="text-center space-y-8">
+             <div className="space-y-2">
+                <p className="text-[10px] font-black uppercase tracking-[0.6em] text-white/20">A Telangana Kitchen Experience</p>
+                <p className="text-orange-500/80 font-bold italic text-sm tracking-widest uppercase">Ramadan Kareem</p>
              </div>
-             
-             <Link href="https://www.getpik.in/" target="_blank" className="flex flex-col items-center gap-4 group">
-              <span className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.5em] text-white/40 group-hover:text-white transition-colors">Digital Experience By</span>
-              <div className="px-8 md:px-12 py-4 md:py-5 bg-black/20 rounded-2xl md:rounded-3xl border border-white/10 flex items-center gap-4 transition-all group-hover:border-white group-hover:bg-black shadow-2xl">
-                <span className="text-white font-black text-xl md:text-2xl tracking-tighter">GetPik</span>
-                <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
-              </div>
-            </Link>
+
+             {/* GetPik Digital Connect */}
+             <Link 
+              href="https://www.getpik.in/pos" 
+              target="_blank" 
+              className="flex flex-col items-center gap-4 group transition-all duration-500"
+             >
+                <span className="text-[8px] font-black uppercase tracking-[0.4em] text-white/30 group-hover:text-orange-500 transition-colors">
+                  Digital Connect By
+                </span>
+                <div className="px-8 py-4 bg-white/5 border border-white/10 rounded-2xl flex items-center gap-4 group-hover:border-orange-500/50 group-hover:bg-orange-500/5 transition-all">
+                  <span className="text-white font-black text-xl tracking-tighter group-hover:text-orange-500 transition-colors">
+                    GetPik
+                  </span>
+                  <div className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse shadow-[0_0_10px_rgba(249,115,22,0.8)]" />
+                </div>
+             </Link>
           </div>
         </div>
       </footer>
 
       <CartSheet isOpen={isCartOpen} onOpenChange={setCartOpen} tableId={tableId} />
       <CartIcon onOpen={() => setCartOpen(true)} />
+
+      <button
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        className={cn(
+          "fixed bottom-28 right-8 z-50 p-5 bg-orange-500 text-black rounded-full shadow-2xl transition-all duration-500 hover:scale-110",
+          showBackToTop ? "translate-y-0 opacity-100" : "translate-y-20 opacity-0"
+        )}
+      >
+        <ArrowUp size={24} strokeWidth={4} />
+      </button>
     </div>
   );
 }
