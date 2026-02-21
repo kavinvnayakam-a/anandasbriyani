@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -37,6 +38,17 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Print Specific Utility to hide everything but the receipt */
+@media print {
+  .admin-theme, nav, header, footer, button, .no-print {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+    color: black !important;
   }
 }
 
