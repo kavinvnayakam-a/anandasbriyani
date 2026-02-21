@@ -23,35 +23,35 @@ export function CartIcon({ onOpen }: { onOpen?: () => void }) {
       className={cn(
         "fixed right-0 top-[65%] -translate-y-1/2 z-40",
         "flex flex-col items-center gap-3",
-        "bg-primary text-black", 
+        "bg-white text-background", 
         "py-8 px-5",
         "rounded-l-[2rem]", 
         "border border-white/20 border-r-0", 
-        "shadow-[-10px_0_30px_rgba(212,175,55,0.2)]", 
+        "shadow-[-10px_0_30px_rgba(0,0,0,0.2)]", 
         "transition-all duration-300 ease-in-out",
-        isAnimate ? "scale-110" : "hover:bg-white",
+        isAnimate ? "scale-110" : "hover:bg-black hover:text-white",
         "active:scale-90 group"
       )}
     >
       <div className={cn(
         "flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-black transition-all",
         totalItems > 0 
-          ? "bg-black text-primary" 
-          : "bg-black/20 text-black/50"
+          ? "bg-background text-white" 
+          : "bg-background/20 text-white/50"
       )}>
         {totalItems}
       </div>
 
       <ShoppingBag className={cn(
         "h-6 w-6",
-        totalItems > 0 ? "text-black" : "text-black/40"
+        totalItems > 0 ? "text-background" : "text-background/40"
       )} />
 
       <span className="[writing-mode:vertical-lr] rotate-180 text-[10px] font-black uppercase tracking-[0.3em]">
         My Tray
       </span>
 
-      <div className="h-6 w-[2px] bg-black/10 mt-1 rounded-full" />
+      <div className="h-6 w-[2px] bg-background/10 mt-1 rounded-full" />
     </button>
   );
 }

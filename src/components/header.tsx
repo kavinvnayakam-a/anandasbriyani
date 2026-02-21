@@ -12,7 +12,7 @@ type HeaderProps = {
 
 export function Header({ tableId }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-50 w-full h-20 bg-black/80 backdrop-blur-xl border-b border-primary/20 shadow-2xl">
+    <header className="sticky top-0 z-50 w-full h-20 bg-background/80 backdrop-blur-xl border-b border-white/20 shadow-2xl">
       <div className="container mx-auto h-full flex items-center justify-between px-6">
         
         <div className="flex items-center gap-4">
@@ -24,7 +24,7 @@ export function Header({ tableId }: HeaderProps) {
             ravoyi-highlight
             flex items-center justify-center
             overflow-hidden
-            border-2 border-primary
+            border-2 border-white
           ">
             <Image 
               src={LOGO_URL} 
@@ -36,10 +36,10 @@ export function Header({ tableId }: HeaderProps) {
             />
           </div>
           <div className="flex flex-col">
-            <h1 className="text-2xl font-black italic uppercase tracking-tighter text-primary leading-none">
+            <h1 className="text-2xl font-black italic uppercase tracking-tighter text-white leading-none">
               RAVOYI
             </h1>
-            <span className="text-[8px] font-bold text-primary/60 uppercase tracking-[0.3em] mt-0.5">A Telangana Kitchen</span>
+            <span className="text-[8px] font-bold text-white/60 uppercase tracking-[0.3em] mt-0.5">A Telangana Kitchen</span>
           </div>
         </div>
 
@@ -47,13 +47,13 @@ export function Header({ tableId }: HeaderProps) {
           <div className="
             relative
             flex items-center 
-            bg-zinc-900/50 
+            bg-black/10 
             rounded-2xl 
             p-1.5 
-            border border-primary/30
+            border border-white/30
             shadow-inner
           ">
-            <div className="relative z-10 h-10 px-6 rounded-xl flex flex-col items-center justify-center bg-primary text-white border border-primary shadow-lg">
+            <div className="relative z-10 h-10 px-6 rounded-xl flex flex-col items-center justify-center bg-white text-background border border-white shadow-lg">
                <span className="text-xs font-black tracking-tight uppercase italic">ORDER TAKEAWAY</span>
             </div>
           </div>
