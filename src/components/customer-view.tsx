@@ -190,7 +190,7 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
       </footer>
 
       <CartSheet isOpen={isCartOpen} onOpenChange={setCartOpen} tableId={tableId} />
-      <CartIcon onOpen={() => setCartOpen(true)} />
+      {!isCartOpen && <CartIcon onOpen={() => setCartOpen(true)} />}
 
       <button
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
