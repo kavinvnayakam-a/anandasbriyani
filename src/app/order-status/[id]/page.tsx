@@ -3,16 +3,13 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
-import { useDoc } from '@/firebase';
+import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
-import { useFirestore } from '@/firebase';
 import { 
   CheckCircle2, 
   ChefHat, 
-  ShoppingBag, 
   MapPin,
   Star,
-  Clock,
   PackageCheck
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
@@ -29,14 +26,17 @@ export default function OrderStatusPage() {
   const firestore = useFirestore();
   const orderId = params?.id as string;
   
-  const orderRef = orderId && firestore ? doc(firestore, "orders", orderId) : null;
+  const orderRef = useMemoFirebase(
+    () => orderId && firestore ? doc(firestore, "orders", orderId) : null,
+    [orderId, firestore]
+  );
+  
   const { data: order, isLoading } = useDoc<Order>(orderRef);
 
   const [timeLeft, setTimeLeft] = useState(PICKUP_TIMER_DURATION);
   const [isTimerActive, setIsTimerActive] = useState(false);
 
   useEffect(() => {
-    // Prevent back navigation
     window.history.pushState(null, "", window.location.href);
     const handlePopState = () => {
       window.history.pushState(null, "", window.location.href);
@@ -86,7 +86,6 @@ export default function OrderStatusPage() {
   return (
     <div className="min-h-screen bg-[#0a0500] text-white pb-10 overflow-hidden">
       
-      {/* 1. HERO SECTION */}
       <div className="relative h-[45vh] w-full overflow-hidden">
         <Image 
           src={HALEEM_HERO} 
@@ -98,7 +97,6 @@ export default function OrderStatusPage() {
         
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0500] via-transparent to-transparent" />
         
-        {/* BRAND LOGO - TOP RIGHT */}
         <div className="absolute top-8 right-6 z-30">
           <div className="relative p-1 bg-white rounded-full shadow-2xl border-2 border-[#b8582e]">
             <Image 
@@ -112,11 +110,9 @@ export default function OrderStatusPage() {
         </div>
       </div>
 
-      {/* 2. MAIN STATUS CARD */}
       <div className="relative -mt-32 px-4 md:px-6 z-20">
         <div className="bg-[#b8582e] rounded-[3rem] p-8 md:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
           
-          {/* Order Header */}
           <div className="mb-10 pb-6 border-b border-white/10 flex justify-between items-end">
             <div>
               <p className="text-white/40 text-[9px] font-black uppercase tracking-[0.4em] mb-1">Order Token</p>
@@ -130,12 +126,10 @@ export default function OrderStatusPage() {
             )}
           </div>
 
-          {/* 3. VERTICAL STATUS TRACKER */}
           <div className="space-y-12">
             {steps.map((step, idx) => (
               <div key={step.id} className="relative flex gap-8">
                 
-                {/* Connector Line */}
                 {idx !== steps.length - 1 && (
                   <div className={cn(
                     "absolute left-[21px] top-12 w-[2px] h-12",
@@ -143,7 +137,6 @@ export default function OrderStatusPage() {
                   )} />
                 )}
 
-                {/* Status Icon Circle */}
                 <div className={cn(
                   "relative z-10 w-11 h-11 rounded-full flex items-center justify-center border-2 transition-all duration-700",
                   step.completed || step.active 
@@ -161,7 +154,6 @@ export default function OrderStatusPage() {
                   )}
                 </div>
 
-                {/* Step Text Content */}
                 <div className="flex flex-col justify-center">
                   <h3 className={cn(
                     "font-black text-lg uppercase tracking-tight italic leading-none",
@@ -180,7 +172,6 @@ export default function OrderStatusPage() {
             ))}
           </div>
 
-          {/* Ramadan Decoration Footer */}
           <div className="mt-14 pt-8 border-t border-white/10 flex flex-col items-center gap-4">
              <div className="flex items-center gap-3">
                 <Star size={10} className="text-white/20 fill-white/20" />
@@ -191,7 +182,6 @@ export default function OrderStatusPage() {
         </div>
       </div>
 
-      {/* 5. BRANDING FOOTER */}
       <footer className="mt-12 flex flex-col items-center gap-3">
         <div className="flex items-center gap-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/10 backdrop-blur-sm">
             <span className="text-[8px] font-black uppercase tracking-[0.3em] text-white/20">Powered by</span>
