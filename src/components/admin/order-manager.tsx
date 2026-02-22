@@ -222,7 +222,8 @@ export default function OrderManager() {
       setCashReceived("");
       setShowNewOrder(false);
       
-      const finalOrder = { id: docRef.id, ...orderData } as Order;
+      // Use local timestamp for immediate preview
+      const finalOrder = { id: docRef.id, ...orderData, timestamp: { seconds: Math.floor(Date.now() / 1000) } } as Order;
       setPrintingOrder(finalOrder);
       setShowPrintPreview(true);
 
@@ -244,6 +245,12 @@ export default function OrderManager() {
     if (!ts) return "";
     const date = ts.seconds ? new Date(ts.seconds * 1000) : new Date(ts);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const formatOrderDate = (ts: any) => {
+    if (!ts) return "";
+    const date = ts.seconds ? new Date(ts.seconds * 1000) : new Date(ts);
+    return date.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' });
   };
 
   const pendingOrders = orders.filter(o => o.status === 'Pending');
@@ -309,7 +316,6 @@ export default function OrderManager() {
                   </div>
                 </div>
 
-                {/* ITEM LIST */}
                 <div className="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
                   <p className="text-[9px] font-black uppercase text-zinc-400 tracking-widest ml-1 mb-2">Order Items</p>
                   {order.items.map((item, idx) => (
@@ -326,7 +332,6 @@ export default function OrderManager() {
                   ))}
                 </div>
 
-                {/* TAX BREAKDOWN */}
                 <div className="p-4 bg-zinc-50 rounded-2xl border border-zinc-100 space-y-2">
                   <p className="text-[9px] font-black uppercase text-zinc-400 tracking-widest leading-none mb-2">Order Summary</p>
                   <div className="flex justify-between items-center text-[10px] font-bold text-zinc-500 uppercase">
@@ -580,6 +585,10 @@ export default function OrderManager() {
                       <span>ORD: #{printingOrder.orderNumber}</span>
                       <span>{formatOrderTime(printingOrder.timestamp)}</span>
                     </div>
+                    <div className="flex justify-between text-[9px] mt-1">
+                      <span>BILL DATE: {formatOrderDate(printingOrder.timestamp)}</span>
+                      <span>{formatOrderTime(printingOrder.timestamp)}</span>
+                    </div>
                     <p className="truncate uppercase mt-1">CUST: {printingOrder.customerName}</p>
                   </div>
 
@@ -699,6 +708,24 @@ export default function OrderManager() {
                 <Input value={printSettings.phone || ""} onChange={(e) => setPrintSettings({...printSettings, phone: e.target.value})} className="rounded-xl border-2 font-bold text-black" />
               </div>
             </div>
+
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black uppercase text-zinc-400">Paper Size</Label>
+              <RadioGroup 
+                value={printSettings.paperWidth} 
+                onValueChange={(v: any) => setPrintSettings({...printSettings, paperWidth: v})}
+                className="grid grid-cols-2 gap-4"
+              >
+                <Label htmlFor="p-58" className={cn("flex items-center justify-center p-4 border-2 rounded-xl cursor-pointer font-bold", printSettings.paperWidth === '58mm' ? "border-[#b8582e] text-[#b8582e] bg-[#b8582e]/5" : "border-zinc-100 text-zinc-400")}>
+                  <RadioGroupItem value="58mm" id="p-58" className="sr-only" />
+                  58mm (Small)
+                </Label>
+                <Label htmlFor="p-80" className={cn("flex items-center justify-center p-4 border-2 rounded-xl cursor-pointer font-bold", printSettings.paperWidth === '80mm' ? "border-[#b8582e] text-[#b8582e] bg-[#b8582e]/5" : "border-zinc-100 text-zinc-400")}>
+                  <RadioGroupItem value="80mm" id="p-80" className="sr-only" />
+                  80mm (Large)
+                </Label>
+              </RadioGroup>
+            </div>
             
             <div className="space-y-2">
               <Label className="text-[10px] font-black uppercase text-zinc-400">Footer Message</Label>
@@ -745,6 +772,10 @@ export default function OrderManager() {
               <div className="py-2 border-b border-dashed border-black text-[10px]">
                 <div className="flex justify-between font-bold">
                   <span>ORDER: #{printingOrder.orderNumber}</span>
+                  <span>{formatOrderTime(printingOrder.timestamp)}</span>
+                </div>
+                <div className="flex justify-between mt-1">
+                  <span>BILL DATE: {formatOrderDate(printingOrder.timestamp)}</span>
                   <span>{formatOrderTime(printingOrder.timestamp)}</span>
                 </div>
                 <p>CUST: {printingOrder.customerName}</p>
