@@ -30,6 +30,16 @@ interface PrintSettings {
   paperWidth: '58mm' | '80mm';
 }
 
+const DEFAULT_PRINT_SETTINGS: PrintSettings = {
+  storeName: "RAVOYI Kitchen",
+  address: "Authentic Telangana Kitchen, Hyderabad",
+  phone: "+91 98765 43210",
+  gstin: "36ABCDE1234F1Z5",
+  fssai: "12345678901234",
+  footerMessage: "Thank you for visiting RAVOYI! Savor the spice.",
+  paperWidth: '80mm'
+};
+
 export default function OrderManager() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -48,15 +58,7 @@ export default function OrderManager() {
   const [paymentMethod, setPaymentMethod] = useState<'Card' | 'Cash' | 'UPI'>('Cash');
   const [menuSearch, setMenuSearch] = useState("");
 
-  const [printSettings, setPrintSettings] = useState<PrintSettings>({
-    storeName: "RAVOYI Kitchen",
-    address: "Authentic Telangana Kitchen, Hyderabad",
-    phone: "+91 98765 43210",
-    gstin: "36ABCDE1234F1Z5",
-    fssai: "12345678901234",
-    footerMessage: "Thank you for visiting RAVOYI! Savor the spice.",
-    paperWidth: '80mm'
-  });
+  const [printSettings, setPrintSettings] = useState<PrintSettings>(DEFAULT_PRINT_SETTINGS);
 
   useEffect(() => {
     if (!firestore) return;
@@ -71,7 +73,9 @@ export default function OrderManager() {
     });
 
     const unsubSettings = onSnapshot(doc(firestore, "settings", "print_template"), (d) => {
-      if (d.exists()) setPrintSettings(d.data() as PrintSettings);
+      if (d.exists()) {
+        setPrintSettings({ ...DEFAULT_PRINT_SETTINGS, ...d.data() } as PrintSettings);
+      }
     });
 
     return () => { unsubOrders(); unsubMenu(); unsubSettings(); };
@@ -526,26 +530,26 @@ export default function OrderManager() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label className="text-[10px] font-black uppercase text-zinc-400">Store Name</Label>
-                <Input value={printSettings.storeName} onChange={(e) => setPrintSettings({...printSettings, storeName: e.target.value})} className="rounded-xl border-2 font-bold text-black" />
+                <Input value={printSettings.storeName || ""} onChange={(e) => setPrintSettings({...printSettings, storeName: e.target.value})} className="rounded-xl border-2 font-bold text-black" />
               </div>
               <div className="space-y-2">
                 <Label className="text-[10px] font-black uppercase text-zinc-400">GSTIN</Label>
-                <Input value={printSettings.gstin} onChange={(e) => setPrintSettings({...printSettings, gstin: e.target.value})} className="rounded-xl border-2 font-bold uppercase text-black" />
+                <Input value={printSettings.gstin || ""} onChange={(e) => setPrintSettings({...printSettings, gstin: e.target.value})} className="rounded-xl border-2 font-bold uppercase text-black" />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label className="text-[10px] font-black uppercase text-zinc-400">FSSAI Number</Label>
-                <Input value={printSettings.fssai} onChange={(e) => setPrintSettings({...printSettings, fssai: e.target.value})} className="rounded-xl border-2 font-bold text-black" />
+                <Input value={printSettings.fssai || ""} onChange={(e) => setPrintSettings({...printSettings, fssai: e.target.value})} className="rounded-xl border-2 font-bold text-black" />
               </div>
               <div className="space-y-2">
                 <Label className="text-[10px] font-black uppercase text-zinc-400">Phone</Label>
-                <Input value={printSettings.phone} onChange={(e) => setPrintSettings({...printSettings, phone: e.target.value})} className="rounded-xl border-2 font-bold text-black" />
+                <Input value={printSettings.phone || ""} onChange={(e) => setPrintSettings({...printSettings, phone: e.target.value})} className="rounded-xl border-2 font-bold text-black" />
               </div>
             </div>
             <div className="space-y-2">
               <Label className="text-[10px] font-black uppercase text-zinc-400">Footer Message</Label>
-              <Textarea value={printSettings.footerMessage} onChange={(e) => setPrintSettings({...printSettings, footerMessage: e.target.value})} className="rounded-xl border-2 font-bold text-black min-h-[80px]" />
+              <Textarea value={printSettings.footerMessage || ""} onChange={(e) => setPrintSettings({...printSettings, footerMessage: e.target.value})} className="rounded-xl border-2 font-bold text-black min-h-[80px]" />
             </div>
           </div>
           <DialogFooter>
