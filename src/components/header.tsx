@@ -16,11 +16,11 @@ export function Header({ tableId }: HeaderProps) {
     <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur-xl border-b border-white/5 py-4 shadow-xl">
       <div className="container mx-auto flex items-center justify-between px-6">
         
-        {/* Brand Section: Circular Logo + Tagline */}
-        <div className="flex items-center gap-4">
+        {/* Brand Section: Logo stacked with Tagline */}
+        <div className="flex flex-col items-start gap-2">
           <div className="
             relative 
-            h-16 w-16           
+            h-14 w-14           
             rounded-full 
             border-[2px] border-white  
             bg-white
@@ -32,24 +32,19 @@ export function Header({ tableId }: HeaderProps) {
             <Image 
               src={LOGO_URL} 
               alt="RAVOYI Logo" 
-              width={64} 
-              height={64} 
+              width={56} 
+              height={56} 
               className="object-contain"
               priority
             />
           </div>
           
-          <div className="flex flex-col">
-            <h1 className="text-white text-lg font-black uppercase tracking-tighter leading-none italic">
-              RAVOYI <span className="text-orange-500">Kitchen</span>
-            </h1>
-            <p className="text-[7px] font-black text-white/50 uppercase tracking-[0.4em] mt-1">
-              A Telangana Kitchen
-            </p>
-          </div>
+          <p className="text-[7px] font-black text-white/50 uppercase tracking-[0.4em] ml-1">
+            A Telangana Kitchen
+          </p>
         </div>
 
-        {/* Ramadan Message Section (Replaces Takeaway Button) */}
+        {/* Ramadan Message Section */}
         <div className="hidden md:flex flex-col items-end text-right space-y-1">
           <div className="flex items-center gap-2 text-orange-500">
              <Star size={10} fill="currentColor" className="animate-pulse" />

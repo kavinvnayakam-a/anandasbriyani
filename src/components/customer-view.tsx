@@ -115,7 +115,7 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
       
       <main className="max-w-5xl mx-auto px-4 md:px-6 py-12 md:py-24 relative z-20">
         <header className="mb-24 text-center">
-          {/* Hero Section simplified for space - Ramadan branding moved to Header */}
+          {/* Hero Section */}
           <h1 className="text-7xl md:text-[11rem] font-black text-white tracking-tighter uppercase italic leading-none animate-in fade-in slide-in-from-bottom-8 duration-1000">
             Iftar <span className="text-orange-500">Specials</span>
           </h1>
@@ -156,7 +156,6 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
           <div className="text-center space-y-8">
              <div className="space-y-2">
                 <p className="text-[10px] font-black uppercase tracking-[0.6em] text-white/20">A Telangana Kitchen Experience</p>
-                <p className="text-orange-500/80 font-bold italic text-sm tracking-widest uppercase">Ramadan Kareem</p>
              </div>
 
              {/* GetPik Digital Connect */}
