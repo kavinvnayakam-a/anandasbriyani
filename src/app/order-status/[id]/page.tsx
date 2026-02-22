@@ -61,21 +61,49 @@ export default function OrderStatusPage() {
 
     // Start 3-min timer ONLY when Handover is clicked in Admin
     if (order?.status === 'Handover') {
+      const storageKey = `handover_timer_${orderId}`;
+      let endTime = localStorage.getItem(storageKey);
+      
+      if (!endTime) {
+        // First time hitting handover status, set the end time
+        const newEndTime = Date.now() + (PICKUP_TIMER_DURATION * 1000);
+        localStorage.setItem(storageKey, newEndTime.toString());
+      }
+      
       setIsTimerActive(true);
     }
-  }, [order?.status]);
+  }, [order?.status, orderId]);
 
   useEffect(() => {
     let interval: any;
-    if (isTimerActive && timeLeft > 0) {
-      interval = setInterval(() => {
-        setTimeLeft((prev) => prev - 1);
-      }, 1000);
-    } else if (timeLeft === 0) {
-      router.push('/thanks');
+    if (isTimerActive) {
+      const storageKey = `handover_timer_${orderId}`;
+      
+      const updateTimer = () => {
+        const storedEndTime = localStorage.getItem(storageKey);
+        if (!storedEndTime) return;
+
+        const endTime = parseInt(storedEndTime);
+        const now = Date.now();
+        const remaining = Math.max(0, Math.floor((endTime - now) / 1000));
+        
+        setTimeLeft(remaining);
+
+        if (remaining <= 0) {
+          clearInterval(interval);
+          localStorage.removeItem(storageKey);
+          router.push('/thanks');
+        }
+      };
+
+      // Initial run
+      updateTimer();
+      
+      // Setup real-time interval
+      interval = setInterval(updateTimer, 1000);
     }
     return () => clearInterval(interval);
-  }, [isTimerActive, timeLeft, router]);
+  }, [isTimerActive, orderId, router]);
 
   if (isLoading) return null;
 
