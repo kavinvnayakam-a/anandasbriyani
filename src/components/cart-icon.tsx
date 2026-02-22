@@ -22,10 +22,10 @@ export function CartIcon({ onOpen }: { onOpen?: () => void }) {
       aria-label="Open cart"
       className={cn(
         "fixed right-0 top-[60%] -translate-y-1/2 z-[70]",
-        "flex flex-col items-center gap-4",
+        "flex flex-col items-center gap-3",
         "bg-[#0c1a2b] text-white", // Royal Navy Background
-        "py-10 px-4",
-        "rounded-l-[2.5rem]", 
+        "py-6 px-3",
+        "rounded-l-[1.5rem]", 
         "border-2 border-orange-500/40 border-r-0", // Orange Border
         "shadow-[-10px_0_40px_rgba(249,115,22,0.2)]", // Orange Glow
         "transition-all duration-500 ease-in-out",
@@ -35,9 +35,9 @@ export function CartIcon({ onOpen }: { onOpen?: () => void }) {
     >
       {/* Item Counter with Pulse */}
       <div className={cn(
-        "relative flex h-8 w-8 items-center justify-center rounded-full text-[12px] font-black transition-all duration-500",
+        "relative flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-black transition-all duration-500",
         totalItems > 0 
-          ? "bg-orange-500 text-black shadow-[0_0_15px_rgba(249,115,22,0.6)]" 
+          ? "bg-orange-500 text-black shadow-[0_0_10px_rgba(249,115,22,0.6)]" 
           : "bg-white/10 text-white/30"
       )}>
         {totalItems}
@@ -47,20 +47,20 @@ export function CartIcon({ onOpen }: { onOpen?: () => void }) {
       </div>
 
       <ShoppingBag className={cn(
-        "h-6 w-6 transition-colors duration-300",
+        "h-5 w-5 transition-colors duration-300",
         totalItems > 0 ? "text-orange-400" : "text-white/20"
       )} />
 
       {/* Label with Vertical Text */}
       <div className="flex flex-col items-center gap-2">
-        <span className="[writing-mode:vertical-lr] rotate-180 text-[11px] font-black uppercase tracking-[0.4em] text-white/90 group-hover:text-white">
+        <span className="[writing-mode:vertical-lr] rotate-180 text-[9px] font-black uppercase tracking-[0.3em] text-white/90 group-hover:text-white">
           My Tray
         </span>
         
         {/* Decorative Divider */}
         <div className="flex flex-col gap-1 items-center">
             <div className="h-1 w-1 rounded-full bg-orange-500" />
-            <div className="h-8 w-[1px] bg-gradient-to-b from-orange-500 to-transparent" />
+            <div className="h-4 w-[1px] bg-gradient-to-b from-orange-500 to-transparent" />
         </div>
       </div>
     </button>
