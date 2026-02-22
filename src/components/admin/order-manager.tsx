@@ -308,7 +308,7 @@ export default function OrderManager() {
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300" size={18} />
                   <Input 
                     placeholder="Search Menu..." 
-                    className="pl-12 h-12 bg-zinc-50 border-none rounded-2xl font-bold"
+                    className="pl-12 h-12 bg-zinc-50 border-none rounded-2xl font-bold text-black"
                     value={menuSearch}
                     onChange={(e) => setMenuSearch(e.target.value)}
                   />
@@ -348,7 +348,7 @@ export default function OrderManager() {
                       value={customerName}
                       onChange={(e) => setCustomerName(e.target.value)}
                       placeholder="e.g. Rahul Kumar"
-                      className="bg-white border-zinc-200 h-12 rounded-xl font-bold"
+                      className="bg-white border-zinc-200 h-12 rounded-xl font-bold text-black"
                     />
                   </div>
                   <div className="space-y-2">
@@ -357,7 +357,7 @@ export default function OrderManager() {
                       value={customerPhone}
                       onChange={(e) => setCustomerPhone(e.target.value)}
                       placeholder="10-digit mobile"
-                      className="bg-white border-zinc-200 h-12 rounded-xl font-bold"
+                      className="bg-white border-zinc-200 h-12 rounded-xl font-bold text-black"
                     />
                   </div>
                 </div>
@@ -453,7 +453,7 @@ export default function OrderManager() {
               <Input 
                 value={printSettings.storeName} 
                 onChange={(e) => setPrintSettings({...printSettings, storeName: e.target.value})}
-                className="rounded-xl border-2 font-bold"
+                className="rounded-xl border-2 font-bold text-black"
               />
             </div>
             <div className="grid gap-2">
@@ -461,7 +461,7 @@ export default function OrderManager() {
               <Input 
                 value={printSettings.gstin} 
                 onChange={(e) => setPrintSettings({...printSettings, gstin: e.target.value})}
-                className="rounded-xl border-2 font-bold uppercase"
+                className="rounded-xl border-2 font-bold uppercase text-black"
               />
             </div>
             <div className="grid gap-2">
@@ -469,7 +469,7 @@ export default function OrderManager() {
               <Input 
                 value={printSettings.address} 
                 onChange={(e) => setPrintSettings({...printSettings, address: e.target.value})}
-                className="rounded-xl border-2 font-bold"
+                className="rounded-xl border-2 font-bold text-black"
               />
             </div>
             <div className="grid gap-2">
