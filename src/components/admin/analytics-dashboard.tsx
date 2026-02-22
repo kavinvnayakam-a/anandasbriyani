@@ -302,12 +302,12 @@ export default function AnalyticsDashboard() {
           </DialogHeader>
           
           <ScrollArea className="max-h-[60vh] p-10 bg-zinc-950 flex flex-col items-center">
-            <div className="bg-white text-black p-8 shadow-2xl font-mono text-[13px] w-[300px] font-black">
+            <div className="bg-white text-black p-8 shadow-2xl font-mono text-[12px] w-[300px] font-black">
               <div className="text-center border-b-2 border-dashed border-black pb-4 mb-4">
-                <h1 className="text-2xl font-black uppercase">{printSettings?.storeName || 'RAVOYI KITCHEN'}</h1>
-                <p className="uppercase text-[10px] mt-1">{printSettings?.address}</p>
-                <p className="text-lg font-black mt-4 border-y border-black py-2">DAILY SALES SUMMARY</p>
-                <p className="text-[12px] mt-2 uppercase">DATE: {new Date(selectedDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
+                <h1 className="text-lg font-black uppercase">{printSettings?.storeName || 'RAVOYI KITCHEN'}</h1>
+                <p className="uppercase text-[9px] mt-1">{printSettings?.address}</p>
+                <p className="text-base font-black mt-4 border-y border-black py-2">DAILY SALES SUMMARY</p>
+                <p className="text-[11px] mt-2 uppercase">DATE: {new Date(selectedDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
               </div>
 
               <div className="space-y-3 border-b-2 border-dashed border-black pb-4 mb-4">
@@ -323,7 +323,7 @@ export default function AnalyticsDashboard() {
                   <span>TAX (GST 5%)</span>
                   <span>{formatCurrency(stats.revenue.gst)}</span>
                 </div>
-                <div className="flex justify-between text-2xl font-black border-t-2 border-black pt-3 mt-2">
+                <div className="flex justify-between text-xl font-black border-t-2 border-black pt-3 mt-2">
                   <span>GRAND TOTAL</span>
                   <span>{formatCurrency(stats.revenue.total)}</span>
                 </div>
@@ -346,7 +346,7 @@ export default function AnalyticsDashboard() {
               </div>
 
               <div className="text-center pt-6 border-t-2 border-dashed border-black opacity-80">
-                <p className="italic text-[10px] uppercase">Audit Report • {new Date().toLocaleTimeString()}</p>
+                <p className="italic text-[9px] uppercase">Audit Report • {new Date().toLocaleTimeString()}</p>
               </div>
             </div>
           </ScrollArea>
@@ -361,15 +361,15 @@ export default function AnalyticsDashboard() {
 
       <div id="printable-eod-report" className="hidden print:block font-mono text-black p-0 m-0 w-[80mm] font-bold">
           <div className="text-center border-b-2 border-dashed border-black pb-4 mb-4">
-            <h1 className="text-xl font-black uppercase leading-tight mb-1">{printSettings?.storeName || 'RAVOYI KITCHEN'}</h1>
-            <p className="uppercase text-[10px] font-bold mb-2">{printSettings?.address}</p>
-            <div className="text-lg font-black border-y-2 border-black py-2 my-2 uppercase">
+            <h1 className="text-lg font-black uppercase leading-tight mb-1">{printSettings?.storeName || 'RAVOYI KITCHEN'}</h1>
+            <p className="uppercase text-[9px] font-bold mb-2">{printSettings?.address}</p>
+            <div className="text-base font-black border-y-2 border-black py-2 my-2 uppercase">
               End of Day Report
             </div>
-            <p className="text-sm font-black uppercase">DATE: {new Date(selectedDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
+            <p className="text-xs font-black uppercase">DATE: {new Date(selectedDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
           </div>
 
-          <div className="space-y-3 border-b-2 border-dashed border-black pb-4 mb-4 text-sm">
+          <div className="space-y-3 border-b-2 border-dashed border-black pb-4 mb-4 text-xs">
             <div className="flex justify-between">
               <span>TOTAL BILLS</span>
               <span className="font-black">{allOrders.length}</span>
@@ -382,14 +382,14 @@ export default function AnalyticsDashboard() {
               <span>TAX (GST 5%)</span>
               <span className="font-black">{formatCurrency(stats.revenue.gst)}</span>
             </div>
-            <div className="flex justify-between text-2xl font-black border-t-2 border-black pt-3 mt-2">
+            <div className="flex justify-between text-xl font-black border-t-2 border-black pt-3 mt-2">
               <span>TOTAL</span>
               <span>{formatCurrency(stats.revenue.total)}</span>
             </div>
           </div>
 
-          <div className="space-y-2 mb-6 text-sm">
-            <p className="font-black text-center mb-2 border-b-2 border-black pb-1 text-base uppercase">Payment Split</p>
+          <div className="space-y-2 mb-6 text-xs">
+            <p className="font-black text-center mb-2 border-b-2 border-black pb-1 text-sm uppercase">Payment Split</p>
             <div className="flex justify-between">
               <span>UPI ({stats.payments.count_UPI || 0})</span>
               <span className="font-black">{formatCurrency(stats.payments.UPI || 0)}</span>
@@ -405,7 +405,7 @@ export default function AnalyticsDashboard() {
           </div>
 
           <div className="text-center pt-4 border-t-2 border-dashed border-black opacity-100">
-            <p className="italic text-[10px] uppercase font-bold">Audit Generated: {new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}</p>
+            <p className="italic text-[9px] uppercase font-bold">Audit Generated: {new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}</p>
             <p className="text-[8px] mt-2 font-black uppercase tracking-widest">RAVOYI Management System</p>
           </div>
       </div>
