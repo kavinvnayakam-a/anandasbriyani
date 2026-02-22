@@ -14,14 +14,14 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // Orders: Customers can place (create) and track (read)
-    // They are strictly prohibited from editing or deleting once the order is placed
+    // Orders: Customers can place (create) and track (read) without sign-in
+    // They are strictly prohibited from editing (update) or deleting data
     match /orders/{orderId} {
       allow read, create: if true;
       allow update, delete: if isAdmin();
     }
 
-    // Archived orders (History): Customers can view, but only Admin can modify/manage
+    // Archived orders (History): Publicly readable and creatable, but immutable for customers
     match /order_history/{historyId} {
       allow read, create: if true;
       allow update, delete: if isAdmin();
