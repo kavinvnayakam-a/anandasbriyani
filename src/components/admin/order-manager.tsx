@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Textarea } from "@/components/ui/textarea";
 
 interface PrintSettings {
   storeName: string;
@@ -410,7 +411,7 @@ export default function OrderManager() {
                           </div>
                           <div className="flex items-center gap-2">
                             <button onClick={() => handleRemoveItem(item.id)} className="p-1.5 hover:bg-white rounded-lg transition-colors text-zinc-400">
-                              <Minus size={14} />
+                              {item.quantity > 1 ? <Minus size={14} /> : <X size={14} />}
                             </button>
                             <span className="text-xs font-black w-6 text-center">{item.quantity}</span>
                             <button onClick={() => handleAddItem(item)} className="p-1.5 hover:bg-white rounded-lg transition-colors text-[#b8582e]">
@@ -518,7 +519,7 @@ export default function OrderManager() {
                   </div>
 
                   <div className="text-center pt-4 border-t border-dashed border-black opacity-60">
-                    <p className="italic text-[8px]">{printSettings.footerMessage}</p>
+                    <p className="italic text-[8px] whitespace-pre-wrap">{printSettings.footerMessage}</p>
                     <p className="mt-2 font-black uppercase">Token #{printingOrder.orderNumber}</p>
                   </div>
                 </>
@@ -568,11 +569,28 @@ export default function OrderManager() {
               />
             </div>
             <div className="grid gap-2">
+              <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Support Phone</Label>
+              <Input 
+                value={printSettings.phone} 
+                onChange={(e) => setPrintSettings({...printSettings, phone: e.target.value})}
+                className="rounded-xl border-2 font-bold text-black"
+              />
+            </div>
+            <div className="grid gap-2">
               <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Address</Label>
               <Input 
                 value={printSettings.address} 
                 onChange={(e) => setPrintSettings({...printSettings, address: e.target.value})}
                 className="rounded-xl border-2 font-bold text-black"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Footer Message</Label>
+              <Textarea 
+                value={printSettings.footerMessage} 
+                onChange={(e) => setPrintSettings({...printSettings, footerMessage: e.target.value})}
+                className="rounded-xl border-2 font-bold text-black resize-none min-h-[80px]"
+                placeholder="Message printed at bottom of slip"
               />
             </div>
             <div className="grid gap-2">
@@ -660,7 +678,7 @@ export default function OrderManager() {
             </div>
 
             <div className="pt-4 text-center border-t border-dashed border-black">
-              <p className="text-[8px] italic">{printSettings.footerMessage}</p>
+              <p className="text-[8px] italic whitespace-pre-wrap">{printSettings.footerMessage}</p>
               <p className="text-[8px] mt-2 font-bold">ORDER TOKEN: #{printingOrder.orderNumber}</p>
             </div>
           </>
