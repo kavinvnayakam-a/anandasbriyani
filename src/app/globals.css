@@ -41,14 +41,16 @@ body {
   }
 }
 
-/* Print Specific Utility to hide everything but the receipt */
+/* Print Specific Utility: Target layout elements instead of root containers to prevent blank prints */
 @media print {
-  .admin-theme, nav, header, footer, button, .no-print {
+  nav, header, footer, button, aside, .no-print, [role="dialog"], .sidebar-provider {
     display: none !important;
   }
   body {
     background: white !important;
     color: black !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 }
 

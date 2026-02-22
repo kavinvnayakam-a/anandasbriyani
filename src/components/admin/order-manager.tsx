@@ -56,10 +56,8 @@ export default function OrderManager() {
   const firestore = useFirestore();
   const { toast } = useToast();
 
-  // State for cash received on existing orders in the feed
   const [feedCashReceived, setFeedCashReceived] = useState<Record<string, string>>({});
 
-  // New Order State (Manual)
   const [selectedItems, setSelectedItems] = useState<CartItem[]>([]);
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
@@ -94,7 +92,6 @@ export default function OrderManager() {
     const subtotal = selectedItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
     const cgst = subtotal * 0.025;
     const sgst = subtotal * 0.025;
-    // Round the grand total to the nearest whole number
     const total = Math.round(subtotal + cgst + sgst);
     return { subtotal, cgst, sgst, total };
   };
@@ -128,12 +125,9 @@ export default function OrderManager() {
       setPrintingOrder(updatedOrder);
       setShowPrintPreview(true);
       
-      if (order.paymentMethod === 'Cash' && printSettings.triggerCashDrawer) {
-        toast({ title: "Opening Cash Drawer...", description: "Hardware signal sent to MP301 DK port." });
-      }
-      toast({ title: "Order Confirmed", description: "Hardware preview generated." });
+      toast({ title: "Order Confirmed" });
     } catch (error) {
-      toast({ variant: "destructive", title: "Update Failed", description: "Could not confirm order." });
+      toast({ variant: "destructive", title: "Update Failed" });
     }
   };
 
@@ -146,7 +140,7 @@ export default function OrderManager() {
     if (!firestore) return;
     await setDoc(doc(firestore, "settings", "print_template"), printSettings);
     setShowSettings(false);
-    toast({ title: "Settings Saved", description: "MP301 Hardware optimization applied." });
+    toast({ title: "Settings Saved" });
   };
 
   const handleAddItem = (item: MenuItem) => {
@@ -171,12 +165,12 @@ export default function OrderManager() {
 
   const handleCreateOrder = async () => {
     if (!firestore || selectedItems.length === 0 || !customerName) {
-      toast({ variant: "destructive", title: "Incomplete Details", description: "Add items and customer name." });
+      toast({ variant: "destructive", title: "Incomplete Details" });
       return;
     }
 
     if (paymentMethod === 'Cash' && (Number(cashReceived) < totals.total)) {
-      toast({ variant: "destructive", title: "Insufficient Cash", description: "Received amount must be equal or greater than total." });
+      toast({ variant: "destructive", title: "Insufficient Cash" });
       return;
     }
 
@@ -217,21 +211,18 @@ export default function OrderManager() {
 
       const docRef = await addDoc(collection(firestore, "orders"), orderData);
       
-      toast({ title: `Order #${orderNumber} Created`, description: "Opening preview." });
-      
       setSelectedItems([]);
       setCustomerName("");
       setCustomerPhone("");
       setCashReceived("");
       setShowNewOrder(false);
       
-      // Use local timestamp for immediate preview
       const finalOrder = { id: docRef.id, ...orderData, timestamp: { seconds: Math.floor(Date.now() / 1000) } } as Order;
       setPrintingOrder(finalOrder);
       setShowPrintPreview(true);
 
     } catch (error) {
-      toast({ variant: "destructive", title: "Order Failed", description: "Could not create manual order." });
+      toast({ variant: "destructive", title: "Order Failed" });
     } finally {
       setIsPlacingOrder(false);
     }
@@ -389,7 +380,6 @@ export default function OrderManager() {
         })}
       </div>
 
-      {/* NEW ORDER DIALOG */}
       <Dialog open={showNewOrder} onOpenChange={setShowNewOrder}>
         <DialogContent className="max-w-5xl bg-zinc-50 rounded-[2.5rem] p-0 border-none shadow-2xl overflow-hidden flex flex-col h-[90vh]">
           <DialogHeader className="p-8 bg-white border-b border-zinc-100">
@@ -552,7 +542,6 @@ export default function OrderManager() {
         </DialogContent>
       </Dialog>
 
-      {/* PRINT PREVIEW DIALOG */}
       <Dialog open={showPrintPreview} onOpenChange={setShowPrintPreview}>
         <DialogContent className="max-w-lg bg-zinc-900 border-zinc-800 p-0 overflow-hidden rounded-[3rem] shadow-2xl">
           <DialogHeader className="p-8 border-b border-zinc-800 flex justify-between items-center bg-black/40">
@@ -568,7 +557,6 @@ export default function OrderManager() {
           </DialogHeader>
           
           <ScrollArea className="max-h-[60vh] p-10 bg-zinc-950 flex flex-col items-center gap-10">
-            {/* 1. Customer Receipt */}
             <div 
               className="bg-white text-black p-8 shadow-2xl font-mono text-[11px] relative" 
               style={{ width: printSettings.paperWidth === '58mm' ? '220px' : '300px' }}
@@ -643,14 +631,12 @@ export default function OrderManager() {
               )}
             </div>
 
-            {/* Visual Divider / Cut Simulation */}
             <div className="w-full flex items-center gap-4 py-4 px-10">
                <div className="h-px flex-1 bg-zinc-800" />
                <span className="text-[8px] font-black text-zinc-600 uppercase tracking-widest">Auto-Cut Line</span>
                <div className="h-px flex-1 bg-zinc-800" />
             </div>
 
-            {/* 2. Kitchen Token (KOT) */}
             <div 
               className="bg-white text-black p-8 shadow-2xl font-mono text-center border-t-4 border-zinc-200" 
               style={{ width: printSettings.paperWidth === '58mm' ? '220px' : '300px' }}
@@ -668,7 +654,7 @@ export default function OrderManager() {
              <div className="flex gap-4">
                 <button 
                   onClick={() => {
-                    toast({ title: "Tray Released", description: "Hardware command sent to MP301." });
+                    toast({ title: "Tray Released" });
                   }}
                   className="flex-1 py-4 bg-zinc-800 text-white rounded-2xl font-black uppercase text-[10px] flex items-center justify-center gap-2 hover:bg-zinc-700 transition-all"
                 >
@@ -683,7 +669,6 @@ export default function OrderManager() {
         </DialogContent>
       </Dialog>
 
-      {/* SETTINGS DIALOG */}
       <Dialog open={showSettings} onOpenChange={setShowSettings}>
         <DialogContent className="max-w-md bg-white rounded-[2rem] p-8 border-none shadow-2xl">
           <DialogHeader>
@@ -757,14 +742,8 @@ export default function OrderManager() {
         </DialogContent>
       </Dialog>
 
-      {/* PRINTABLE COMPONENT */}
+      {/* MP301 Specific Printable Area */}
       <div id="printable-receipt" className="hidden print:block font-mono text-black" style={{ width: printSettings.paperWidth }}>
-        {/* ESC/POS Drawer Kick Sequence for MP301 Compatibility */}
-        {printSettings.triggerCashDrawer && (
-          <span className="hidden">{"\x1b\x70\x00\x19\xfa"}</span>
-        )}
-        
-        {/* 1. MAIN RECEIPT */}
         <div className="receipt-section">
           <div className="p-4 text-center border-b border-dashed border-black">
             <h1 className="text-xl font-black uppercase">{printSettings.storeName}</h1>
@@ -834,11 +813,30 @@ export default function OrderManager() {
 
       <style jsx global>{`
         @media print {
-          body * { visibility: hidden; background: white !important; }
-          #printable-receipt, #printable-receipt * { visibility: visible; }
-          #printable-receipt { position: absolute; left: 0; top: 0; margin: 0; padding: 0; }
-          .print-cut-line { display: block; border-bottom: 1px dashed black; height: 1px; width: 100%; }
-          @page { margin: 0; size: auto; }
+          body * { 
+            visibility: hidden !important; 
+          }
+          #printable-receipt, #printable-receipt * { 
+            visibility: visible !important; 
+          }
+          #printable-receipt { 
+            position: absolute !important; 
+            left: 0 !important; 
+            top: 0 !important; 
+            margin: 0 !important; 
+            padding: 0 !important; 
+            display: block !important;
+          }
+          .print-cut-line { 
+            display: block !important; 
+            border-bottom: 1px dashed black !important; 
+            height: 1px !important; 
+            width: 100% !important; 
+          }
+          @page { 
+            margin: 0 !important; 
+            size: auto !important; 
+          }
         }
         .custom-scrollbar::-webkit-scrollbar {
           width: 4px;
