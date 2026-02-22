@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useMemo, useEffect } from 'react';
@@ -20,7 +19,6 @@ const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/dasara-finedine.fi
 const KITCHEN_COORDS = { lat: 17.35786972797417, lng: 78.54533232987296 };
 const ALLOWED_RADIUS_METERS = 100;
 
-// High-Fidelity Ramadan Decoration Component
 const HangingDecoration = ({ className, delay = "0s", height = "h-32", type = "lantern" }: { className?: string, delay?: string, height?: string, type?: "lantern" | "moon" | "star" }) => (
   <div 
     className={cn("absolute flex flex-col items-center z-10", className)}
@@ -96,13 +94,9 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
   };
 
   useEffect(() => {
-    // 1. Disable right-click
     const handleContextMenu = (e: MouseEvent) => e.preventDefault();
     document.addEventListener('contextmenu', handleContextMenu);
-
-    // 2. Initialize Geofence
     checkLocation();
-
     return () => document.removeEventListener('contextmenu', handleContextMenu);
   }, []);
 
@@ -139,59 +133,80 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
     }).map(cat => ({ category: cat, items: grouped[cat] }));
   }, [menuItems]);
 
-  // GEOFENCE GUARD UI
   if (locationStatus === 'checking') {
     return (
-      <div className="h-screen w-full flex flex-col items-center justify-center bg-[#0a0500] text-white">
-        <div className="relative mb-12">
-          <div className="absolute inset-0 bg-orange-500/20 rounded-full blur-3xl animate-pulse" />
-          <LocateFixed className="w-16 h-16 text-orange-500 animate-[spin_3s_linear_infinite]" />
+      <div className="h-screen w-full flex flex-col items-center justify-center bg-[#0a0500] text-white p-6 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#b8582e]/20 via-transparent to-transparent opacity-40" />
+        
+        <div className="relative mb-12 flex flex-col items-center">
+          <div className="relative p-1 rounded-full bg-white mb-8 shadow-2xl shadow-white/10 animate-pulse">
+            <Image src={LOGO_URL} alt="RAVOYI" width={100} height={100} className="rounded-full" />
+          </div>
+          <LocateFixed className="w-12 h-12 text-orange-500 animate-[spin_3s_linear_infinite]" />
         </div>
-        <h2 className="text-xl font-black uppercase tracking-[0.3em] text-white italic">Verifying Location</h2>
-        <p className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] mt-4">Please wait while we secure your session</p>
+        
+        <h2 className="text-2xl font-black uppercase tracking-[0.3em] text-white italic text-center leading-none">Verifying Proximity</h2>
+        <p className="text-[10px] font-bold text-white/40 uppercase tracking-[0.4em] mt-6 animate-pulse">Establishing Secure Session</p>
       </div>
     );
   }
 
   if (locationStatus === 'too-far') {
     return (
-      <div className="h-screen w-full flex flex-col items-center justify-center bg-[#0a0500] p-8 text-center text-white">
-        <div className="bg-orange-500/10 p-8 rounded-[3rem] border border-orange-500/20 max-w-sm w-full shadow-2xl">
-          <div className="bg-orange-500 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-8 shadow-[0_0_30px_rgba(249,115,22,0.4)]">
-            <MapPinOff className="text-black w-10 h-10" />
+      <div className="h-screen w-full flex flex-col items-center justify-center bg-[#0a0500] p-8 text-center text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-orange-500/10 via-transparent to-transparent opacity-40" />
+        
+        <div className="relative z-10 bg-white/5 p-10 rounded-[3.5rem] border border-white/10 max-w-sm w-full shadow-2xl backdrop-blur-xl">
+          <div className="relative p-1 rounded-full bg-white mx-auto mb-10 w-24 h-24 shadow-xl border-4 border-orange-500/20">
+            <Image src={LOGO_URL} alt="RAVOYI" fill className="rounded-full object-contain p-2" />
           </div>
+          
+          <div className="bg-orange-500/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-8">
+            <MapPinOff className="text-orange-500 w-8 h-8" />
+          </div>
+          
           <h2 className="text-3xl font-black italic uppercase tracking-tighter leading-none mb-4">Out of Range</h2>
-          <p className="text-xs font-bold text-white/60 uppercase tracking-widest leading-relaxed mb-10">
-            Access to our digital menu is limited to customers within <span className="text-orange-500">100 meters</span> of RAVOYI Kitchen.
+          <p className="text-[10px] font-bold text-white/60 uppercase tracking-[0.3em] leading-relaxed mb-10">
+            Access restricted to customers within <span className="text-orange-500">100 meters</span> of RAVOYI Kitchen.
           </p>
+          
           <button 
             onClick={checkLocation}
-            className="w-full py-5 bg-white text-black rounded-2xl font-black uppercase italic text-xs flex items-center justify-center gap-3 active:scale-95 transition-all shadow-xl"
+            className="w-full py-5 bg-[#b8582e] text-white rounded-2xl font-black uppercase italic text-xs flex items-center justify-center gap-3 active:scale-95 transition-all shadow-xl shadow-[#b8582e]/20"
           >
             <RefreshCcw size={18} /> Retry Verification
           </button>
         </div>
-        <p className="fixed bottom-12 text-[8px] font-black uppercase tracking-[0.5em] text-white/20">A Telangana Kitchen Experience</p>
+        
+        <p className="fixed bottom-12 text-[8px] font-black uppercase tracking-[0.6em] text-white/20">RAVOYI • Authentically Telangana</p>
       </div>
     );
   }
 
   if (locationStatus === 'denied') {
     return (
-      <div className="h-screen w-full flex flex-col items-center justify-center bg-[#0a0500] p-8 text-center text-white">
-        <div className="bg-rose-500/10 p-8 rounded-[3rem] border border-rose-500/20 max-w-sm w-full shadow-2xl">
-          <div className="bg-rose-500 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-8 shadow-[0_0_30px_rgba(244,63,94,0.4)]">
-            <ShieldAlert className="text-black w-10 h-10" />
+      <div className="h-screen w-full flex flex-col items-center justify-center bg-[#0a0500] p-8 text-center text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-rose-500/10 via-transparent to-transparent opacity-40" />
+        
+        <div className="relative z-10 bg-white/5 p-10 rounded-[3.5rem] border border-white/10 max-w-sm w-full shadow-2xl backdrop-blur-xl">
+          <div className="relative p-1 rounded-full bg-white mx-auto mb-10 w-24 h-24 shadow-xl border-4 border-rose-500/20">
+            <Image src={LOGO_URL} alt="RAVOYI" fill className="rounded-full object-contain p-2" />
           </div>
-          <h2 className="text-3xl font-black italic uppercase tracking-tighter leading-none mb-4">Location Required</h2>
-          <p className="text-xs font-bold text-white/60 uppercase tracking-widest leading-relaxed mb-10">
-            Please enable <span className="text-rose-500">Location Permissions</span> in your browser settings to browse and order from our kitchen.
+
+          <div className="bg-rose-500/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-8">
+            <ShieldAlert className="text-rose-500 w-8 h-8" />
+          </div>
+          
+          <h2 className="text-3xl font-black italic uppercase tracking-tighter leading-none mb-4">Location Locked</h2>
+          <p className="text-[10px] font-bold text-white/60 uppercase tracking-[0.3em] leading-relaxed mb-10">
+            Please enable <span className="text-rose-500">Location Permissions</span> in your browser settings to continue.
           </p>
+          
           <button 
             onClick={checkLocation}
             className="w-full py-5 bg-white text-black rounded-2xl font-black uppercase italic text-xs flex items-center justify-center gap-3 active:scale-95 transition-all shadow-xl"
           >
-            <RefreshCcw size={18} /> Refresh Permission
+            <RefreshCcw size={18} /> Enable & Refresh
           </button>
         </div>
       </div>
@@ -211,7 +226,6 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
 
       <Header tableId={tableId} onCartClick={() => setCartOpen(true)} timeLeft={0} />
 
-      {/* 🏮 DECORATION SEQUENCE */}
       <div className="absolute top-20 left-0 w-full h-[400px] overflow-hidden pointer-events-none z-10">
         <HangingDecoration className="left-[10%]" height="h-32" type="moon" delay="0s" />
         <HangingDecoration className="left-[28%]" height="h-24" type="star" delay="1.2s" />
@@ -227,7 +241,6 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
           </h1>
         </header>
 
-        {/* MENU CATEGORIES */}
         <div className="space-y-40">
           {categorizedMenu.map(({ category, items }) => (
             <section key={category} id={category} className="scroll-mt-52">
@@ -251,7 +264,6 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
         </div>
       </main>
 
-      {/* FOOTER */}
       <footer className="bg-black/60 border-t border-white/5 py-32 px-6">
         <div className="max-w-5xl mx-auto flex flex-col items-center gap-12">
           <div className="h-28 w-28 rounded-full border-2 border-orange-500/30 p-1 bg-white">
