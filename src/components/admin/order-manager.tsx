@@ -371,7 +371,6 @@ export default function OrderManager() {
           </DialogHeader>
 
           <div className="flex-1 flex overflow-hidden">
-            {/* Left Column: Menu Selection */}
             <div className="w-1/2 border-r border-zinc-200 flex flex-col bg-white">
               <div className="p-4 border-b border-zinc-100 bg-zinc-50/50">
                 <div className="relative">
@@ -403,11 +402,9 @@ export default function OrderManager() {
               </ScrollArea>
             </div>
 
-            {/* Right Column: Order Details */}
             <div className="w-1/2 flex flex-col bg-zinc-50 relative">
               <ScrollArea className="flex-1">
                 <div className="p-6 space-y-6">
-                  {/* Customer Details */}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1.5">
                       <Label className="text-[9px] font-black uppercase text-zinc-400 tracking-widest">Customer Name</Label>
@@ -429,7 +426,6 @@ export default function OrderManager() {
                     </div>
                   </div>
 
-                  {/* Payment Method */}
                   <div className="space-y-2">
                     <Label className="text-[9px] font-black uppercase text-zinc-400 tracking-widest">Payment Method</Label>
                     <RadioGroup 
@@ -455,7 +451,6 @@ export default function OrderManager() {
                     </RadioGroup>
                   </div>
 
-                  {/* Cash Section */}
                   {paymentMethod === 'Cash' && (
                     <div className="bg-white p-4 rounded-2xl border border-zinc-200 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
                       <div className="grid grid-cols-2 gap-4 items-center">
@@ -479,7 +474,6 @@ export default function OrderManager() {
                     </div>
                   )}
 
-                  {/* Items List */}
                   <div className="space-y-3">
                     <Label className="text-[9px] font-black uppercase text-zinc-400 tracking-widest">Selected Items ({selectedItems.length})</Label>
                     <div className="space-y-2">
@@ -510,7 +504,6 @@ export default function OrderManager() {
                 </div>
               </ScrollArea>
 
-              {/* Sticky Order Footer */}
               <div className="p-6 bg-white border-t border-zinc-200 flex-shrink-0">
                 <div className="flex justify-between items-end">
                   <div className="flex flex-col">
@@ -596,8 +589,12 @@ export default function OrderManager() {
                       <span>₹{printingOrder.subtotal?.toFixed(2) || (printingOrder.totalPrice / 1.05).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-[11px] opacity-80">
-                      <span>GST (5%)</span>
-                      <span>₹{(printingOrder.cgst! + printingOrder.sgst!)?.toFixed(2) || (printingOrder.totalPrice - (printingOrder.totalPrice / 1.05)).toFixed(2)}</span>
+                      <span>CGST (2.5%)</span>
+                      <span>₹{printingOrder.cgst?.toFixed(2) || ((printingOrder.totalPrice - (printingOrder.totalPrice / 1.05))/2).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-[11px] opacity-80">
+                      <span>SGST (2.5%)</span>
+                      <span>₹{printingOrder.sgst?.toFixed(2) || ((printingOrder.totalPrice - (printingOrder.totalPrice / 1.05))/2).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between border-t-2 border-black pt-2 mt-1 text-2xl font-black">
                       <span>GRAND TOTAL</span>
@@ -712,7 +709,6 @@ export default function OrderManager() {
         </DialogContent>
       </Dialog>
 
-      {/* ACTUAL PRINTABLE AREA */}
       <div id="printable-receipt" className="hidden print:block font-mono text-black font-black" style={{ width: '80mm' }}>
         <div className="receipt-section p-2">
           <div className="text-center border-b-4 border-dashed border-black pb-6 mb-6">
@@ -761,8 +757,12 @@ export default function OrderManager() {
                     <span>₹{printingOrder.subtotal?.toFixed(2) || (printingOrder.totalPrice / 1.05).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between mt-1">
-                    <span>GST (5%):</span>
-                    <span>₹{(printingOrder.cgst! + printingOrder.sgst!)?.toFixed(2) || (printingOrder.totalPrice - (printingOrder.totalPrice / 1.05)).toFixed(2)}</span>
+                    <span>CGST (2.5%):</span>
+                    <span>₹{printingOrder.cgst?.toFixed(2) || ((printingOrder.totalPrice - (printingOrder.totalPrice / 1.05))/2).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between mt-1">
+                    <span>SGST (2.5%):</span>
+                    <span>₹{printingOrder.sgst?.toFixed(2) || ((printingOrder.totalPrice - (printingOrder.totalPrice / 1.05))/2).toFixed(2)}</span>
                   </div>
                 </div>
                 <div className="text-4xl font-black border-t-4 border-black pt-4 mt-2 flex justify-between">

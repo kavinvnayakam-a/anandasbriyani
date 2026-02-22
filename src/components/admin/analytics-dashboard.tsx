@@ -124,7 +124,6 @@ export default function AnalyticsDashboard() {
   return (
     <div className="space-y-10 pb-24 animate-in fade-in duration-700">
       
-      {/* HEADER CONTROLS */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 bg-white p-8 rounded-[2.5rem] border border-zinc-200 shadow-xl">
         <div className="flex flex-col">
           <h3 className="text-2xl font-black uppercase italic tracking-tighter text-zinc-900 leading-none">Business Analytics</h3>
@@ -288,7 +287,6 @@ export default function AnalyticsDashboard() {
         </div>
       </div>
 
-      {/* PRINT PREVIEW DIALOG */}
       <Dialog open={showPrintPreview} onOpenChange={setShowPrintPreview}>
         <DialogContent className="max-w-md bg-zinc-900 border-zinc-800 p-0 overflow-hidden rounded-[3rem] shadow-2xl">
           <DialogHeader className="p-8 border-b border-zinc-800 flex justify-between items-center bg-black/40">
@@ -304,7 +302,6 @@ export default function AnalyticsDashboard() {
           </DialogHeader>
           
           <ScrollArea className="max-h-[60vh] p-10 bg-zinc-950 flex flex-col items-center">
-            {/* Visual Preview Only */}
             <div className="bg-white text-black p-8 shadow-2xl font-mono text-[13px] w-[300px] font-black">
               <div className="text-center border-b-2 border-dashed border-black pb-4 mb-4">
                 <h1 className="text-2xl font-black uppercase">{printSettings?.storeName || 'RAVOYI KITCHEN'}</h1>
@@ -362,55 +359,54 @@ export default function AnalyticsDashboard() {
         </DialogContent>
       </Dialog>
 
-      {/* ACTUAL PRINTABLE ELEMENT (Moved out of Dialog Portal for reliability) */}
-      <div id="printable-eod-report" className="hidden print:block font-mono text-black p-0 m-0 w-[80mm] font-black">
-          <div className="text-center border-b-4 border-dashed border-black pb-6 mb-6">
-            <h1 className="text-3xl font-black uppercase leading-tight mb-2">{printSettings?.storeName || 'RAVOYI KITCHEN'}</h1>
-            <p className="uppercase text-[12px] font-black mb-4">{printSettings?.address}</p>
-            <div className="text-2xl font-black border-y-4 border-black py-4 my-4 uppercase">
+      <div id="printable-eod-report" className="hidden print:block font-mono text-black p-0 m-0 w-[80mm] font-bold">
+          <div className="text-center border-b-2 border-dashed border-black pb-4 mb-4">
+            <h1 className="text-xl font-black uppercase leading-tight mb-1">{printSettings?.storeName || 'RAVOYI KITCHEN'}</h1>
+            <p className="uppercase text-[10px] font-bold mb-2">{printSettings?.address}</p>
+            <div className="text-lg font-black border-y-2 border-black py-2 my-2 uppercase">
               End of Day Report
             </div>
-            <p className="text-xl font-black uppercase">DATE: {new Date(selectedDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
+            <p className="text-sm font-black uppercase">DATE: {new Date(selectedDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
           </div>
 
-          <div className="space-y-6 border-b-4 border-dashed border-black pb-6 mb-6 text-xl">
+          <div className="space-y-3 border-b-2 border-dashed border-black pb-4 mb-4 text-sm">
             <div className="flex justify-between">
               <span>TOTAL BILLS</span>
-              <span>{allOrders.length}</span>
+              <span className="font-black">{allOrders.length}</span>
             </div>
             <div className="flex justify-between">
               <span>NET SALES</span>
-              <span>{formatCurrency(stats.revenue.subtotal)}</span>
+              <span className="font-black">{formatCurrency(stats.revenue.subtotal)}</span>
             </div>
             <div className="flex justify-between">
               <span>TAX (GST 5%)</span>
-              <span>{formatCurrency(stats.revenue.gst)}</span>
+              <span className="font-black">{formatCurrency(stats.revenue.gst)}</span>
             </div>
-            <div className="flex justify-between text-4xl font-black border-t-4 border-black pt-6 mt-4">
+            <div className="flex justify-between text-2xl font-black border-t-2 border-black pt-3 mt-2">
               <span>TOTAL</span>
               <span>{formatCurrency(stats.revenue.total)}</span>
             </div>
           </div>
 
-          <div className="space-y-4 mb-10 text-xl">
-            <p className="font-black text-center mb-4 border-b-4 border-black pb-2 text-2xl uppercase">Payment Split</p>
+          <div className="space-y-2 mb-6 text-sm">
+            <p className="font-black text-center mb-2 border-b-2 border-black pb-1 text-base uppercase">Payment Split</p>
             <div className="flex justify-between">
               <span>UPI ({stats.payments.count_UPI || 0})</span>
-              <span>{formatCurrency(stats.payments.UPI || 0)}</span>
+              <span className="font-black">{formatCurrency(stats.payments.UPI || 0)}</span>
             </div>
             <div className="flex justify-between">
               <span>CASH ({stats.payments.count_Cash || 0})</span>
-              <span>{formatCurrency(stats.payments.Cash || 0)}</span>
+              <span className="font-black">{formatCurrency(stats.payments.Cash || 0)}</span>
             </div>
             <div className="flex justify-between">
               <span>CARD ({stats.payments.count_Card || 0})</span>
-              <span>{formatCurrency(stats.payments.Card || 0)}</span>
+              <span className="font-black">{formatCurrency(stats.payments.Card || 0)}</span>
             </div>
           </div>
 
-          <div className="text-center pt-8 border-t-4 border-dashed border-black opacity-100">
-            <p className="italic text-[12px] uppercase font-black">Audit Generated: {new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}</p>
-            <p className="text-[10px] mt-4 font-black uppercase tracking-widest">RAVOYI Management System</p>
+          <div className="text-center pt-4 border-t-2 border-dashed border-black opacity-100">
+            <p className="italic text-[10px] uppercase font-bold">Audit Generated: {new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}</p>
+            <p className="text-[8px] mt-2 font-black uppercase tracking-widest">RAVOYI Management System</p>
           </div>
       </div>
 
