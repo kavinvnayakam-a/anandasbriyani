@@ -14,19 +14,20 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // Orders: Customers can place (create) and track (read), Admin can update status or delete
+    // Orders: Customers can place (create) and track (read)
+    // They are strictly prohibited from editing or deleting once the order is placed
     match /orders/{orderId} {
-      allow read: if true;
-      allow create: if true;
+      allow read, create: if true;
       allow update, delete: if isAdmin();
     }
 
-    // Archived orders: Strictly Admin access
+    // Archived orders (History): Customers can view, but only Admin can modify/manage
     match /order_history/{historyId} {
-      allow read, write: if isAdmin();
+      allow read, create: if true;
+      allow update, delete: if isAdmin();
     }
 
-    // Daily Stats: Open for order counter transaction logic
+    // Daily Stats: Open for the atomic order counter transaction logic
     match /daily_stats/{statId} {
       allow read, write: if true;
     }
@@ -37,7 +38,7 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     
-    // Default fallback: Deny everything else
+    // Default fallback: Deny everything else unless authenticated as admin
     match /{document=**} {
       allow read, write: if isAdmin();
     }
