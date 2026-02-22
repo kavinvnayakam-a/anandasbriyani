@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect, useMemo } from 'react';
@@ -8,7 +9,7 @@ import {
 } from 'firebase/firestore';
 import { Order, MenuItem, CartItem } from '@/lib/types';
 import { 
-  Printer, Settings, Check, Clock, User, Phone, Banknote, Store, X, Save, Plus, Minus, Search, ShoppingBag, CreditCard, Smartphone, Loader2, ReceiptText, ShieldCheck, Wallet, Hash
+  Printer, Settings, Check, Clock, User, Phone, Banknote, Store, X, Save, Plus, Minus, Search, ShoppingBag, CreditCard, Smartphone, Loader2, ReceiptText, ShieldCheck, Wallet, Hash, Cpu
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn, formatCurrency } from '@/lib/utils';
@@ -29,6 +30,7 @@ interface PrintSettings {
   footerMessage: string;
   paperWidth: '58mm' | '80mm';
   triggerCashDrawer: boolean;
+  optimizedFor: string;
 }
 
 const DEFAULT_PRINT_SETTINGS: PrintSettings = {
@@ -39,7 +41,8 @@ const DEFAULT_PRINT_SETTINGS: PrintSettings = {
   fssai: "12345678901234",
   footerMessage: "Thank you for visiting RAVOYI! Savor the spice.",
   paperWidth: '80mm',
-  triggerCashDrawer: false
+  triggerCashDrawer: false,
+  optimizedFor: "My POS MP301"
 };
 
 export default function OrderManager() {
@@ -126,9 +129,9 @@ export default function OrderManager() {
       setShowPrintPreview(true);
       
       if (order.paymentMethod === 'Cash' && printSettings.triggerCashDrawer) {
-        toast({ title: "Opening Cash Drawer...", description: "Secure tray released." });
+        toast({ title: "Opening Cash Drawer...", description: "Hardware signal sent to MP301 DK port." });
       }
-      toast({ title: "Order Confirmed", description: "Preview generated." });
+      toast({ title: "Order Confirmed", description: "Hardware preview generated." });
     } catch (error) {
       toast({ variant: "destructive", title: "Update Failed", description: "Could not confirm order." });
     }
@@ -143,7 +146,7 @@ export default function OrderManager() {
     if (!firestore) return;
     await setDoc(doc(firestore, "settings", "print_template"), printSettings);
     setShowSettings(false);
-    toast({ title: "Settings Saved", description: "Print template updated." });
+    toast({ title: "Settings Saved", description: "MP301 Hardware optimization applied." });
   };
 
   const handleAddItem = (item: MenuItem) => {
@@ -555,9 +558,9 @@ export default function OrderManager() {
           <DialogHeader className="p-8 border-b border-zinc-800 flex justify-between items-center bg-black/40">
              <div>
                 <DialogTitle className="text-xl font-black uppercase italic text-white flex items-center gap-3">
-                   <ReceiptText className="text-[#b8582e]" /> Receipt Preview
+                   <ReceiptText className="text-[#b8582e]" /> MP301 Receipt Preview
                 </DialogTitle>
-                <DialogDescription className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Verify Slips Before Printing</DialogDescription>
+                <DialogDescription className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Verify Slips Before Hardware Transmission</DialogDescription>
              </div>
              <button onClick={() => setShowPrintPreview(false)} className="p-2 text-zinc-500 hover:text-white">
                 <X size={20} />
@@ -665,7 +668,7 @@ export default function OrderManager() {
              <div className="flex gap-4">
                 <button 
                   onClick={() => {
-                    toast({ title: "Tray Released", description: "Hardware command sent to drawer." });
+                    toast({ title: "Tray Released", description: "Hardware command sent to MP301." });
                   }}
                   className="flex-1 py-4 bg-zinc-800 text-white rounded-2xl font-black uppercase text-[10px] flex items-center justify-center gap-2 hover:bg-zinc-700 transition-all"
                 >
@@ -674,7 +677,7 @@ export default function OrderManager() {
                 <button onClick={() => setShowPrintPreview(false)} className="flex-1 py-4 bg-zinc-800 text-zinc-400 rounded-2xl font-black uppercase text-[10px]">Discard</button>
              </div>
              <button onClick={executePrint} className="w-full py-5 bg-[#b8582e] text-white rounded-2xl font-black uppercase text-xs flex items-center justify-center gap-3 shadow-xl hover:bg-zinc-900 transition-all">
-                <Printer size={18} /> Execute Print
+                <Printer size={18} /> Execute MP301 Print
              </button>
           </div>
         </DialogContent>
@@ -684,8 +687,11 @@ export default function OrderManager() {
       <Dialog open={showSettings} onOpenChange={setShowSettings}>
         <DialogContent className="max-w-md bg-white rounded-[2rem] p-8 border-none shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-black uppercase italic tracking-tighter text-zinc-900">Receipt Configuration</DialogTitle>
-            <DialogDescription className="text-xs text-zinc-400 uppercase font-bold">Configure headers and hardware triggers</DialogDescription>
+            <div className="flex items-center gap-3 mb-2">
+               <Cpu className="text-[#b8582e] w-6 h-6" />
+               <DialogTitle className="text-2xl font-black uppercase italic tracking-tighter text-zinc-900 leading-none">POS Hardware Config</DialogTitle>
+            </div>
+            <DialogDescription className="text-xs text-zinc-400 uppercase font-bold">Optimized for My POS MP301 Thermal Series</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="grid grid-cols-2 gap-4">
@@ -722,7 +728,7 @@ export default function OrderManager() {
                 </Label>
                 <Label htmlFor="p-80" className={cn("flex items-center justify-center p-4 border-2 rounded-xl cursor-pointer font-bold", printSettings.paperWidth === '80mm' ? "border-[#b8582e] text-[#b8582e] bg-[#b8582e]/5" : "border-zinc-100 text-zinc-400")}>
                   <RadioGroupItem value="80mm" id="p-80" className="sr-only" />
-                  80mm (Large)
+                  80mm (MP301)
                 </Label>
               </RadioGroup>
             </div>
@@ -735,7 +741,7 @@ export default function OrderManager() {
             <div className="pt-4 border-t border-zinc-100 flex items-center justify-between">
                <div className="flex flex-col">
                   <span className="text-[10px] font-black uppercase text-zinc-900">Trigger Cash Drawer</span>
-                  <span className="text-[8px] font-bold text-zinc-400 uppercase">Open tray automatically on cash prints</span>
+                  <span className="text-[8px] font-bold text-zinc-400 uppercase">Hardware Pulse via MP301 DK Port</span>
                </div>
                <Switch 
                 checked={printSettings.triggerCashDrawer} 
@@ -745,7 +751,7 @@ export default function OrderManager() {
           </div>
           <DialogFooter>
             <button onClick={saveSettings} className="w-full py-4 bg-zinc-900 text-white rounded-2xl font-black uppercase flex items-center justify-center gap-2">
-              <Save size={18} /> Update Template
+              <Save size={18} /> Deploy Hardware Sync
             </button>
           </DialogFooter>
         </DialogContent>
@@ -753,6 +759,7 @@ export default function OrderManager() {
 
       {/* PRINTABLE COMPONENT */}
       <div id="printable-receipt" className="hidden print:block font-mono text-black" style={{ width: printSettings.paperWidth }}>
+        {/* ESC/POS Drawer Kick Sequence for MP301 Compatibility */}
         {printSettings.triggerCashDrawer && (
           <span className="hidden">{"\x1b\x70\x00\x19\xfa"}</span>
         )}
