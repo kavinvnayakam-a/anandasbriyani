@@ -54,7 +54,10 @@ export default function OrderManager() {
   const firestore = useFirestore();
   const { toast } = useToast();
 
-  // New Order State
+  // State for cash received on existing orders in the feed
+  const [feedCashReceived, setFeedCashReceived] = useState<Record<string, string>>({});
+
+  // New Order State (Manual)
   const [selectedItems, setSelectedItems] = useState<CartItem[]>([]);
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
@@ -101,10 +104,27 @@ export default function OrderManager() {
 
   const confirmOrder = async (order: Order) => {
     if (!firestore) return;
+    
+    const receivedAmount = feedCashReceived[order.id] ? Number(feedCashReceived[order.id]) : order.totalPrice;
+    
+    if (order.paymentMethod === 'Cash' && receivedAmount < order.totalPrice) {
+      toast({ variant: "destructive", title: "Insufficient Cash", description: "Please enter correct amount received." });
+      return;
+    }
+
     try {
-      await updateDoc(doc(firestore, "orders", order.id), { status: "Received" });
-      setPrintingOrder(order);
+      const updates: any = { status: "Received" };
+      if (order.paymentMethod === 'Cash') {
+        updates.cashReceived = receivedAmount;
+        updates.changeDue = receivedAmount - order.totalPrice;
+      }
+
+      await updateDoc(doc(firestore, "orders", order.id), updates);
+      
+      const updatedOrder = { ...order, ...updates };
+      setPrintingOrder(updatedOrder);
       setShowPrintPreview(true);
+      
       if (order.paymentMethod === 'Cash' && printSettings.triggerCashDrawer) {
         toast({ title: "Opening Cash Drawer...", description: "Secure tray released." });
       }
@@ -206,11 +226,6 @@ export default function OrderManager() {
       setPrintingOrder(finalOrder);
       setShowPrintPreview(true);
 
-      if (paymentMethod === 'Cash' && printSettings.triggerCashDrawer) {
-        // Hardware signal simulation
-        console.log("SEND_ESC_POS: OPEN_DRAWER");
-      }
-
     } catch (error) {
       toast({ variant: "destructive", title: "Order Failed", description: "Could not create manual order." });
     } finally {
@@ -259,57 +274,73 @@ export default function OrderManager() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {pendingOrders.map((order) => (
-          <div key={order.id} className="bg-white border border-zinc-200 rounded-[2.5rem] p-8 flex flex-col transition-all shadow-lg hover:shadow-2xl hover:border-[#b8582e]/30 group">
-            <div className="flex justify-between items-start mb-6">
-              <div className="flex items-center gap-4">
-                <div className="bg-zinc-50 p-4 rounded-2xl border border-zinc-100 flex items-center justify-center">
-                  <span className="text-2xl font-black text-[#b8582e] italic leading-none">#{order.orderNumber}</span>
-                </div>
-                <div>
-                   <p className="text-[10px] font-black uppercase text-zinc-400 tracking-widest leading-none mb-1">Status</p>
-                   <span className="px-3 py-1 bg-orange-100 text-orange-600 rounded-full text-[9px] font-black uppercase border border-orange-200">Pending</span>
-                </div>
-              </div>
-              <div className="text-right flex flex-col items-end">
-                 <div className="flex items-center gap-2 text-zinc-400 font-bold text-[10px] uppercase">
-                    <Clock size={12}/> {formatOrderTime(order.timestamp)}
-                 </div>
-              </div>
-            </div>
+        {pendingOrders.map((order) => {
+          const cashInputVal = feedCashReceived[order.id] || "";
+          const change = Math.max(0, (Number(cashInputVal) || order.totalPrice) - order.totalPrice);
 
-            <div className="space-y-4 mb-8">
-              <div className="flex items-center gap-3 p-4 bg-zinc-50 rounded-2xl border border-zinc-100">
-                <User size={16} className="text-[#b8582e]" />
-                <div className="flex flex-col">
-                  <span className="text-[9px] font-black uppercase text-zinc-400 tracking-widest leading-none">Customer</span>
-                  <span className="text-xs font-bold uppercase italic text-zinc-900">{order.customerName}</span>
+          return (
+            <div key={order.id} className="bg-white border border-zinc-200 rounded-[2.5rem] p-8 flex flex-col transition-all shadow-lg hover:shadow-2xl hover:border-[#b8582e]/30 group">
+              <div className="flex justify-between items-start mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="bg-zinc-50 p-4 rounded-2xl border border-zinc-100 flex items-center justify-center">
+                    <span className="text-2xl font-black text-[#b8582e] italic leading-none">#{order.orderNumber}</span>
+                  </div>
+                  <div>
+                     <p className="text-[10px] font-black uppercase text-zinc-400 tracking-widest leading-none mb-1">Status</p>
+                     <span className="px-3 py-1 bg-orange-100 text-orange-600 rounded-full text-[9px] font-black uppercase border border-orange-200">Pending</span>
+                  </div>
+                </div>
+                <div className="text-right flex flex-col items-end">
+                   <div className="flex items-center gap-2 text-zinc-400 font-bold text-[10px] uppercase">
+                      <Clock size={12}/> {formatOrderTime(order.timestamp)}
+                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-4 bg-zinc-50 rounded-2xl border border-zinc-100">
-                <Phone size={16} className="text-[#b8582e]" />
-                <div className="flex flex-col">
-                  <span className="text-[9px] font-black uppercase text-zinc-400 tracking-widest leading-none">Contact</span>
-                  <span className="text-xs font-bold text-zinc-900">{order.customerPhone}</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 p-4 bg-[#b8582e]/5 rounded-2xl border border-[#b8582e]/10">
-                <Banknote size={16} className="text-[#b8582e]" />
-                <div className="flex flex-col">
-                  <span className="text-[9px] font-black uppercase text-zinc-400 tracking-widest leading-none">Total</span>
-                  <span className="text-lg font-black italic text-[#b8582e] leading-none">₹{order.totalPrice} ({order.paymentMethod})</span>
-                </div>
-              </div>
-            </div>
 
-            <button 
-              onClick={() => confirmOrder(order)} 
-              className="mt-auto w-full py-5 bg-[#b8582e] text-white rounded-2xl font-black uppercase italic text-xs flex items-center justify-center gap-3 shadow-xl hover:bg-zinc-900 transition-all active:scale-95"
-            >
-              <Check size={20}/> Confirm & Print
-            </button>
-          </div>
-        ))}
+              <div className="space-y-4 mb-8">
+                <div className="flex items-center gap-3 p-4 bg-zinc-50 rounded-2xl border border-zinc-100">
+                  <User size={16} className="text-[#b8582e]" />
+                  <div className="flex flex-col">
+                    <span className="text-[9px] font-black uppercase text-zinc-400 tracking-widest leading-none">Customer</span>
+                    <span className="text-xs font-bold uppercase italic text-zinc-900">{order.customerName}</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 p-4 bg-[#b8582e]/5 rounded-2xl border border-[#b8582e]/10">
+                  <Banknote size={16} className="text-[#b8582e]" />
+                  <div className="flex flex-col">
+                    <span className="text-[9px] font-black uppercase text-zinc-400 tracking-widest leading-none">Total</span>
+                    <span className="text-lg font-black italic text-[#b8582e] leading-none">₹{order.totalPrice} ({order.paymentMethod})</span>
+                  </div>
+                </div>
+
+                {order.paymentMethod === 'Cash' && (
+                  <div className="p-4 bg-zinc-50 rounded-2xl border-2 border-dashed border-zinc-200 space-y-3">
+                    <Label className="text-[9px] font-black uppercase text-zinc-400">Reconcile Cash</Label>
+                    <div className="flex gap-3">
+                      <Input 
+                        placeholder="Amount Received" 
+                        value={cashInputVal}
+                        onChange={(e) => setFeedCashReceived(prev => ({...prev, [order.id]: e.target.value}))}
+                        className="bg-white border-zinc-200 h-10 text-xs font-black text-black"
+                      />
+                      <div className="flex flex-col justify-center">
+                        <span className="text-[8px] font-black text-zinc-400 uppercase">Change</span>
+                        <span className="text-xs font-black text-emerald-600">₹{change}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <button 
+                onClick={() => confirmOrder(order)} 
+                className="mt-auto w-full py-5 bg-[#b8582e] text-white rounded-2xl font-black uppercase italic text-xs flex items-center justify-center gap-3 shadow-xl hover:bg-zinc-900 transition-all active:scale-95"
+              >
+                <Check size={20}/> Confirm & Print
+              </button>
+            </div>
+          );
+        })}
       </div>
 
       {/* NEW ORDER DIALOG */}
@@ -525,19 +556,31 @@ export default function OrderManager() {
                   </div>
 
                   <div className="text-right font-black text-sm mb-4">
-                    <div className="flex justify-between border-t border-black pt-2">
-                      <span>TOTAL</span>
+                    <div className="flex justify-between text-[9px] opacity-60">
+                      <span>SUBTOTAL</span>
+                      <span>₹{printingOrder.subtotal?.toFixed(2) || (printingOrder.totalPrice / 1.05).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-[9px] opacity-60">
+                      <span>CGST (2.5%)</span>
+                      <span>₹{printingOrder.cgst?.toFixed(2) || ((printingOrder.totalPrice - (printingOrder.totalPrice / 1.05)) / 2).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-[9px] opacity-60">
+                      <span>SGST (2.5%)</span>
+                      <span>₹{printingOrder.sgst?.toFixed(2) || ((printingOrder.totalPrice - (printingOrder.totalPrice / 1.05)) / 2).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between border-t border-black pt-2 mt-1">
+                      <span>GRAND TOTAL</span>
                       <span>₹{printingOrder.totalPrice}</span>
                     </div>
                     {printingOrder.paymentMethod === 'Cash' && (
                       <div className="text-[9px] mt-2 space-y-1 opacity-60">
                         <div className="flex justify-between">
                           <span>RECEIVED</span>
-                          <span>₹{(printingOrder as any).cashReceived || printingOrder.totalPrice}</span>
+                          <span>₹{printingOrder.cashReceived || printingOrder.totalPrice}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span>CHANGE</span>
-                          <span>₹{(printingOrder as any).changeDue || 0}</span>
+                          <span>CHANGE DUE</span>
+                          <span>₹{printingOrder.changeDue || 0}</span>
                         </div>
                       </div>
                     )}
@@ -594,7 +637,7 @@ export default function OrderManager() {
       <Dialog open={showSettings} onOpenChange={setShowSettings}>
         <DialogContent className="max-w-md bg-white rounded-[2rem] p-8 border-none shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-black uppercase italic tracking-tighter">Receipt Configuration</DialogTitle>
+            <DialogTitle className="text-2xl font-black uppercase italic tracking-tighter text-zinc-900">Receipt Configuration</DialogTitle>
             <DialogDescription className="text-xs text-zinc-400 uppercase font-bold">Configure headers and hardware triggers</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -645,7 +688,6 @@ export default function OrderManager() {
 
       {/* PRINTABLE COMPONENT */}
       <div id="printable-receipt" className="hidden print:block font-mono text-black" style={{ width: printSettings.paperWidth }}>
-        {/* ESC/POS Hardware Hook (Simulated hidden character for drawer kick) */}
         {printSettings.triggerCashDrawer && (
           <span className="hidden">{"\x1b\x70\x00\x19\xfa"}</span>
         )}
@@ -681,11 +723,16 @@ export default function OrderManager() {
               </div>
 
               <div className="py-4 text-right">
-                <div className="text-lg font-black uppercase">Total: ₹{printingOrder.totalPrice}</div>
+                <div className="text-[9px] mb-1">
+                  <p>SUBTOTAL: ₹{printingOrder.subtotal?.toFixed(2) || (printingOrder.totalPrice / 1.05).toFixed(2)}</p>
+                  <p>CGST (2.5%): ₹{printingOrder.cgst?.toFixed(2) || ((printingOrder.totalPrice - (printingOrder.totalPrice / 1.05)) / 2).toFixed(2)}</p>
+                  <p>SGST (2.5%): ₹{printingOrder.sgst?.toFixed(2) || ((printingOrder.totalPrice - (printingOrder.totalPrice / 1.05)) / 2).toFixed(2)}</p>
+                </div>
+                <div className="text-lg font-black uppercase border-t border-black pt-1">Total: ₹{printingOrder.totalPrice}</div>
                 {printingOrder.paymentMethod === 'Cash' && (
                   <div className="text-[9px] mt-1">
-                    <p>Cash Received: ₹{(printingOrder as any).cashReceived || printingOrder.totalPrice}</p>
-                    <p>Change: ₹{(printingOrder as any).changeDue || 0}</p>
+                    <p>Cash Received: ₹{printingOrder.cashReceived || printingOrder.totalPrice}</p>
+                    <p>Change Due: ₹{printingOrder.changeDue || 0}</p>
                   </div>
                 )}
               </div>
@@ -697,7 +744,6 @@ export default function OrderManager() {
           )}
         </div>
 
-        {/* 2. AUTO-CUT BREAK & TOKEN */}
         <div className="print-cut-line" style={{ pageBreakAfter: 'always', borderBottom: '1px dashed #000', margin: '20px 0' }} />
 
         <div className="token-section p-8 text-center">

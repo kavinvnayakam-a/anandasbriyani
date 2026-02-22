@@ -12,7 +12,8 @@ import {
   Star,
   PackageCheck,
   ShieldAlert,
-  BellRing
+  BellRing,
+  Clock
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { Order } from '@/lib/types';
@@ -50,7 +51,6 @@ export default function OrderStatusPage() {
   }, []);
 
   useEffect(() => {
-    // Beep when order is Ready for the customer to hear
     if (order?.status === 'Ready') {
       if (!audioPlayed.current) {
         const audio = new Audio(BEEP_SOUND_URL);
@@ -59,13 +59,11 @@ export default function OrderStatusPage() {
       }
     }
 
-    // Start 3-min timer ONLY when Handover is clicked in Admin
     if (order?.status === 'Handover') {
       const storageKey = `handover_timer_${orderId}`;
       let endTime = localStorage.getItem(storageKey);
       
       if (!endTime) {
-        // First time hitting handover status, set the end time
         const newEndTime = Date.now() + (PICKUP_TIMER_DURATION * 1000);
         localStorage.setItem(storageKey, newEndTime.toString());
       }
@@ -96,10 +94,7 @@ export default function OrderStatusPage() {
         }
       };
 
-      // Initial run
       updateTimer();
-      
-      // Setup real-time interval
       interval = setInterval(updateTimer, 1000);
     }
     return () => clearInterval(interval);
@@ -137,7 +132,7 @@ export default function OrderStatusPage() {
       { 
         id: 4, 
         label: 'Final Ready for Pickup', 
-        time: isTimerActive ? `Closing in ${formatTimer(timeLeft)}` : (status === 'Ready' ? 'Collect at Counter' : 'Pending'), 
+        time: status === 'Ready' ? 'Collect at Counter' : (status === 'Handover' ? 'Handed Over' : 'Pending'), 
         completed: status === 'Handover', 
         active: ['Ready', 'Handover'].includes(status), 
         icon: BellRing 
@@ -154,8 +149,23 @@ export default function OrderStatusPage() {
   const steps = getStatusSteps();
 
   return (
-    <div className="min-h-screen bg-[#0a0500] text-white pb-10 overflow-hidden">
+    <div className="min-h-screen bg-[#0a0500] text-white pb-10 overflow-hidden relative">
       
+      {/* PERSISTENT FLOATING TIMER (Top Left) */}
+      {isTimerActive && (
+        <div className="fixed top-6 left-6 z-[100] animate-in slide-in-from-left-4 duration-500">
+          <div className="bg-[#b8582e] px-5 py-3 rounded-2xl border-2 border-white/20 shadow-2xl flex items-center gap-3 backdrop-blur-md">
+            <div className="p-2 bg-white/10 rounded-xl">
+              <Clock size={16} className="text-white animate-pulse" />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[8px] font-black uppercase tracking-widest text-white/60">Auto Redirect</span>
+              <span className="text-xl font-black text-white tabular-nums leading-none">{formatTimer(timeLeft)}</span>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="relative h-[40vh] w-full overflow-hidden">
         <Image 
           src={HALEEM_HERO} 
@@ -188,12 +198,6 @@ export default function OrderStatusPage() {
               <p className="text-white/40 text-[9px] font-black uppercase tracking-[0.4em] mb-1">Takeaway Token</p>
               <h2 className="text-6xl font-black text-white italic tracking-tighter">#{order?.orderNumber || '---'}</h2>
             </div>
-            {isTimerActive && (
-              <div className="bg-black/20 px-6 py-4 rounded-[2rem] border border-white/10 flex flex-col items-center animate-pulse">
-                 <p className="text-[8px] font-black uppercase tracking-widest text-white/60">Collection Done</p>
-                 <p className="text-3xl font-black text-white tabular-nums">{formatTimer(timeLeft)}</p>
-              </div>
-            )}
           </div>
 
           <div className="space-y-10">
