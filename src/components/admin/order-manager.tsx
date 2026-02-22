@@ -310,35 +310,15 @@ export default function OrderManager() {
                 </div>
 
                 <div className="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
-                  <p className="text-[9px] font-black uppercase text-zinc-400 tracking-widest ml-1 mb-2">Order Items</p>
                   {order.items.map((item, idx) => (
                     <div key={idx} className="flex justify-between items-center p-3 bg-zinc-50 rounded-xl border border-zinc-100">
                       <div className="flex items-center gap-3">
                         <span className="text-[#b8582e] font-black italic text-xs">{item.quantity}x</span>
-                        <div className="flex flex-col">
-                          <span className="text-[10px] font-bold uppercase italic text-zinc-900 truncate max-w-[120px]">{item.name}</span>
-                          <span className="text-[8px] font-bold text-zinc-400 uppercase">MRP: ₹{item.price}</span>
-                        </div>
+                        <span className="text-[10px] font-bold uppercase italic text-zinc-900 truncate max-w-[120px]">{item.name}</span>
                       </div>
                       <span className="text-[10px] font-black text-zinc-900">₹{item.price * item.quantity}</span>
                     </div>
                   ))}
-                </div>
-
-                <div className="p-4 bg-zinc-50 rounded-2xl border border-zinc-100 space-y-2">
-                  <p className="text-[9px] font-black uppercase text-zinc-400 tracking-widest leading-none mb-2">Order Summary</p>
-                  <div className="flex justify-between items-center text-[10px] font-bold text-zinc-500 uppercase">
-                    <span>Subtotal</span>
-                    <span>₹{orderSubtotal.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-[10px] font-bold text-zinc-400 uppercase">
-                    <span>CGST (2.5%)</span>
-                    <span>₹{orderCgst.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-[10px] font-bold text-zinc-400 uppercase">
-                    <span>SGST (2.5%)</span>
-                    <span>₹{orderSgst.toFixed(2)}</span>
-                  </div>
                 </div>
 
                 <div className="flex items-center gap-3 p-4 bg-[#b8582e]/5 rounded-2xl border border-[#b8582e]/10">
@@ -546,9 +526,9 @@ export default function OrderManager() {
           <DialogHeader className="p-8 border-b border-zinc-800 flex justify-between items-center bg-black/40">
              <div>
                 <DialogTitle className="text-xl font-black uppercase italic text-white flex items-center gap-3">
-                   <ReceiptText className="text-[#b8582e]" /> MP301 Receipt Preview
+                   <ReceiptText className="text-[#b8582e]" /> Receipt Preview
                 </DialogTitle>
-                <DialogDescription className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Verify Slips Before Hardware Transmission</DialogDescription>
+                <DialogDescription className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Verify Slips Before Printing</DialogDescription>
              </div>
              <button onClick={() => setShowPrintPreview(false)} className="p-2 text-zinc-500 hover:text-white">
                 <X size={20} />
@@ -557,12 +537,12 @@ export default function OrderManager() {
           
           <ScrollArea className="max-h-[60vh] p-10 bg-zinc-950 flex flex-col items-center gap-10">
             <div 
-              className="bg-white text-black p-8 shadow-2xl font-mono text-[13px] relative font-black" 
-              style={{ width: printSettings.paperWidth === '58mm' ? '220px' : '300px' }}
+              className="bg-white text-black p-8 shadow-2xl font-mono text-[14px] relative font-black leading-tight" 
+              style={{ width: '300px' }}
             >
               <div className="text-center border-b-2 border-dashed border-black pb-4 mb-4">
                 <h1 className="text-2xl font-black uppercase">{printSettings.storeName}</h1>
-                <p className="uppercase text-[10px] leading-tight mt-1">{printSettings.address}</p>
+                <p className="uppercase text-[10px] mt-1">{printSettings.address}</p>
                 <p className="text-[10px] mt-1">Tel: {printSettings.phone}</p>
                 <div className="flex justify-center gap-4 mt-2 text-[10px] font-bold">
                   <span>GST: {printSettings.gstin}</span>
@@ -608,22 +588,10 @@ export default function OrderManager() {
                       <span>GST (5%)</span>
                       <span>₹{(printingOrder.cgst! + printingOrder.sgst!)?.toFixed(2) || (printingOrder.totalPrice - (printingOrder.totalPrice / 1.05)).toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between border-t-2 border-black pt-2 mt-1 text-xl font-black">
+                    <div className="flex justify-between border-t-2 border-black pt-2 mt-1 text-2xl font-black">
                       <span>GRAND TOTAL</span>
                       <span>₹{printingOrder.totalPrice}</span>
                     </div>
-                    {printingOrder.paymentMethod === 'Cash' && (
-                      <div className="text-[11px] mt-2 pt-2 border-t border-dashed border-black/20">
-                        <div className="flex justify-between">
-                          <span>CASH RECEIVED</span>
-                          <span>₹{printingOrder.cashReceived || printingOrder.totalPrice}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>CHANGE DUE</span>
-                          <span>₹{printingOrder.changeDue || 0}</span>
-                        </div>
-                      </div>
-                    )}
                   </div>
 
                   <div className="text-center pt-4 border-t-2 border-dashed border-black opacity-80">
@@ -635,35 +603,24 @@ export default function OrderManager() {
 
             <div className="w-full flex items-center gap-4 py-4 px-10">
                <div className="h-px flex-1 bg-zinc-800" />
-               <span className="text-[8px] font-black text-zinc-600 uppercase tracking-widest">Auto-Cut Line</span>
+               <span className="text-[8px] font-black text-zinc-600 uppercase tracking-widest">Token Cut</span>
                <div className="h-px flex-1 bg-zinc-800" />
             </div>
 
             <div 
               className="bg-white text-black p-8 shadow-2xl font-mono text-center border-t-4 border-zinc-200" 
-              style={{ width: printSettings.paperWidth === '58mm' ? '220px' : '300px' }}
+              style={{ width: '300px' }}
             >
               <p className="text-[12px] font-black uppercase tracking-widest mb-2">Collection Token</p>
               <h2 className="text-7xl font-black italic">#{printingOrder?.orderNumber}</h2>
               <div className="mt-6 pt-6 border-t-2 border-dashed border-black">
                  <p className="text-xl font-black uppercase">{printingOrder?.customerName}</p>
-                 <p className="text-[10px] mt-2 font-bold opacity-60 uppercase">RAVOYI KITCHEN • AUTHENTIC TASTE</p>
+                 <p className="text-[10px] mt-2 font-bold opacity-60 uppercase">RAVOYI KITCHEN</p>
               </div>
             </div>
           </ScrollArea>
 
           <div className="p-8 bg-zinc-900 flex flex-col gap-4">
-             <div className="flex gap-4">
-                <button 
-                  onClick={() => {
-                    toast({ title: "Tray Released" });
-                  }}
-                  className="flex-1 py-4 bg-zinc-800 text-white rounded-2xl font-black uppercase text-[10px] flex items-center justify-center gap-2 hover:bg-zinc-700 transition-all"
-                >
-                  <Wallet size={14} /> Open Tray
-                </button>
-                <button onClick={() => setShowPrintPreview(false)} className="flex-1 py-4 bg-zinc-800 text-zinc-400 rounded-2xl font-black uppercase text-[10px]">Discard</button>
-             </div>
              <button onClick={executePrint} className="w-full py-5 bg-[#b8582e] text-white rounded-2xl font-black uppercase text-xs flex items-center justify-center gap-3 shadow-xl hover:bg-zinc-900 transition-all">
                 <Printer size={18} /> Execute MP301 Print
              </button>
@@ -728,7 +685,7 @@ export default function OrderManager() {
             <div className="pt-4 border-t border-zinc-100 flex items-center justify-between">
                <div className="flex flex-col">
                   <span className="text-[10px] font-black uppercase text-zinc-900">Trigger Cash Drawer</span>
-                  <span className="text-[8px] font-bold text-zinc-400 uppercase">Hardware Pulse via MP301 DK Port</span>
+                  <span className="text-[8px] font-bold text-zinc-400 uppercase">Hardware Pulse</span>
                </div>
                <Switch 
                 checked={printSettings.triggerCashDrawer} 
@@ -744,14 +701,14 @@ export default function OrderManager() {
         </DialogContent>
       </Dialog>
 
-      {/* MP301 Specific Printable Area */}
-      <div id="printable-receipt" className="hidden print:block font-mono text-black font-black" style={{ width: printSettings.paperWidth }}>
-        <div className="receipt-section">
-          <div className="p-4 text-center border-b-2 border-dashed border-black">
-            <h1 className="text-2xl font-black uppercase">{printSettings.storeName}</h1>
-            <p className="text-[10px] font-bold uppercase mt-1">{printSettings.address}</p>
-            <p className="text-[10px] font-bold mt-1">Tel: {printSettings.phone}</p>
-            <div className="flex justify-center gap-4 mt-2 text-[10px] font-black">
+      {/* ACTUAL PRINTABLE AREA (Moved to root level for reliability) */}
+      <div id="printable-receipt" className="hidden print:block font-mono text-black font-black" style={{ width: '80mm' }}>
+        <div className="receipt-section p-2">
+          <div className="text-center border-b-4 border-dashed border-black pb-6 mb-6">
+            <h1 className="text-3xl font-black uppercase leading-tight">{printSettings.storeName}</h1>
+            <p className="text-[12px] font-black uppercase mt-2">{printSettings.address}</p>
+            <p className="text-[12px] font-black mt-1">Tel: {printSettings.phone}</p>
+            <div className="flex justify-center gap-4 mt-4 text-[12px] font-black">
               <span>GST: {printSettings.gstin}</span>
               <span>FSSAI: {printSettings.fssai}</span>
             </div>
@@ -759,89 +716,73 @@ export default function OrderManager() {
 
           {printingOrder && (
             <>
-              <div className="py-3 border-b-2 border-dashed border-black text-[12px] font-black uppercase">
-                <div className="flex justify-between text-lg">
+              <div className="py-4 border-b-4 border-dashed border-black text-[14px] font-black uppercase">
+                <div className="flex justify-between text-2xl mb-2">
                   <span>ORDER: #{printingOrder.orderNumber}</span>
                   <span>{formatOrderTime(printingOrder.timestamp)}</span>
                 </div>
-                <div className="flex justify-between mt-1 text-[10px]">
+                <div className="flex justify-between text-[12px] mb-1">
                   <span>DATE: {formatOrderDate(printingOrder.timestamp)}</span>
                   <span>METHOD: {printingOrder.paymentMethod}</span>
                 </div>
-                <p className="mt-1">CUST: {printingOrder.customerName}</p>
+                <p className="mt-2 text-lg">CUST: {printingOrder.customerName}</p>
               </div>
 
-              <div className="py-3 border-b-2 border-dashed border-black text-[13px] font-black uppercase">
-                <div className="grid grid-cols-12 gap-1 mb-2 border-b border-black/10 pb-1 text-[10px]">
+              <div className="py-4 border-b-4 border-dashed border-black text-[14px] font-black uppercase">
+                <div className="grid grid-cols-12 gap-1 mb-4 border-b-2 border-black pb-2 text-[12px]">
                    <span className="col-span-2">Qty</span>
                    <span className="col-span-7">Item</span>
                    <span className="col-span-3 text-right">Price</span>
                 </div>
                 {printingOrder.items.map((item, idx) => (
-                  <div key={idx} className="grid grid-cols-12 gap-1 mb-2 leading-tight">
-                    <span className="col-span-2 font-black">{item.quantity}x</span>
-                    <span className="col-span-7 uppercase">{item.name}</span>
-                    <span className="col-span-3 text-right font-black">₹{item.price * item.quantity}</span>
+                  <div key={idx} className="grid grid-cols-12 gap-1 mb-3 leading-tight">
+                    <span className="col-span-2 text-xl">{item.quantity}x</span>
+                    <span className="col-span-7 text-lg">{item.name}</span>
+                    <span className="col-span-3 text-right text-lg">₹{item.price * item.quantity}</span>
                   </div>
                 ))}
               </div>
 
-              <div className="py-4 text-right space-y-1 font-black uppercase">
-                <div className="text-[11px]">
+              <div className="py-6 text-right space-y-2 font-black uppercase">
+                <div className="text-[14px]">
                   <div className="flex justify-between">
                     <span>SUBTOTAL:</span>
                     <span>₹{printingOrder.subtotal?.toFixed(2) || (printingOrder.totalPrice / 1.05).toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between mt-1">
                     <span>GST (5%):</span>
                     <span>₹{(printingOrder.cgst! + printingOrder.sgst!)?.toFixed(2) || (printingOrder.totalPrice - (printingOrder.totalPrice / 1.05)).toFixed(2)}</span>
                   </div>
                 </div>
-                <div className="text-2xl font-black uppercase border-t-2 border-black pt-2 mt-1 flex justify-between">
+                <div className="text-4xl font-black border-t-4 border-black pt-4 mt-2 flex justify-between">
                    <span>TOTAL:</span>
                    <span>₹{printingOrder.totalPrice}</span>
                 </div>
-                {printingOrder.paymentMethod === 'Cash' && (
-                  <div className="text-[11px] mt-2 pt-2 border-t border-dashed border-black/20">
-                    <div className="flex justify-between">
-                      <span>CASH RECEIVED:</span>
-                      <span>₹{printingOrder.cashReceived || printingOrder.totalPrice}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>CHANGE DUE:</span>
-                      <span>₹{printingOrder.changeDue || 0}</span>
-                    </div>
-                  </div>
-                )}
               </div>
 
-              <div className="pt-4 pb-10 text-center border-t-2 border-dashed border-black">
-                <p className="text-[10px] italic font-black uppercase">{printSettings.footerMessage}</p>
+              <div className="pt-6 pb-10 text-center border-t-4 border-dashed border-black">
+                <p className="text-[12px] italic font-black uppercase leading-tight">{printSettings.footerMessage}</p>
               </div>
             </>
           )}
         </div>
 
-        <div className="print-cut-line" style={{ pageBreakAfter: 'always', borderBottom: '2px dashed #000', margin: '30px 0' }} />
+        <div className="print-cut-line" style={{ pageBreakAfter: 'always', borderBottom: '4px dashed #000', margin: '40px 0' }} />
 
-        <div className="token-section p-8 text-center font-black">
-           <p className="text-[12px] font-black uppercase mb-4 tracking-widest">Collection Token</p>
-           <h1 className="text-8xl font-black italic">#{printingOrder?.orderNumber}</h1>
-           <div className="mt-8 pt-6 border-t-2 border-dashed border-black uppercase">
-              <p className="text-2xl font-black">{printingOrder?.customerName}</p>
-              <p className="text-[10px] mt-2 font-bold opacity-80">RAVOYI KITCHEN • AUTHENTIC TELANGANA TASTE</p>
+        <div className="token-section p-10 text-center font-black">
+           <p className="text-[16px] font-black uppercase mb-6 tracking-widest">Collection Token</p>
+           <h1 className="text-[100px] font-black italic leading-none">#{printingOrder?.orderNumber}</h1>
+           <div className="mt-10 pt-10 border-t-4 border-dashed border-black uppercase">
+              <p className="text-3xl font-black mb-2">{printingOrder?.customerName}</p>
+              <p className="text-[14px] font-black opacity-100">RAVOYI KITCHEN • AUTHENTIC TASTE</p>
            </div>
         </div>
       </div>
 
       <style jsx global>{`
         @media print {
-          body * { 
-            visibility: hidden !important; 
-          }
-          #printable-receipt, #printable-receipt * { 
-            visibility: visible !important; 
-          }
+          body * { visibility: hidden !important; }
+          #printable-receipt, #printable-receipt * { visibility: visible !important; }
           #printable-receipt { 
             position: absolute !important; 
             left: 0 !important; 
@@ -851,26 +792,7 @@ export default function OrderManager() {
             display: block !important;
             width: 80mm !important;
           }
-          .print-cut-line { 
-            display: block !important; 
-            border-bottom: 2px dashed black !important; 
-            height: 1px !important; 
-            width: 100% !important; 
-          }
-          @page { 
-            margin: 0 !important; 
-            size: auto !important; 
-          }
-        }
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #e5e7eb;
-          border-radius: 10px;
+          @page { margin: 0 !important; size: auto !important; }
         }
       `}</style>
     </div>

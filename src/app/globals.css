@@ -42,7 +42,7 @@ body {
 
 /* Print Specific Utility: Target layout elements instead of root containers to prevent blank prints */
 @media print {
-  nav, header, footer, button, aside, .no-print, .sidebar-provider {
+  nav, header, footer, button, aside, .no-print, .sidebar-provider, [role="dialog"], .sheet {
     display: none !important;
   }
   body {

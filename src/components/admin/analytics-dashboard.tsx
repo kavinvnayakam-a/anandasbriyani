@@ -90,7 +90,6 @@ export default function AnalyticsDashboard() {
 
   const allOrders = useMemo(() => [...liveOrders, ...historyOrders], [liveOrders, historyOrders]);
 
-  // Financial Calculations
   const stats = useMemo(() => {
     const revenue = allOrders.reduce((acc, order) => ({
       total: acc.total + (Number(order.totalPrice) || 0),
@@ -161,7 +160,6 @@ export default function AnalyticsDashboard() {
         </div>
       </div>
 
-      {/* TOP STATS - REVENUE & TAX */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <StatCard 
           title="Grand Total (Sales)" 
@@ -189,7 +187,6 @@ export default function AnalyticsDashboard() {
         />
       </div>
 
-      {/* PAYMENT SPLITS */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <StatCard 
           title="UPI Collections" 
@@ -217,7 +214,6 @@ export default function AnalyticsDashboard() {
         />
       </div>
 
-      {/* MAIN DATA TABLE */}
       <div className="bg-white border border-zinc-200 rounded-[3rem] shadow-2xl overflow-hidden">
         <div className="p-10 border-b border-zinc-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
@@ -308,7 +304,8 @@ export default function AnalyticsDashboard() {
           </DialogHeader>
           
           <ScrollArea className="max-h-[60vh] p-10 bg-zinc-950 flex flex-col items-center">
-            <div id="printable-eod-report" className="bg-white text-black p-8 shadow-2xl font-mono text-[13px] w-[300px] font-black">
+            {/* Visual Preview Only */}
+            <div className="bg-white text-black p-8 shadow-2xl font-mono text-[13px] w-[300px] font-black">
               <div className="text-center border-b-2 border-dashed border-black pb-4 mb-4">
                 <h1 className="text-2xl font-black uppercase">{printSettings?.storeName || 'RAVOYI KITCHEN'}</h1>
                 <p className="uppercase text-[10px] mt-1">{printSettings?.address}</p>
@@ -352,8 +349,7 @@ export default function AnalyticsDashboard() {
               </div>
 
               <div className="text-center pt-6 border-t-2 border-dashed border-black opacity-80">
-                <p className="italic text-[10px] uppercase">End of Day Audit Report • {new Date().toLocaleTimeString()}</p>
-                <p className="text-[9px] mt-2 font-black uppercase">RAVOYI Management System</p>
+                <p className="italic text-[10px] uppercase">Audit Report • {new Date().toLocaleTimeString()}</p>
               </div>
             </div>
           </ScrollArea>
@@ -366,11 +362,70 @@ export default function AnalyticsDashboard() {
         </DialogContent>
       </Dialog>
 
+      {/* ACTUAL PRINTABLE ELEMENT (Moved out of Dialog Portal for reliability) */}
+      <div id="printable-eod-report" className="hidden print:block font-mono text-black p-0 m-0 w-[80mm] font-black">
+          <div className="text-center border-b-4 border-dashed border-black pb-6 mb-6">
+            <h1 className="text-3xl font-black uppercase leading-tight mb-2">{printSettings?.storeName || 'RAVOYI KITCHEN'}</h1>
+            <p className="uppercase text-[12px] font-black mb-4">{printSettings?.address}</p>
+            <div className="text-2xl font-black border-y-4 border-black py-4 my-4 uppercase">
+              End of Day Report
+            </div>
+            <p className="text-xl font-black uppercase">DATE: {new Date(selectedDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
+          </div>
+
+          <div className="space-y-6 border-b-4 border-dashed border-black pb-6 mb-6 text-xl">
+            <div className="flex justify-between">
+              <span>TOTAL BILLS</span>
+              <span>{allOrders.length}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>NET SALES</span>
+              <span>{formatCurrency(stats.revenue.subtotal)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>TAX (GST 5%)</span>
+              <span>{formatCurrency(stats.revenue.gst)}</span>
+            </div>
+            <div className="flex justify-between text-4xl font-black border-t-4 border-black pt-6 mt-4">
+              <span>TOTAL</span>
+              <span>{formatCurrency(stats.revenue.total)}</span>
+            </div>
+          </div>
+
+          <div className="space-y-4 mb-10 text-xl">
+            <p className="font-black text-center mb-4 border-b-4 border-black pb-2 text-2xl uppercase">Payment Split</p>
+            <div className="flex justify-between">
+              <span>UPI ({stats.payments.count_UPI || 0})</span>
+              <span>{formatCurrency(stats.payments.UPI || 0)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>CASH ({stats.payments.count_Cash || 0})</span>
+              <span>{formatCurrency(stats.payments.Cash || 0)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>CARD ({stats.payments.count_Card || 0})</span>
+              <span>{formatCurrency(stats.payments.Card || 0)}</span>
+            </div>
+          </div>
+
+          <div className="text-center pt-8 border-t-4 border-dashed border-black opacity-100">
+            <p className="italic text-[12px] uppercase font-black">Audit Generated: {new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}</p>
+            <p className="text-[10px] mt-4 font-black uppercase tracking-widest">RAVOYI Management System</p>
+          </div>
+      </div>
+
       <style jsx global>{`
         @media print {
-          body * { visibility: hidden !important; background: white !important; }
+          body * { visibility: hidden !important; }
           #printable-eod-report, #printable-eod-report * { visibility: visible !important; }
-          #printable-eod-report { position: absolute !important; left: 0 !important; top: 0 !important; margin: 0 !important; padding: 0 !important; width: 80mm !important; }
+          #printable-eod-report { 
+            position: absolute !important; 
+            left: 0 !important; 
+            top: 0 !important; 
+            display: block !important;
+            width: 80mm !important;
+            padding: 10px !important;
+          }
           @page { margin: 0; size: auto; }
         }
       `}</style>
