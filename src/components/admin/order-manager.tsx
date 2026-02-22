@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect, useMemo } from 'react';
@@ -8,7 +9,7 @@ import {
 } from 'firebase/firestore';
 import { Order, MenuItem, CartItem } from '@/lib/types';
 import { 
-  Printer, Settings, Check, Clock, User, Phone, Banknote, Store, X, Save, Plus, Minus, Search, ShoppingBag, CreditCard, Smartphone, Loader2, ReceiptText
+  Printer, Settings, Check, Clock, User, Phone, Banknote, Store, X, Save, Plus, Minus, Search, ShoppingBag, CreditCard, Smartphone, Loader2, ReceiptText, ShieldCheck
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn, formatCurrency } from '@/lib/utils';
@@ -24,6 +25,7 @@ interface PrintSettings {
   address: string;
   phone: string;
   gstin: string;
+  fssai: string;
   footerMessage: string;
   paperWidth: '58mm' | '80mm';
 }
@@ -51,6 +53,7 @@ export default function OrderManager() {
     address: "Authentic Telangana Kitchen, Hyderabad",
     phone: "+91 98765 43210",
     gstin: "36ABCDE1234F1Z5",
+    fssai: "12345678901234",
     footerMessage: "Thank you for visiting RAVOYI! Savor the spice.",
     paperWidth: '80mm'
   });
@@ -58,18 +61,15 @@ export default function OrderManager() {
   useEffect(() => {
     if (!firestore) return;
     
-    // Fetch Orders
     const q = query(collection(firestore, "orders"), orderBy("timestamp", "desc"));
     const unsubOrders = onSnapshot(q, (snapshot) => {
       setOrders(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Order[]);
     });
 
-    // Fetch Menu Items for new orders
     const unsubMenu = onSnapshot(collection(firestore, "menu_items"), (snapshot) => {
       setMenuItems(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as MenuItem[]);
     });
 
-    // Fetch Print Settings
     const unsubSettings = onSnapshot(doc(firestore, "settings", "print_template"), (d) => {
       if (d.exists()) setPrintSettings(d.data() as PrintSettings);
     });
@@ -172,13 +172,11 @@ export default function OrderManager() {
       
       toast({ title: `Order #${orderNumber} Created`, description: "Opening preview." });
       
-      // Reset State
       setSelectedItems([]);
       setCustomerName("");
       setCustomerPhone("");
       setShowNewOrder(false);
       
-      // Open Preview
       const finalOrder = { id: docRef.id, ...orderData } as Order;
       setPrintingOrder(finalOrder);
       setShowPrintPreview(true);
@@ -233,7 +231,6 @@ export default function OrderManager() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {pendingOrders.map((order) => (
           <div key={order.id} className="bg-white border border-zinc-200 rounded-[2.5rem] p-8 flex flex-col transition-all shadow-lg hover:shadow-2xl hover:border-[#b8582e]/30 group">
-            
             <div className="flex justify-between items-start mb-6">
               <div className="flex items-center gap-4">
                 <div className="bg-zinc-50 p-4 rounded-2xl border border-zinc-100 flex items-center justify-center">
@@ -269,7 +266,7 @@ export default function OrderManager() {
               <div className="flex items-center gap-3 p-4 bg-[#b8582e]/5 rounded-2xl border border-[#b8582e]/10">
                 <Banknote size={16} className="text-[#b8582e]" />
                 <div className="flex flex-col">
-                  <span className="text-[9px] font-black uppercase text-zinc-400 tracking-widest leading-none">Total (Incl. 5% GST)</span>
+                  <span className="text-[9px] font-black uppercase text-zinc-400 tracking-widest leading-none">Total</span>
                   <span className="text-lg font-black italic text-[#b8582e] leading-none">₹{order.totalPrice} ({order.paymentMethod})</span>
                 </div>
               </div>
@@ -279,17 +276,10 @@ export default function OrderManager() {
               onClick={() => confirmOrder(order)} 
               className="mt-auto w-full py-5 bg-[#b8582e] text-white rounded-2xl font-black uppercase italic text-xs flex items-center justify-center gap-3 shadow-xl hover:bg-zinc-900 transition-all active:scale-95"
             >
-              <Check size={20}/> Confirm & Print Slip
+              <Check size={20}/> Confirm & Print
             </button>
           </div>
         ))}
-
-        {pendingOrders.length === 0 && (
-          <div className="col-span-full h-80 flex flex-col items-center justify-center bg-zinc-50 border-4 border-dashed border-zinc-200 rounded-[3rem] text-zinc-300">
-             <Store size={48} className="mb-4 opacity-20" />
-             <p className="text-[10px] font-black uppercase tracking-[0.4em]">Counter Clear</p>
-          </div>
-        )}
       </div>
 
       {/* NEW ORDER DIALOG */}
@@ -299,7 +289,7 @@ export default function OrderManager() {
             <div className="flex justify-between items-center">
               <div>
                 <DialogTitle className="text-3xl font-black uppercase italic tracking-tighter text-zinc-900">Manual Order Entry</DialogTitle>
-                <DialogDescription className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">Add items to create a new counter ticket</DialogDescription>
+                <DialogDescription className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">Take orders directly at the counter</DialogDescription>
               </div>
               <button onClick={() => setShowNewOrder(false)} className="p-2 hover:bg-zinc-100 rounded-full transition-colors">
                 <X size={24} className="text-zinc-400" />
@@ -332,12 +322,7 @@ export default function OrderManager() {
                         <p className="font-black italic uppercase text-xs text-zinc-900 leading-none mb-1">{item.name}</p>
                         <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">{item.category}</p>
                       </div>
-                      <div className="flex items-center gap-4">
-                        <span className="font-black italic text-[#b8582e]">₹{item.price}</span>
-                        <div className="p-2 bg-white rounded-xl shadow-sm group-hover:bg-[#b8582e] group-hover:text-white transition-colors">
-                          <Plus size={16} />
-                        </div>
-                      </div>
+                      <span className="font-black italic text-[#b8582e]">₹{item.price}</span>
                     </button>
                   ))}
                 </div>
@@ -396,36 +381,27 @@ export default function OrderManager() {
               <div className="flex-1 flex flex-col min-h-0">
                 <Label className="text-[10px] font-black uppercase text-zinc-400 tracking-widest mb-3">Selected Items ({selectedItems.length})</Label>
                 <ScrollArea className="flex-1 bg-white rounded-[2rem] border border-zinc-100 p-4">
-                  {selectedItems.length === 0 ? (
-                    <div className="h-40 flex flex-col items-center justify-center text-zinc-300">
-                      <ShoppingBag size={32} className="mb-2 opacity-20" />
-                      <p className="text-[9px] font-black uppercase tracking-widest">Tray is Empty</p>
+                  {selectedItems.map((item, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-3 bg-zinc-50 rounded-xl mb-2">
+                      <div className="flex-1 min-w-0 pr-4">
+                        <p className="font-bold text-zinc-900 text-xs truncate leading-none mb-1">{item.name}</p>
+                        <p className="text-[10px] font-black text-[#b8582e]">₹{item.price * item.quantity}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button onClick={() => handleRemoveItem(item.id)} className="p-1.5 hover:bg-white rounded-lg transition-colors text-zinc-400">
+                          {item.quantity > 1 ? <Minus size={14} /> : <X size={14} />}
+                        </button>
+                        <span className="text-xs font-black w-6 text-center">{item.quantity}</span>
+                        <button onClick={() => handleAddItem(item)} className="p-1.5 hover:bg-white rounded-lg transition-colors text-[#b8582e]">
+                          <Plus size={14} />
+                        </button>
+                      </div>
                     </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {selectedItems.map((item, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-3 bg-zinc-50 rounded-xl">
-                          <div className="flex-1 min-w-0 pr-4">
-                            <p className="font-bold text-zinc-900 text-xs truncate leading-none mb-1">{item.name}</p>
-                            <p className="text-[10px] font-black text-[#b8582e]">₹{item.price * item.quantity}</p>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <button onClick={() => handleRemoveItem(item.id)} className="p-1.5 hover:bg-white rounded-lg transition-colors text-zinc-400">
-                              {item.quantity > 1 ? <Minus size={14} /> : <X size={14} />}
-                            </button>
-                            <span className="text-xs font-black w-6 text-center">{item.quantity}</span>
-                            <button onClick={() => handleAddItem(item)} className="p-1.5 hover:bg-white rounded-lg transition-colors text-[#b8582e]">
-                              <Plus size={14} />
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  ))}
                 </ScrollArea>
               </div>
 
-              <div className="space-y-4 pt-4 border-t border-zinc-200">
+              <div className="pt-4 border-t border-zinc-200">
                 <div className="flex justify-between items-end">
                   <div className="flex flex-col">
                     <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">Total Amount</span>
@@ -433,8 +409,8 @@ export default function OrderManager() {
                   </div>
                   <button 
                     onClick={handleCreateOrder}
-                    disabled={isPlacingOrder || selectedItems.length === 0 || !customerName || !customerPhone}
-                    className="h-14 px-10 bg-[#b8582e] text-white rounded-2xl font-black uppercase italic text-xs shadow-xl shadow-[#b8582e]/20 hover:bg-zinc-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3"
+                    disabled={isPlacingOrder || selectedItems.length === 0}
+                    className="h-14 px-10 bg-[#b8582e] text-white rounded-2xl font-black uppercase italic text-xs shadow-xl flex items-center gap-3"
                   >
                     {isPlacingOrder ? <Loader2 className="animate-spin" /> : <Check size={20} />}
                     Finalize Order
@@ -454,17 +430,17 @@ export default function OrderManager() {
                 <DialogTitle className="text-xl font-black uppercase italic text-white flex items-center gap-3">
                    <ReceiptText className="text-[#b8582e]" /> Receipt Preview
                 </DialogTitle>
-                <DialogDescription className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Verification Before Printing</DialogDescription>
+                <DialogDescription className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Verify Slips Before Printing</DialogDescription>
              </div>
              <button onClick={() => setShowPrintPreview(false)} className="p-2 text-zinc-500 hover:text-white">
                 <X size={20} />
              </button>
           </DialogHeader>
           
-          <ScrollArea className="max-h-[60vh] p-10 bg-zinc-950 flex justify-center">
-            {/* Virtual Thermal Paper */}
+          <ScrollArea className="max-h-[60vh] p-10 bg-zinc-950 flex flex-col items-center gap-10">
+            {/* 1. Customer Receipt */}
             <div 
-              className="bg-white text-black p-8 shadow-2xl font-mono text-[11px] animate-in fade-in slide-in-from-top-full duration-1000" 
+              className="bg-white text-black p-8 shadow-2xl font-mono text-[11px] relative" 
               style={{ width: printSettings.paperWidth === '58mm' ? '220px' : '300px' }}
             >
               <div className="text-center border-b border-dashed border-black pb-4 mb-4">
@@ -472,6 +448,7 @@ export default function OrderManager() {
                 <p className="uppercase text-[9px] leading-tight">{printSettings.address}</p>
                 <p className="text-[9px]">Tel: {printSettings.phone}</p>
                 <p className="text-[9px] font-bold">GST: {printSettings.gstin}</p>
+                <p className="text-[9px] font-bold">FSSAI: {printSettings.fssai}</p>
               </div>
 
               {printingOrder && (
@@ -485,60 +462,54 @@ export default function OrderManager() {
                   </div>
 
                   <div className="border-b border-dashed border-black pb-2 mb-2">
-                    <div className="grid grid-cols-12 font-bold mb-1 border-b border-black pb-1">
-                      <span className="col-span-2">QTY</span>
-                      <span className="col-span-7">ITEM</span>
-                      <span className="col-span-3 text-right">AMT</span>
-                    </div>
                     {printingOrder.items.map((item, idx) => (
                       <div key={idx} className="grid grid-cols-12 mb-1">
-                        <span className="col-span-2">{item.quantity}</span>
+                        <span className="col-span-2">{item.quantity}x</span>
                         <span className="col-span-7 uppercase truncate">{item.name}</span>
                         <span className="col-span-3 text-right">₹{item.price * item.quantity}</span>
                       </div>
                     ))}
                   </div>
 
-                  <div className="text-right space-y-1 mb-4">
-                    <div className="flex justify-between">
-                      <span>SUBTOTAL</span>
-                      <span>₹{printingOrder.subtotal?.toFixed(0) || (printingOrder.totalPrice / 1.05).toFixed(0)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>CGST (2.5%)</span>
-                      <span>₹{printingOrder.cgst?.toFixed(0) || (printingOrder.totalPrice * 0.025 / 1.05).toFixed(0)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>SGST (2.5%)</span>
-                      <span>₹{printingOrder.sgst?.toFixed(0) || (printingOrder.totalPrice * 0.025 / 1.05).toFixed(0)}</span>
-                    </div>
-                    <div className="flex justify-between border-t border-black pt-2 mt-2 font-black text-sm">
-                      <span>GRAND TOTAL</span>
+                  <div className="text-right font-black text-sm mb-4">
+                    <div className="flex justify-between border-t border-black pt-2">
+                      <span>TOTAL</span>
                       <span>₹{printingOrder.totalPrice}</span>
                     </div>
                   </div>
 
                   <div className="text-center pt-4 border-t border-dashed border-black opacity-60">
-                    <p className="italic text-[8px] whitespace-pre-wrap">{printSettings.footerMessage}</p>
-                    <p className="mt-2 font-black uppercase">Token #{printingOrder.orderNumber}</p>
+                    <p className="italic text-[8px]">{printSettings.footerMessage}</p>
                   </div>
                 </>
               )}
             </div>
+
+            {/* Visual Divider / Cut Simulation */}
+            <div className="w-full flex items-center gap-4 py-4 px-10">
+               <div className="h-px flex-1 bg-zinc-800" />
+               <span className="text-[8px] font-black text-zinc-600 uppercase tracking-widest">Auto-Cut Line</span>
+               <div className="h-px flex-1 bg-zinc-800" />
+            </div>
+
+            {/* 2. Kitchen Token (KOT) */}
+            <div 
+              className="bg-white text-black p-8 shadow-2xl font-mono text-center border-t-4 border-zinc-200" 
+              style={{ width: printSettings.paperWidth === '58mm' ? '220px' : '300px' }}
+            >
+              <p className="text-[10px] font-bold uppercase tracking-widest mb-2">Collection Token</p>
+              <h2 className="text-5xl font-black italic">#{printingOrder?.orderNumber}</h2>
+              <div className="mt-4 pt-4 border-t border-dashed border-black">
+                 <p className="text-xs font-bold uppercase">{printingOrder?.customerName}</p>
+                 <p className="text-[8px] mt-1 opacity-60">RAVOYI KITCHEN</p>
+              </div>
+            </div>
           </ScrollArea>
 
           <div className="p-8 bg-zinc-900 flex gap-4">
-             <button 
-               onClick={() => setShowPrintPreview(false)}
-               className="flex-1 py-4 bg-zinc-800 text-zinc-400 rounded-2xl font-black uppercase text-xs hover:bg-zinc-700 transition-all"
-             >
-                Discard
-             </button>
-             <button 
-               onClick={executePrint}
-               className="flex-[2] py-4 bg-[#b8582e] text-white rounded-2xl font-black uppercase text-xs flex items-center justify-center gap-3 shadow-xl hover:bg-white hover:text-black transition-all group"
-             >
-                <Printer size={18} className="group-hover:animate-bounce" /> Execute Print
+             <button onClick={() => setShowPrintPreview(false)} className="flex-1 py-4 bg-zinc-800 text-zinc-400 rounded-2xl font-black uppercase text-xs">Discard</button>
+             <button onClick={executePrint} className="flex-[2] py-4 bg-[#b8582e] text-white rounded-2xl font-black uppercase text-xs flex items-center justify-center gap-3 shadow-xl">
+                <Printer size={18} /> Execute Print
              </button>
           </div>
         </DialogContent>
@@ -549,163 +520,105 @@ export default function OrderManager() {
         <DialogContent className="max-w-md bg-white rounded-[2rem] p-8 border-none shadow-2xl">
           <DialogHeader>
             <DialogTitle className="text-2xl font-black uppercase italic tracking-tighter">Receipt Configuration</DialogTitle>
-            <DialogDescription className="sr-only">Configure thermal printer receipt template</DialogDescription>
+            <DialogDescription className="text-xs text-zinc-400 uppercase font-bold">Configure headers and FSSAI details</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <div className="grid gap-2">
-              <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Store Name</Label>
-              <Input 
-                value={printSettings.storeName} 
-                onChange={(e) => setPrintSettings({...printSettings, storeName: e.target.value})}
-                className="rounded-xl border-2 font-bold text-black"
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">GSTIN Number</Label>
-              <Input 
-                value={printSettings.gstin} 
-                onChange={(e) => setPrintSettings({...printSettings, gstin: e.target.value})}
-                className="rounded-xl border-2 font-bold uppercase text-black"
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Support Phone</Label>
-              <Input 
-                value={printSettings.phone} 
-                onChange={(e) => setPrintSettings({...printSettings, phone: e.target.value})}
-                className="rounded-xl border-2 font-bold text-black"
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Address</Label>
-              <Input 
-                value={printSettings.address} 
-                onChange={(e) => setPrintSettings({...printSettings, address: e.target.value})}
-                className="rounded-xl border-2 font-bold text-black"
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Footer Message</Label>
-              <Textarea 
-                value={printSettings.footerMessage} 
-                onChange={(e) => setPrintSettings({...printSettings, footerMessage: e.target.value})}
-                className="rounded-xl border-2 font-bold text-black resize-none min-h-[80px]"
-                placeholder="Message printed at bottom of slip"
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Paper Width</Label>
-              <div className="flex gap-2">
-                {['58mm', '80mm'].map((size) => (
-                  <button
-                    key={size}
-                    onClick={() => setPrintSettings({...printSettings, paperWidth: size as any})}
-                    className={cn(
-                      "flex-1 py-3 rounded-xl border-2 font-black uppercase text-xs transition-all",
-                      printSettings.paperWidth === size ? "bg-[#b8582e] text-white border-[#b8582e]" : "bg-zinc-50 border-zinc-200 text-zinc-400"
-                    )}
-                  >
-                    {size}
-                  </button>
-                ))}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase text-zinc-400">Store Name</Label>
+                <Input value={printSettings.storeName} onChange={(e) => setPrintSettings({...printSettings, storeName: e.target.value})} className="rounded-xl border-2 font-bold text-black" />
               </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase text-zinc-400">GSTIN</Label>
+                <Input value={printSettings.gstin} onChange={(e) => setPrintSettings({...printSettings, gstin: e.target.value})} className="rounded-xl border-2 font-bold uppercase text-black" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase text-zinc-400">FSSAI Number</Label>
+                <Input value={printSettings.fssai} onChange={(e) => setPrintSettings({...printSettings, fssai: e.target.value})} className="rounded-xl border-2 font-bold text-black" />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase text-zinc-400">Phone</Label>
+                <Input value={printSettings.phone} onChange={(e) => setPrintSettings({...printSettings, phone: e.target.value})} className="rounded-xl border-2 font-bold text-black" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black uppercase text-zinc-400">Footer Message</Label>
+              <Textarea value={printSettings.footerMessage} onChange={(e) => setPrintSettings({...printSettings, footerMessage: e.target.value})} className="rounded-xl border-2 font-bold text-black min-h-[80px]" />
             </div>
           </div>
           <DialogFooter>
-            <button 
-              onClick={saveSettings}
-              className="w-full py-4 bg-zinc-900 text-white rounded-2xl font-black uppercase flex items-center justify-center gap-2 hover:bg-[#b8582e] transition-all"
-            >
+            <button onClick={saveSettings} className="w-full py-4 bg-zinc-900 text-white rounded-2xl font-black uppercase flex items-center justify-center gap-2">
               <Save size={18} /> Update Template
             </button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* HIDDEN PRINTABLE COMPONENT */}
+      {/* PRINTABLE COMPONENT */}
       <div id="printable-receipt" className="hidden print:block font-mono text-black" style={{ width: printSettings.paperWidth }}>
-        <div className="p-4 text-center border-b border-dashed border-black">
-          <h1 className="text-xl font-black uppercase">{printSettings.storeName}</h1>
-          <p className="text-[10px] uppercase">{printSettings.address}</p>
-          <p className="text-[10px]">Tel: {printSettings.phone}</p>
-          <p className="text-[10px] font-bold">GST: {printSettings.gstin}</p>
+        {/* 1. MAIN RECEIPT */}
+        <div className="receipt-section">
+          <div className="p-4 text-center border-b border-dashed border-black">
+            <h1 className="text-xl font-black uppercase">{printSettings.storeName}</h1>
+            <p className="text-[10px]">{printSettings.address}</p>
+            <p className="text-[10px]">Tel: {printSettings.phone}</p>
+            <p className="text-[10px] font-bold">GST: {printSettings.gstin}</p>
+            <p className="text-[10px] font-bold">FSSAI: {printSettings.fssai}</p>
+          </div>
+
+          {printingOrder && (
+            <>
+              <div className="py-2 border-b border-dashed border-black text-[10px]">
+                <div className="flex justify-between font-bold">
+                  <span>ORDER: #{printingOrder.orderNumber}</span>
+                  <span>{formatOrderTime(printingOrder.timestamp)}</span>
+                </div>
+                <p>CUST: {printingOrder.customerName}</p>
+              </div>
+
+              <div className="py-2 border-b border-dashed border-black text-[10px]">
+                {printingOrder.items.map((item, idx) => (
+                  <div key={idx} className="grid grid-cols-12 gap-1 mb-1">
+                    <span className="col-span-2">{item.quantity}x</span>
+                    <span className="col-span-7 uppercase">{item.name}</span>
+                    <span className="col-span-3 text-right">₹{item.price * item.quantity}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="py-4 text-right">
+                <div className="text-lg font-black uppercase">Total: ₹{printingOrder.totalPrice}</div>
+              </div>
+
+              <div className="pt-4 text-center border-t border-dashed border-black">
+                <p className="text-[8px] italic">{printSettings.footerMessage}</p>
+              </div>
+            </>
+          )}
         </div>
 
-        {printingOrder && (
-          <>
-            <div className="py-2 border-b border-dashed border-black text-[10px]">
-              <div className="flex justify-between font-bold">
-                <span>ORDER: #{printingOrder.orderNumber}</span>
-                <span>{formatOrderTime(printingOrder.timestamp)}</span>
-              </div>
-              <p>CUSTOMER: {printingOrder.customerName}</p>
-              <p>PHONE: {printingOrder.customerPhone}</p>
-            </div>
+        {/* 2. AUTO-CUT BREAK & TOKEN */}
+        <div className="print-cut-line" style={{ pageBreakAfter: 'always', borderBottom: '1px dashed #000', margin: '20px 0' }} />
 
-            <div className="py-2 border-b border-dashed border-black text-[10px]">
-              <div className="grid grid-cols-12 gap-1 font-bold mb-1 border-b border-dashed border-black pb-1">
-                <span className="col-span-1">#</span>
-                <span className="col-span-7">ITEM</span>
-                <span className="col-span-4 text-right">PRICE</span>
-              </div>
-              {printingOrder.items.map((item, idx) => (
-                <div key={idx} className="grid grid-cols-12 gap-1 mb-1">
-                  <span className="col-span-1">{item.quantity}</span>
-                  <span className="col-span-7 uppercase">{item.name}</span>
-                  <span className="col-span-4 text-right">₹{item.price * item.quantity}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="py-2 text-right text-[10px] border-b border-dashed border-black">
-               <div className="flex justify-between">
-                  <span>Subtotal:</span>
-                  <span>₹{printingOrder.subtotal?.toFixed(0) || (printingOrder.totalPrice / 1.05).toFixed(0)}</span>
-               </div>
-               <div className="flex justify-between">
-                  <span>CGST @ 2.5%:</span>
-                  <span>₹{printingOrder.cgst?.toFixed(0) || (printingOrder.totalPrice * 0.025 / 1.05).toFixed(0)}</span>
-               </div>
-               <div className="flex justify-between">
-                  <span>SGST @ 2.5%:</span>
-                  <span>₹{printingOrder.sgst?.toFixed(0) || (printingOrder.totalPrice * 0.025 / 1.05).toFixed(0)}</span>
-               </div>
-            </div>
-
-            <div className="py-4 text-right">
-              <div className="text-lg font-black uppercase">Grand Total: ₹{printingOrder.totalPrice}</div>
-              <p className="text-[10px]">Paid via: {printingOrder.paymentMethod}</p>
-            </div>
-
-            <div className="pt-4 text-center border-t border-dashed border-black">
-              <p className="text-[8px] italic whitespace-pre-wrap">{printSettings.footerMessage}</p>
-              <p className="text-[8px] mt-2 font-bold">ORDER TOKEN: #{printingOrder.orderNumber}</p>
-            </div>
-          </>
-        )}
+        <div className="token-section p-8 text-center">
+           <p className="text-[10px] font-bold uppercase mb-4">Collection Token</p>
+           <h1 className="text-6xl font-black">#{printingOrder?.orderNumber}</h1>
+           <div className="mt-6 pt-4 border-t border-dashed border-black">
+              <p className="text-sm font-black uppercase">{printingOrder?.customerName}</p>
+              <p className="text-[8px] opacity-60">RAVOYI KITCHEN</p>
+           </div>
+        </div>
       </div>
 
       <style jsx global>{`
         @media print {
-          body * {
-            visibility: hidden;
-            background: white !important;
-          }
-          #printable-receipt, #printable-receipt * {
-            visibility: visible;
-          }
-          #printable-receipt {
-            position: absolute;
-            left: 0;
-            top: 0;
-            margin: 0;
-            padding: 0;
-            background: white !important;
-          }
-          @page {
-            margin: 0;
-            size: auto;
-          }
+          body * { visibility: hidden; background: white !important; }
+          #printable-receipt, #printable-receipt * { visibility: visible; }
+          #printable-receipt { position: absolute; left: 0; top: 0; margin: 0; padding: 0; }
+          .print-cut-line { display: block; border-bottom: 1px dashed black; height: 1px; width: 100%; }
+          @page { margin: 0; size: auto; }
         }
       `}</style>
     </div>

@@ -1,7 +1,7 @@
+
 "use client"
 
-import { useState, useMemo, useEffect } from 'react';
-import { useSessionTimer } from '@/hooks/use-session-timer';
+import { useMemo } from 'react';
 import { useCart } from '@/hooks/use-cart';
 import { menuItems } from '@/lib/menu-data';
 import { Header } from '@/components/header';
@@ -16,26 +16,12 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { useToast } from '@/hooks/use-toast';
+import { useState } from 'react';
 import Link from 'next/link';
 
 export default function CustomerView({ tableId }: { tableId: string | null }) {
-  const { clearCart, addToCart } = useCart();
+  const { addToCart } = useCart();
   const [isCartOpen, setCartOpen] = useState(false);
-  const { toast } = useToast();
-
-  const { timeLeft } = useSessionTimer(clearCart);
-
-  useEffect(() => {
-    if (tableId && typeof window !== 'undefined' && window.innerWidth < 768) {
-      toast({
-        title: "Session Active",
-        description: "Order within 10mins to keep your table session.",
-        className: "bg-zinc-900 text-white border-b-4 border-amber-500",
-        duration: 5000,
-      });
-    }
-  }, [tableId, toast]);
 
   const categorizedMenu = useMemo(() => {
     const categoryOrder = [
@@ -63,7 +49,7 @@ export default function CustomerView({ tableId }: { tableId: string | null }) {
 
   return (
     <div className="min-h-screen bg-[#e76876] font-sans flex flex-col">
-      <Header tableId={tableId} onCartClick={() => setCartOpen(true)} timeLeft={timeLeft} />
+      <Header tableId={tableId} onCartClick={() => setCartOpen(true)} timeLeft={0} />
       
       <main className="container mx-auto px-4 py-8 flex-1">
         <header className="mb-10 text-center md:text-left">
@@ -103,17 +89,14 @@ export default function CustomerView({ tableId }: { tableId: string | null }) {
         </Accordion>
       </main>
 
-      {/* --- DESIGNED FOOTER SECTION --- */}
       <footer className="mt-20 bg-zinc-900 text-white py-12 px-6 border-t-4 border-white">
         <div className="container mx-auto flex flex-col items-center gap-6">
-          {/* Brand Logo */}
           <div className="text-2xl font-black italic uppercase tracking-tighter text-[#e76876]">
             Grillicious
           </div>
           
           <div className="h-px w-16 bg-zinc-800" />
           
-          {/* GetPik Credit */}
           <Link 
             href="https://www.getpik.in/" 
             target="_blank" 

@@ -1,6 +1,6 @@
+
 import type { Metadata } from 'next';
 import './globals.css';
-import { Toaster } from "@/components/ui/toaster";
 import { CartProvider } from '@/context/cart-context';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 
@@ -10,7 +10,6 @@ export const metadata: Metadata = {
   icons: {
     icon: 'https://firebasestorage.googleapis.com/v0/b/dasara-finedine.firebasestorage.app/o/RAVOYI%20LOGO.pdf.webp?alt=media&token=f09f33b3-b303-400e-bbc4-b5dca418c8af',
   },
-  // Strictly prevent indexing and crawling across all search engines
   robots: {
     index: false,
     follow: false,
@@ -46,14 +45,12 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap" rel="stylesheet" />
-        {/* Additional meta tag for absolute certainty */}
         <meta name="robots" content="noindex, nofollow, noarchive" />
       </head>
       <body className="font-body antialiased font-bold">
         <FirebaseClientProvider config={firebaseConfig}>
           <CartProvider>
             {children}
-            <Toaster />
           </CartProvider>
         </FirebaseClientProvider>
       </body>
