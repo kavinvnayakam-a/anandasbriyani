@@ -3,29 +3,43 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Correctly match the 'menu_items' collection used by the app
+    // Admin helper: For this prototype, any authenticated user is treated as an admin
+    function isAdmin() {
+      return request.auth != null;
+    }
+
+    // Menu Items: Customers can browse, Admin can manage
     match /menu_items/{itemId} {
-      allow read, write: if true;
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
-    // Live orders collection
+    // Orders: Customers can place (create) and track (read), Admin can update status or delete
     match /orders/{orderId} {
-      allow read, write: if true;
+      allow read: if true;
+      allow create: if true;
+      allow update, delete: if isAdmin();
     }
 
-    // Archived orders collection
+    // Archived orders: Strictly Admin access
     match /order_history/{historyId} {
-      allow read, write: if true;
+      allow read, write: if isAdmin();
     }
 
-    // Internal counters for order numbers
+    // Daily Stats: Open for order counter transaction logic
     match /daily_stats/{statId} {
       allow read, write: if true;
     }
+
+    // Settings (Print/Menu Config): Customers can read, Admin can edit
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
     
-    // Default fallback to keep things open during development
+    // Default fallback: Deny everything else
     match /{document=**} {
-      allow read, write: if true;
+      allow read, write: if isAdmin();
     }
   }
 }

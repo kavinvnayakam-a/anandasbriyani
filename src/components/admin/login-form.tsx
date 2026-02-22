@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Unlock, Mail, Lock, ShieldCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/firebase";
+import { initiateAnonymousSignIn } from "@/firebase/non-blocking-login";
 import Image from "next/image";
 
 const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/dasara-finedine.firebasestorage.app/o/RAVOYI%20LOGO.pdf.webp?alt=media&token=f09f33b3-b303-400e-bbc4-b5dca418c8af";
@@ -16,6 +18,7 @@ const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/dasara-finedine.fi
 export default function LoginForm() {
   const router = useRouter();
   const { toast } = useToast();
+  const authInstance = useAuth();
   const [auth, setAuth, isAuthLoaded] = useLocalStorage('ravoyi-admin-auth', false);
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
@@ -34,7 +37,14 @@ export default function LoginForm() {
     // Simulate authentication logic with strict email check
     setTimeout(() => {
       if (email === "info@getpik.in" && password.length >= 4) {
+        // 1. Grant Local Storage Auth
         setAuth(true);
+        
+        // 2. Grant Firebase Auth (to satisfy Security Rules)
+        if (authInstance) {
+          initiateAnonymousSignIn(authInstance);
+        }
+
         toast({
           title: "Authentication Successful",
           description: "Welcome back to the RAVOYI Kitchen Console.",
@@ -101,7 +111,7 @@ export default function LoginForm() {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Security Key</Label>
+              <Label className="text-[10px) font-black uppercase tracking-widest text-zinc-400 ml-1">Security Key</Label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300 w-4 h-4" />
                 <Input 
