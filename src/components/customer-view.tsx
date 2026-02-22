@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useMemo, useEffect } from 'react';
@@ -11,10 +12,13 @@ import { CartIcon } from '@/components/cart-icon';
 import type { MenuItem } from '@/lib/types';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowUp, Moon, Star } from 'lucide-react';
-import { cn } from "@/lib/utils";
+import { ArrowUp, Moon, Star, MapPinOff, ShieldAlert, RefreshCcw, LocateFixed } from 'lucide-react';
+import { cn, haversineDistance } from "@/lib/utils";
 
 const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/dasara-finedine.firebasestorage.app/o/RAVOYI%20LOGO.pdf.webp?alt=media&token=f09f33b3-b303-400e-bbc4-b5dca418c8af";
+
+const KITCHEN_COORDS = { lat: 17.35786972797417, lng: 78.54533232987296 };
+const ALLOWED_RADIUS_METERS = 100;
 
 // High-Fidelity Ramadan Decoration Component
 const HangingDecoration = ({ className, delay = "0s", height = "h-32", type = "lantern" }: { className?: string, delay?: string, height?: string, type?: "lantern" | "moon" | "star" }) => (
@@ -22,20 +26,16 @@ const HangingDecoration = ({ className, delay = "0s", height = "h-32", type = "l
     className={cn("absolute flex flex-col items-center z-10", className)}
     style={{ animation: `sway 4s ease-in-out infinite alternate ${delay}` }}
   >
-    {/* Silk Golden Thread */}
     <div className={cn("w-[1px] bg-gradient-to-b from-transparent via-orange-400 to-orange-300", height)} />
     
     {type === "lantern" && (
       <div className="relative w-7 h-10">
-        {/* Dome Top */}
         <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-5 h-4 bg-gradient-to-b from-amber-300 to-amber-500 rounded-t-full border border-amber-200" />
-        {/* Navy Body with Gold Frame */}
         <div className="w-full h-full bg-[#0c1a2b] rounded-sm border border-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.2)] relative overflow-hidden">
           <div className="absolute inset-x-1 top-1 bottom-1 bg-gradient-to-t from-orange-600 via-orange-400 to-amber-200 rounded-t-full flex items-center justify-center">
              <div className="w-1.5 h-3 bg-white rounded-full blur-[2px] opacity-80 animate-pulse" />
           </div>
         </div>
-        {/* Pedestal Base */}
         <div className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-9 h-1.5 bg-amber-600 rounded-sm border-t border-amber-300" />
       </div>
     )}
@@ -50,6 +50,8 @@ const HangingDecoration = ({ className, delay = "0s", height = "h-32", type = "l
   </div>
 );
 
+type LocationStatus = 'checking' | 'authorized' | 'too-far' | 'denied' | 'error';
+
 export default function CustomerView({ tableId }: { tableId: string | null, mode: 'dine-in' | 'takeaway' }) {
   const { addToCart } = useCart();
   const [isCartOpen, setCartOpen] = useState(false);
@@ -57,11 +59,50 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [locationStatus, setLocationStatus] = useState<LocationStatus>('checking');
+
+  const checkLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationStatus('error');
+      return;
+    }
+
+    setLocationStatus('checking');
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const distance = haversineDistance(
+          position.coords.latitude,
+          position.coords.longitude,
+          KITCHEN_COORDS.lat,
+          KITCHEN_COORDS.lng
+        );
+
+        if (distance <= ALLOWED_RADIUS_METERS) {
+          setLocationStatus('authorized');
+        } else {
+          setLocationStatus('too-far');
+        }
+      },
+      (error) => {
+        if (error.code === error.PERMISSION_DENIED) {
+          setLocationStatus('denied');
+        } else {
+          setLocationStatus('error');
+        }
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  };
 
   useEffect(() => {
-    // Disable right-click
+    // 1. Disable right-click
     const handleContextMenu = (e: MouseEvent) => e.preventDefault();
     document.addEventListener('contextmenu', handleContextMenu);
+
+    // 2. Initialize Geofence
+    checkLocation();
+
     return () => document.removeEventListener('contextmenu', handleContextMenu);
   }, []);
 
@@ -98,6 +139,65 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
     }).map(cat => ({ category: cat, items: grouped[cat] }));
   }, [menuItems]);
 
+  // GEOFENCE GUARD UI
+  if (locationStatus === 'checking') {
+    return (
+      <div className="h-screen w-full flex flex-col items-center justify-center bg-[#0a0500] text-white">
+        <div className="relative mb-12">
+          <div className="absolute inset-0 bg-orange-500/20 rounded-full blur-3xl animate-pulse" />
+          <LocateFixed className="w-16 h-16 text-orange-500 animate-[spin_3s_linear_infinite]" />
+        </div>
+        <h2 className="text-xl font-black uppercase tracking-[0.3em] text-white italic">Verifying Location</h2>
+        <p className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] mt-4">Please wait while we secure your session</p>
+      </div>
+    );
+  }
+
+  if (locationStatus === 'too-far') {
+    return (
+      <div className="h-screen w-full flex flex-col items-center justify-center bg-[#0a0500] p-8 text-center text-white">
+        <div className="bg-orange-500/10 p-8 rounded-[3rem] border border-orange-500/20 max-w-sm w-full shadow-2xl">
+          <div className="bg-orange-500 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-8 shadow-[0_0_30px_rgba(249,115,22,0.4)]">
+            <MapPinOff className="text-black w-10 h-10" />
+          </div>
+          <h2 className="text-3xl font-black italic uppercase tracking-tighter leading-none mb-4">Out of Range</h2>
+          <p className="text-xs font-bold text-white/60 uppercase tracking-widest leading-relaxed mb-10">
+            Access to our digital menu is limited to customers within <span className="text-orange-500">100 meters</span> of RAVOYI Kitchen.
+          </p>
+          <button 
+            onClick={checkLocation}
+            className="w-full py-5 bg-white text-black rounded-2xl font-black uppercase italic text-xs flex items-center justify-center gap-3 active:scale-95 transition-all shadow-xl"
+          >
+            <RefreshCcw size={18} /> Retry Verification
+          </button>
+        </div>
+        <p className="fixed bottom-12 text-[8px] font-black uppercase tracking-[0.5em] text-white/20">A Telangana Kitchen Experience</p>
+      </div>
+    );
+  }
+
+  if (locationStatus === 'denied') {
+    return (
+      <div className="h-screen w-full flex flex-col items-center justify-center bg-[#0a0500] p-8 text-center text-white">
+        <div className="bg-rose-500/10 p-8 rounded-[3rem] border border-rose-500/20 max-w-sm w-full shadow-2xl">
+          <div className="bg-rose-500 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-8 shadow-[0_0_30px_rgba(244,63,94,0.4)]">
+            <ShieldAlert className="text-black w-10 h-10" />
+          </div>
+          <h2 className="text-3xl font-black italic uppercase tracking-tighter leading-none mb-4">Location Required</h2>
+          <p className="text-xs font-bold text-white/60 uppercase tracking-widest leading-relaxed mb-10">
+            Please enable <span className="text-rose-500">Location Permissions</span> in your browser settings to browse and order from our kitchen.
+          </p>
+          <button 
+            onClick={checkLocation}
+            className="w-full py-5 bg-white text-black rounded-2xl font-black uppercase italic text-xs flex items-center justify-center gap-3 active:scale-95 transition-all shadow-xl"
+          >
+            <RefreshCcw size={18} /> Refresh Permission
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (loading) return null;
 
   return (
@@ -122,7 +222,6 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
       
       <main className="max-w-5xl mx-auto px-4 md:px-6 py-12 md:py-24 relative z-20">
         <header className="mb-24 text-center">
-          {/* Hero Section */}
           <h1 className="text-7xl md:text-[11rem] font-black text-white tracking-tighter uppercase italic leading-none animate-in fade-in slide-in-from-bottom-8 duration-1000">
             Iftar <span className="text-orange-500">Specials</span>
           </h1>
@@ -155,7 +254,6 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
       {/* FOOTER */}
       <footer className="bg-black/60 border-t border-white/5 py-32 px-6">
         <div className="max-w-5xl mx-auto flex flex-col items-center gap-12">
-          {/* Ravoyi Brand Seal */}
           <div className="h-28 w-28 rounded-full border-2 border-orange-500/30 p-1 bg-white">
             <Image src={LOGO_URL} alt="RAVOYI Logo" width={112} height={112} className="rounded-full" />
           </div>
@@ -165,7 +263,6 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
                 <p className="text-[10px] font-black uppercase tracking-[0.6em] text-white/20">A Telangana Kitchen Experience</p>
              </div>
 
-             {/* GetPik Digital Connect */}
              <Link 
               href="https://www.getpik.in/pos" 
               target="_blank" 
