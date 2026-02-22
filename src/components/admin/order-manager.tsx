@@ -600,6 +600,19 @@ export default function OrderManager() {
                       <span>GRAND TOTAL</span>
                       <span>₹{printingOrder.totalPrice}</span>
                     </div>
+                    
+                    {printingOrder.paymentMethod === 'Cash' && (
+                      <div className="pt-2 mt-2 border-t border-dashed border-black/20 space-y-1">
+                        <div className="flex justify-between text-[10px] font-bold">
+                          <span>CASH RECEIVED</span>
+                          <span>₹{printingOrder.cashReceived}</span>
+                        </div>
+                        <div className="flex justify-between text-[10px] font-bold">
+                          <span>CHANGE DUE</span>
+                          <span>₹{printingOrder.changeDue}</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="text-center pt-4 border-t-2 border-dashed border-black opacity-80">
@@ -774,6 +787,19 @@ export default function OrderManager() {
                    <span>TOTAL:</span>
                    <span>₹{printingOrder.totalPrice}</span>
                 </div>
+                
+                {printingOrder.paymentMethod === 'Cash' && (
+                  <div className="pt-4 mt-2 border-t-2 border-black space-y-1 text-[12px]">
+                    <div className="flex justify-between">
+                      <span>CASH RECEIVED:</span>
+                      <span>₹{printingOrder.cashReceived}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>CHANGE DUE:</span>
+                      <span>₹{printingOrder.changeDue}</span>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="pt-6 pb-10 text-center border-t-4 border-dashed border-black">

@@ -22,6 +22,11 @@ export interface Order {
   paymentMethod: 'Card' | 'Cash' | 'UPI';
   items: CartItem[];
   totalPrice: number;
+  subtotal?: number;
+  cgst?: number;
+  sgst?: number;
+  cashReceived?: number | null;
+  changeDue?: number | null;
   status: 'Pending' | 'Received' | 'Preparing' | 'Served' | 'Ready' | 'Handover' | 'Completed';
   timestamp: any;
   orderNumber: string;
