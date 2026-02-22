@@ -91,8 +91,10 @@ export default function OrderManager() {
     const subtotal = selectedItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
     const cgst = subtotal * 0.025;
     const sgst = subtotal * 0.025;
-    const total = Math.round(subtotal + cgst + sgst);
-    return { subtotal, cgst, sgst, total };
+    const rawTotal = subtotal + cgst + sgst;
+    const total = Math.round(rawTotal);
+    const roundOff = total - rawTotal;
+    return { subtotal, cgst, sgst, total, roundOff };
   };
 
   const totals = useMemo(() => calculateTotals(), [selectedItems]);
@@ -174,7 +176,7 @@ export default function OrderManager() {
     }
 
     setIsPlacingOrder(true);
-    const { subtotal, cgst, sgst, total } = totals;
+    const { subtotal, cgst, sgst, total, roundOff } = totals;
 
     try {
       const today = new Date().toISOString().split('T')[0];
@@ -202,6 +204,7 @@ export default function OrderManager() {
         subtotal,
         cgst,
         sgst,
+        roundOff,
         totalPrice: total,
         status: 'Received',
         timestamp: serverTimestamp(),
@@ -237,13 +240,13 @@ export default function OrderManager() {
   const formatOrderTime = (ts: any) => {
     if (!ts) return "";
     const date = ts.seconds ? new Date(ts.seconds * 1000) : new Date(ts);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
   };
 
   const formatOrderDate = (ts: any) => {
     if (!ts) return "";
     const date = ts.seconds ? new Date(ts.seconds * 1000) : new Date(ts);
-    return date.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' });
+    return date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' });
   };
 
   const pendingOrders = orders.filter(o => o.status === 'Pending');
@@ -540,91 +543,76 @@ export default function OrderManager() {
           </DialogHeader>
           
           <ScrollArea className="max-h-[60vh] p-10 bg-zinc-950 flex flex-col items-center gap-10">
+            {/* PREVIEW CONTAINER (matches the photo style) */}
             <div 
-              className="bg-white text-black p-8 shadow-2xl font-mono text-[12px] relative font-black leading-tight" 
+              className="bg-white text-black p-6 shadow-2xl font-mono text-[12px] relative font-black leading-snug" 
               style={{ width: '300px' }}
             >
-              <div className="text-center border-b-2 border-dashed border-black pb-4 mb-4">
+              <div className="text-center mb-4">
                 <h1 className="text-lg font-black uppercase">{printSettings.storeName}</h1>
-                <p className="uppercase text-[9px] mt-1">{printSettings.address}</p>
-                <p className="text-[9px] mt-1">Tel: {printSettings.phone}</p>
-                <div className="flex justify-center gap-4 mt-2 text-[9px] font-bold">
-                  <span>GST: {printSettings.gstin}</span>
-                  <span>FSSAI: {printSettings.fssai}</span>
+                <p className="uppercase text-[9px] leading-tight font-bold">{printSettings.address}</p>
+                <p className="text-[9px] font-bold">PH : {printSettings.phone}</p>
+                <p className="text-[9px] font-bold">GSTIN : {printSettings.gstin}</p>
+                <p className="text-[9px] font-bold">FSSAI : {printSettings.fssai}</p>
+              </div>
+
+              <div className="border-y-2 border-black py-2 mb-2 text-[10px]">
+                <div className="flex justify-between">
+                  <span>Date: {formatOrderDate(printingOrder?.timestamp)} {formatOrderTime(printingOrder?.timestamp)}</span>
+                  <span className="font-black">Takeaway</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Cashier: Manager</span>
+                  <span>Token No.: {printingOrder?.orderNumber}</span>
+                </div>
+                <div className="flex justify-between mt-1 pt-1 border-t border-black/10">
+                  <span className="uppercase">Cust: {printingOrder?.customerName}</span>
                 </div>
               </div>
 
-              {printingOrder && (
-                <>
-                  <div className="mb-4 border-b-2 border-dashed border-black pb-2">
-                    <div className="flex justify-between text-base font-black">
-                      <span>ORD: #{printingOrder.orderNumber}</span>
-                      <span>{formatOrderTime(printingOrder.timestamp)}</span>
-                    </div>
-                    <div className="flex justify-between text-[9px] mt-1 uppercase">
-                      <span>DATE: {formatOrderDate(printingOrder.timestamp)}</span>
-                      <span>{printingOrder.paymentMethod}</span>
-                    </div>
-                    <p className="truncate uppercase mt-1 border-t border-black/10 pt-1 text-sm">CUST: {printingOrder.customerName}</p>
+              <div className="mb-2">
+                <div className="grid grid-cols-12 font-black border-b border-black pb-1 mb-1 text-[10px]">
+                  <span className="col-span-6">Item</span>
+                  <span className="col-span-2 text-center">Qty.</span>
+                  <span className="col-span-2 text-right">Price</span>
+                  <span className="col-span-2 text-right">Amount</span>
+                </div>
+                {printingOrder?.items.map((item, idx) => (
+                  <div key={idx} className="grid grid-cols-12 text-[10px] leading-tight mb-1">
+                    <span className="col-span-6 uppercase truncate">{item.name}</span>
+                    <span className="col-span-2 text-center">{item.quantity}</span>
+                    <span className="col-span-2 text-right">{item.price.toFixed(2)}</span>
+                    <span className="col-span-2 text-right">{(item.price * item.quantity).toFixed(2)}</span>
                   </div>
+                ))}
+              </div>
 
-                  <div className="border-b-2 border-dashed border-black pb-2 mb-2">
-                    <div className="grid grid-cols-12 text-[9px] font-bold uppercase mb-2 border-b border-black/5 pb-1">
-                       <span className="col-span-2">Qty</span>
-                       <span className="col-span-7">Item</span>
-                       <span className="col-span-3 text-right">Price</span>
-                    </div>
-                    {printingOrder.items.map((item, idx) => (
-                      <div key={idx} className="grid grid-cols-12 mb-2 leading-tight">
-                        <span className="col-span-2 font-black text-sm">{item.quantity}x</span>
-                        <span className="col-span-7 uppercase truncate text-[11px]">{item.name}</span>
-                        <span className="col-span-3 text-right font-black text-[11px]">₹{item.price * item.quantity}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="text-right font-black space-y-1 mb-4">
-                    <div className="flex justify-between text-[10px] opacity-80">
-                      <span>SUBTOTAL</span>
-                      <span>₹{printingOrder.subtotal?.toFixed(2) || (printingOrder.totalPrice / 1.05).toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between text-[10px] opacity-80">
-                      <span>CGST (2.5%)</span>
-                      <span>₹{printingOrder.cgst?.toFixed(2) || ((printingOrder.totalPrice - (printingOrder.totalPrice / 1.05))/2).toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between text-[10px] opacity-80">
-                      <span>SGST (2.5%)</span>
-                      <span>₹{printingOrder.sgst?.toFixed(2) || ((printingOrder.totalPrice - (printingOrder.totalPrice / 1.05))/2).toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between border-t-2 border-black pt-2 mt-1 text-xl font-black">
-                      <span>GRAND TOTAL</span>
-                      <span>₹{printingOrder.totalPrice}</span>
-                    </div>
-                    
-                    {printingOrder.paymentMethod === 'Cash' && (
-                      <div className="pt-2 mt-2 border-t border-dashed border-black/20 space-y-1">
-                        <div className="flex justify-between text-[10px] font-bold">
-                          <span>CASH RECEIVED</span>
-                          <span>₹{printingOrder.cashReceived}</span>
-                        </div>
-                        <div className="flex justify-between text-[10px] font-bold">
-                          <span>CHANGE DUE</span>
-                          <span>₹{printingOrder.changeDue}</span>
-                        </div>
-                      </div>
+              <div className="border-t-2 border-black pt-2 space-y-1 text-right text-[10px]">
+                <div className="flex justify-between">
+                  <span className="font-bold">Total Qty: {printingOrder?.items.reduce((a,b)=>a+b.quantity, 0)}</span>
+                  <div className="flex flex-col items-end">
+                    <div className="flex gap-4"><span>Sub Total</span> <span>{printingOrder?.subtotal?.toFixed(2) || (printingOrder?.totalPrice || 0 / 1.05).toFixed(2)}</span></div>
+                    <div className="flex gap-4"><span>CGST@2.5</span> <span>{printingOrder?.cgst?.toFixed(2) || 0}</span></div>
+                    <div className="flex gap-4"><span>SGST@2.5</span> <span>{printingOrder?.sgst?.toFixed(2) || 0}</span></div>
+                    {printingOrder?.roundOff !== 0 && (
+                      <div className="flex gap-4"><span>Round off</span> <span>{printingOrder?.roundOff?.toFixed(2) || 0}</span></div>
                     )}
                   </div>
+                </div>
+                <div className="flex justify-between items-center text-lg font-black border-t border-black pt-1">
+                  <span>Grand Total</span>
+                  <span>₹{printingOrder?.totalPrice.toFixed(2)}</span>
+                </div>
+              </div>
 
-                  <div className="text-center pt-4 border-t-2 border-dashed border-black opacity-80">
-                    <p className="italic text-[9px] leading-tight uppercase">{printSettings.footerMessage}</p>
-                  </div>
-                </>
-              )}
+              <div className="text-center mt-4 border-t border-black pt-2">
+                <p className="text-[10px] font-bold uppercase italic">Thank You Visit Again...!</p>
+              </div>
             </div>
 
             <div className="w-full flex items-center gap-4 py-4 px-10">
                <div className="h-px flex-1 bg-zinc-800" />
-               <span className="text-[8px] font-black text-zinc-600 uppercase tracking-widest">Token Cut</span>
+               <span className="text-[8px] font-black text-zinc-600 uppercase tracking-widest">Cut Line</span>
                <div className="h-px flex-1 bg-zinc-800" />
             </div>
 
@@ -727,98 +715,92 @@ export default function OrderManager() {
         </DialogContent>
       </Dialog>
 
-      <div id="printable-receipt" className="hidden print:block font-mono text-black font-black" style={{ width: '80mm' }}>
-        <div className="receipt-section p-2">
-          <div className="text-center border-b-4 border-dashed border-black pb-6 mb-6">
-            <h1 className="text-lg font-black uppercase leading-tight">{printSettings.storeName}</h1>
-            <p className="text-[10px] font-black uppercase mt-2">{printSettings.address}</p>
-            <p className="text-[10px] font-black mt-1">Tel: {printSettings.phone}</p>
-            <div className="flex justify-center gap-4 mt-4 text-[10px] font-black">
-              <span>GST: {printSettings.gstin}</span>
-              <span>FSSAI: {printSettings.fssai}</span>
-            </div>
-          </div>
-
-          {printingOrder && (
-            <>
-              <div className="py-4 border-b-4 border-dashed border-black text-[12px] font-black uppercase">
-                <div className="flex justify-between text-base mb-2">
-                  <span>ORDER: #{printingOrder.orderNumber}</span>
-                  <span>{formatOrderTime(printingOrder.timestamp)}</span>
-                </div>
-                <div className="flex justify-between text-[10px] mb-1">
-                  <span>DATE: {formatOrderDate(printingOrder.timestamp)}</span>
-                  <span>METHOD: {printingOrder.paymentMethod}</span>
-                </div>
-                <p className="mt-2 text-base">CUST: {printingOrder.customerName}</p>
+      {/* ACTUAL PRINTABLE CONTENT (HIDDEN FROM UI) */}
+      <div id="printable-receipt" className="hidden print:block font-mono text-black font-black w-[80mm] p-0 m-0">
+        {printingOrder && (
+          <>
+            {/* MAIN BILL SECTION */}
+            <div className="receipt-section p-2" style={{ breakAfter: 'page' }}>
+              <div className="text-center mb-4">
+                <h1 className="text-[16px] font-black uppercase leading-tight m-0">{printSettings.storeName}</h1>
+                <p className="text-[10px] font-bold leading-tight m-0 uppercase">{printSettings.address}</p>
+                <p className="text-[10px] font-bold m-0">PH : {printSettings.phone}</p>
+                <p className="text-[10px] font-bold m-0">GSTIN : {printSettings.gstin}</p>
+                <p className="text-[10px] font-bold m-0">FSSAI : {printSettings.fssai}</p>
               </div>
 
-              <div className="py-4 border-b-4 border-dashed border-black text-[12px] font-black uppercase">
-                <div className="grid grid-cols-12 gap-1 mb-4 border-b-2 border-black pb-2 text-[10px]">
-                   <span className="col-span-2">Qty</span>
-                   <span className="col-span-7">Item</span>
-                   <span className="col-span-3 text-right">Price</span>
+              <div className="border-y-2 border-black py-2 mb-2 text-[11px] leading-tight">
+                <div className="flex justify-between">
+                  <span>Date: {formatOrderDate(printingOrder.timestamp)} {formatOrderTime(printingOrder.timestamp)}</span>
+                  <span>Takeaway</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Cashier: Manager</span>
+                  <span>Token No.: {printingOrder.orderNumber}</span>
+                </div>
+                <div className="mt-1 pt-1 border-t border-black/10">
+                  <span className="uppercase">Customer: {printingOrder.customerName}</span>
+                </div>
+              </div>
+
+              <div className="mb-2">
+                <div className="grid grid-cols-12 font-black border-b-2 border-black pb-1 mb-1 text-[11px]">
+                  <span className="col-span-6">Item</span>
+                  <span className="col-span-2 text-center">Qty.</span>
+                  <span className="col-span-2 text-right">Price</span>
+                  <span className="col-span-2 text-right">Amount</span>
                 </div>
                 {printingOrder.items.map((item, idx) => (
-                  <div key={idx} className="grid grid-cols-12 gap-1 mb-3 leading-tight">
-                    <span className="col-span-2 text-sm">{item.quantity}x</span>
-                    <span className="col-span-7 text-[11px]">{item.name}</span>
-                    <span className="col-span-3 text-right text-[11px]">₹{item.price * item.quantity}</span>
+                  <div key={idx} className="grid grid-cols-12 text-[11px] leading-tight mb-1">
+                    <span className="col-span-6 uppercase truncate">{item.name}</span>
+                    <span className="col-span-2 text-center">{item.quantity}</span>
+                    <span className="col-span-2 text-right">{item.price.toFixed(2)}</span>
+                    <span className="col-span-2 text-right">{(item.price * item.quantity).toFixed(2)}</span>
                   </div>
                 ))}
               </div>
 
-              <div className="py-6 text-right space-y-2 font-black uppercase">
-                <div className="text-[12px]">
-                  <div className="flex justify-between">
-                    <span>SUBTOTAL:</span>
-                    <span>₹{printingOrder.subtotal?.toFixed(2) || (printingOrder.totalPrice / 1.05).toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between mt-1">
-                    <span>CGST (2.5%):</span>
-                    <span>₹{printingOrder.cgst?.toFixed(2) || ((printingOrder.totalPrice - (printingOrder.totalPrice / 1.05))/2).toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between mt-1">
-                    <span>SGST (2.5%):</span>
-                    <span>₹{printingOrder.sgst?.toFixed(2) || ((printingOrder.totalPrice - (printingOrder.totalPrice / 1.05))/2).toFixed(2)}</span>
+              <div className="border-t-2 border-black pt-2 space-y-1 text-right text-[11px]">
+                <div className="flex justify-between">
+                  <span className="font-black">Total Qty: {printingOrder.items.reduce((a,b)=>a+b.quantity, 0)}</span>
+                  <div className="flex flex-col items-end">
+                    <div className="flex gap-4"><span>Sub Total</span> <span>{printingOrder.subtotal?.toFixed(2) || (printingOrder.totalPrice / 1.05).toFixed(2)}</span></div>
+                    <div className="flex gap-4"><span>CGST@2.5</span> <span>{printingOrder.cgst?.toFixed(2) || ((printingOrder.totalPrice - (printingOrder.totalPrice / 1.05))/2).toFixed(2)}</span></div>
+                    <div className="flex gap-4"><span>SGST@2.5</span> <span>{printingOrder.sgst?.toFixed(2) || ((printingOrder.totalPrice - (printingOrder.totalPrice / 1.05))/2).toFixed(2)}</span></div>
+                    {printingOrder.roundOff !== 0 && (
+                      <div className="flex gap-4"><span>Round off</span> <span>{printingOrder.roundOff?.toFixed(2) || 0}</span></div>
+                    )}
                   </div>
                 </div>
-                <div className="text-xl font-black border-t-4 border-black pt-4 mt-2 flex justify-between">
-                   <span>TOTAL:</span>
-                   <span>₹{printingOrder.totalPrice}</span>
+                <div className="flex justify-between items-center text-[18px] font-black border-t-2 border-black pt-1 mt-1">
+                  <span>Grand Total</span>
+                  <span>₹{printingOrder.totalPrice.toFixed(2)}</span>
                 </div>
                 
                 {printingOrder.paymentMethod === 'Cash' && (
-                  <div className="pt-4 mt-2 border-t-2 border-black space-y-1 text-[12px]">
-                    <div className="flex justify-between">
-                      <span>CASH RECEIVED:</span>
-                      <span>₹{printingOrder.cashReceived}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>CHANGE DUE:</span>
-                      <span>₹{printingOrder.changeDue}</span>
-                    </div>
+                  <div className="pt-2 mt-2 border-t border-dashed border-black/40 text-[11px]">
+                    <div className="flex justify-between"><span>CASH RECEIVED</span> <span>₹{printingOrder.cashReceived?.toFixed(2)}</span></div>
+                    <div className="flex justify-between"><span>CHANGE DUE</span> <span>₹{printingOrder.changeDue?.toFixed(2)}</span></div>
                   </div>
                 )}
               </div>
 
-              <div className="pt-6 pb-10 text-center border-t-4 border-dashed border-black">
-                <p className="text-[10px] italic font-black uppercase leading-tight">{printSettings.footerMessage}</p>
+              <div className="text-center mt-6 border-t-2 border-black pt-2 pb-10">
+                <p className="text-[11px] font-black uppercase italic">{printSettings.footerMessage || 'Thank You Visit Again...!'}</p>
               </div>
-            </>
-          )}
-        </div>
+            </div>
 
-        <div className="print-cut-line" style={{ pageBreakAfter: 'always', borderBottom: '4px dashed #000', margin: '40px 0' }} />
-
-        <div className="token-section p-10 text-center font-black">
-           <p className="text-[12px] font-black uppercase mb-6 tracking-widest">Collection Token</p>
-           <h1 className="text-5xl font-black italic leading-none">#{printingOrder?.orderNumber}</h1>
-           <div className="mt-10 pt-10 border-t-4 border-dashed border-black uppercase">
-              <p className="text-lg font-black mb-2">{printingOrder?.customerName}</p>
-              <p className="text-[10px] font-black opacity-100">RAVOYI KITCHEN • AUTHENTIC TASTE</p>
-           </div>
-        </div>
+            {/* TOKEN SECTION (on a new cut page) */}
+            <div className="token-section p-10 text-center font-black" style={{ breakBefore: 'page' }}>
+               <p className="text-[12px] font-black uppercase mb-6 tracking-widest">Collection Token</p>
+               <h1 className="text-[72px] font-black italic leading-none m-0">#{printingOrder.orderNumber}</h1>
+               <div className="mt-10 pt-10 border-t-4 border-dashed border-black uppercase">
+                  <p className="text-[18px] font-black mb-2">{printingOrder.customerName}</p>
+                  <p className="text-[10px] font-bold opacity-100">RAVOYI KITCHEN • AUTHENTIC TASTE</p>
+               </div>
+            </div>
+          </>
+        )}
       </div>
 
       <style jsx global>{`
