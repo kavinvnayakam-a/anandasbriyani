@@ -353,7 +353,7 @@ export default function AnalyticsDashboard() {
 
           <div className="p-8 bg-zinc-900 flex flex-col gap-4">
              <button onClick={executePrint} className="w-full py-5 bg-[#b8582e] text-white rounded-2xl font-black uppercase text-xs flex items-center justify-center gap-3 shadow-xl hover:bg-zinc-900 transition-all">
-                <Printer size={18} /> Execute Report Print
+                <Printer size={18} /> Execute RTP-81 Print
              </button>
           </div>
         </DialogContent>

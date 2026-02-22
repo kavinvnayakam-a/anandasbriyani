@@ -41,7 +41,7 @@ const DEFAULT_PRINT_SETTINGS: PrintSettings = {
   footerMessage: "Thank you for visiting RAVOYI! Savor the spice.",
   paperWidth: '80mm',
   triggerCashDrawer: false,
-  optimizedFor: "My POS MP301"
+  optimizedFor: "Restsol RTP-81"
 };
 
 export default function OrderManager() {
@@ -643,7 +643,7 @@ export default function OrderManager() {
 
           <div className="p-8 bg-zinc-900 flex flex-col gap-4">
              <button onClick={executePrint} className="w-full py-5 bg-[#b8582e] text-white rounded-2xl font-black uppercase text-xs flex items-center justify-center gap-3 shadow-xl hover:bg-zinc-900 transition-all">
-                <Printer size={18} /> Execute MP301 Print
+                <Printer size={18} /> Execute RTP-81 Print
              </button>
           </div>
         </DialogContent>
@@ -656,7 +656,7 @@ export default function OrderManager() {
                <Cpu className="text-[#b8582e] w-6 h-6" />
                <DialogTitle className="text-2xl font-black uppercase italic tracking-tighter text-zinc-900 leading-none">POS Hardware Config</DialogTitle>
             </div>
-            <DialogDescription className="text-xs text-zinc-400 uppercase font-bold">Optimized for My POS MP301 Thermal Series</DialogDescription>
+            <DialogDescription className="text-xs text-zinc-400 uppercase font-bold">Optimized for Restsol Thermal Printer RTP-81 (80mm)</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="grid grid-cols-2 gap-4">
@@ -698,7 +698,7 @@ export default function OrderManager() {
                 </Label>
                 <Label htmlFor="p-80" className={cn("flex items-center justify-center p-4 border-2 rounded-xl cursor-pointer font-bold", printSettings.paperWidth === '80mm' ? "border-[#b8582e] text-[#b8582e] bg-[#b8582e]/5" : "border-zinc-100 text-zinc-400")}>
                   <RadioGroupItem value="80mm" id="p-80" className="sr-only" />
-                  80mm (MP301)
+                  80mm (RTP-81)
                 </Label>
               </RadioGroup>
             </div>
