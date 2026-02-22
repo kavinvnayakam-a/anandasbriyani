@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect, useMemo } from 'react';
@@ -8,7 +9,7 @@ import {
 } from 'firebase/firestore';
 import { Order, MenuItem, CartItem } from '@/lib/types';
 import { 
-  Printer, Settings, Check, Clock, User, Phone, Banknote, Store, X, Save, Plus, Minus, Search, ShoppingBag, CreditCard, Smartphone, Loader2, ReceiptText, ShieldCheck, Wallet
+  Printer, Settings, Check, Clock, User, Phone, Banknote, Store, X, Save, Plus, Minus, Search, ShoppingBag, CreditCard, Smartphone, Loader2, ReceiptText, ShieldCheck, Wallet, Hash
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn, formatCurrency } from '@/lib/utils';
@@ -276,6 +277,9 @@ export default function OrderManager() {
         {pendingOrders.map((order) => {
           const cashInputVal = feedCashReceived[order.id] || "";
           const change = Math.max(0, (Number(cashInputVal) || order.totalPrice) - order.totalPrice);
+          const orderSubtotal = order.subtotal || (order.totalPrice / 1.05);
+          const orderCgst = order.cgst || ((order.totalPrice - orderSubtotal) / 2);
+          const orderSgst = order.sgst || ((order.totalPrice - orderSubtotal) / 2);
 
           return (
             <div key={order.id} className="bg-white border border-zinc-200 rounded-[2.5rem] p-8 flex flex-col transition-all shadow-lg hover:shadow-2xl hover:border-[#b8582e]/30 group">
@@ -296,7 +300,7 @@ export default function OrderManager() {
                 </div>
               </div>
 
-              <div className="space-y-4 mb-8">
+              <div className="space-y-4 mb-6">
                 <div className="flex items-center gap-3 p-4 bg-zinc-50 rounded-2xl border border-zinc-100">
                   <User size={16} className="text-[#b8582e]" />
                   <div className="flex flex-col">
@@ -304,10 +308,45 @@ export default function OrderManager() {
                     <span className="text-xs font-bold uppercase italic text-zinc-900">{order.customerName}</span>
                   </div>
                 </div>
+
+                {/* ITEM LIST */}
+                <div className="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
+                  <p className="text-[9px] font-black uppercase text-zinc-400 tracking-widest ml-1 mb-2">Order Items</p>
+                  {order.items.map((item, idx) => (
+                    <div key={idx} className="flex justify-between items-center p-3 bg-zinc-50 rounded-xl border border-zinc-100">
+                      <div className="flex items-center gap-3">
+                        <span className="text-[#b8582e] font-black italic text-xs">{item.quantity}x</span>
+                        <div className="flex flex-col">
+                          <span className="text-[10px] font-bold uppercase italic text-zinc-900 truncate max-w-[120px]">{item.name}</span>
+                          <span className="text-[8px] font-bold text-zinc-400 uppercase">MRP: ₹{item.price}</span>
+                        </div>
+                      </div>
+                      <span className="text-[10px] font-black text-zinc-900">₹{item.price * item.quantity}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* TAX BREAKDOWN */}
+                <div className="p-4 bg-zinc-50 rounded-2xl border border-zinc-100 space-y-2">
+                  <p className="text-[9px] font-black uppercase text-zinc-400 tracking-widest leading-none mb-2">Order Summary</p>
+                  <div className="flex justify-between items-center text-[10px] font-bold text-zinc-500 uppercase">
+                    <span>Subtotal</span>
+                    <span>₹{orderSubtotal.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-[10px] font-bold text-zinc-400 uppercase">
+                    <span>CGST (2.5%)</span>
+                    <span>₹{orderCgst.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-[10px] font-bold text-zinc-400 uppercase">
+                    <span>SGST (2.5%)</span>
+                    <span>₹{orderSgst.toFixed(2)}</span>
+                  </div>
+                </div>
+
                 <div className="flex items-center gap-3 p-4 bg-[#b8582e]/5 rounded-2xl border border-[#b8582e]/10">
                   <Banknote size={16} className="text-[#b8582e]" />
                   <div className="flex flex-col">
-                    <span className="text-[9px] font-black uppercase text-zinc-400 tracking-widest leading-none">Total</span>
+                    <span className="text-[9px] font-black uppercase text-zinc-400 tracking-widest leading-none">Grand Total</span>
                     <span className="text-lg font-black italic text-[#b8582e] leading-none">₹{order.totalPrice} ({order.paymentMethod})</span>
                   </div>
                 </div>
@@ -762,6 +801,16 @@ export default function OrderManager() {
           #printable-receipt { position: absolute; left: 0; top: 0; margin: 0; padding: 0; }
           .print-cut-line { display: block; border-bottom: 1px dashed black; height: 1px; width: 100%; }
           @page { margin: 0; size: auto; }
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #e5e7eb;
+          border-radius: 10px;
         }
       `}</style>
     </div>
