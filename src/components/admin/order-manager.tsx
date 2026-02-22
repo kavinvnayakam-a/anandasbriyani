@@ -518,7 +518,7 @@ export default function OrderManager() {
                         <button onClick={() => handleRemoveItem(item.id)} className="p-1.5 hover:bg-white rounded-lg transition-colors text-zinc-400">
                           {item.quantity > 1 ? <Minus size={14} /> : <X size={14} />}
                         </button>
-                        <span className="text-xs font-black w-6 text-center">{item.quantity}</span>
+                        <span className="text-xs font-black w-6 text-center text-zinc-900">{item.quantity}</span>
                         <button onClick={() => handleAddItem(item)} className="p-1.5 hover:bg-white rounded-lg transition-colors text-[#b8582e]">
                           <Plus size={14} />
                         </button>
