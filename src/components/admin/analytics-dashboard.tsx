@@ -308,17 +308,17 @@ export default function AnalyticsDashboard() {
           </DialogHeader>
           
           <ScrollArea className="max-h-[60vh] p-10 bg-zinc-950 flex flex-col items-center">
-            <div id="printable-eod-report" className="bg-white text-black p-8 shadow-2xl font-mono text-[11px] w-[300px]">
-              <div className="text-center border-b border-dashed border-black pb-4 mb-4">
-                <h1 className="text-lg font-black uppercase">{printSettings?.storeName || 'RAVOYI KITCHEN'}</h1>
-                <p className="uppercase text-[9px]">{printSettings?.address}</p>
-                <p className="text-[9px] font-bold mt-2">DAILY SALES SUMMARY</p>
-                <p className="text-[10px] mt-1">DATE: {new Date(selectedDate).toLocaleDateString()}</p>
+            <div id="printable-eod-report" className="bg-white text-black p-8 shadow-2xl font-mono text-[13px] w-[300px] font-black">
+              <div className="text-center border-b-2 border-dashed border-black pb-4 mb-4">
+                <h1 className="text-2xl font-black uppercase">{printSettings?.storeName || 'RAVOYI KITCHEN'}</h1>
+                <p className="uppercase text-[10px] mt-1">{printSettings?.address}</p>
+                <p className="text-lg font-black mt-4 border-y border-black py-2">DAILY SALES SUMMARY</p>
+                <p className="text-[12px] mt-2 uppercase">DATE: {new Date(selectedDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
               </div>
 
-              <div className="space-y-2 border-b border-dashed border-black pb-4 mb-4">
+              <div className="space-y-3 border-b-2 border-dashed border-black pb-4 mb-4">
                 <div className="flex justify-between font-black">
-                  <span>TOTAL TRANSACTIONS</span>
+                  <span>TOTAL BILLS</span>
                   <span>{allOrders.length}</span>
                 </div>
                 <div className="flex justify-between">
@@ -326,17 +326,17 @@ export default function AnalyticsDashboard() {
                   <span>{formatCurrency(stats.revenue.subtotal)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>TOTAL TAX (GST)</span>
+                  <span>TAX (GST 5%)</span>
                   <span>{formatCurrency(stats.revenue.gst)}</span>
                 </div>
-                <div className="flex justify-between text-lg font-black border-t border-dashed border-black pt-2 mt-2">
+                <div className="flex justify-between text-2xl font-black border-t-2 border-black pt-3 mt-2">
                   <span>GRAND TOTAL</span>
                   <span>{formatCurrency(stats.revenue.total)}</span>
                 </div>
               </div>
 
-              <div className="space-y-2 mb-6">
-                <p className="font-black text-center mb-2 border-b border-black">PAYMENT SPLITS</p>
+              <div className="space-y-3 mb-6">
+                <p className="font-black text-center mb-3 border-b border-black text-sm">PAYMENT BREAKDOWN</p>
                 <div className="flex justify-between">
                   <span>UPI ({stats.payments.count_UPI || 0})</span>
                   <span>{formatCurrency(stats.payments.UPI || 0)}</span>
@@ -351,9 +351,9 @@ export default function AnalyticsDashboard() {
                 </div>
               </div>
 
-              <div className="text-center pt-4 border-t border-dashed border-black opacity-60">
-                <p className="italic text-[8px]">End of Day Audit Report • {new Date().toLocaleTimeString()}</p>
-                <p className="text-[7px] mt-1">RAVOYI Management System</p>
+              <div className="text-center pt-6 border-t-2 border-dashed border-black opacity-80">
+                <p className="italic text-[10px] uppercase">End of Day Audit Report • {new Date().toLocaleTimeString()}</p>
+                <p className="text-[9px] mt-2 font-black uppercase">RAVOYI Management System</p>
               </div>
             </div>
           </ScrollArea>
@@ -368,9 +368,9 @@ export default function AnalyticsDashboard() {
 
       <style jsx global>{`
         @media print {
-          body * { visibility: hidden; background: white !important; }
-          #printable-eod-report, #printable-eod-report * { visibility: visible; }
-          #printable-eod-report { position: absolute; left: 0; top: 0; margin: 0; padding: 0; width: 80mm !important; }
+          body * { visibility: hidden !important; background: white !important; }
+          #printable-eod-report, #printable-eod-report * { visibility: visible !important; }
+          #printable-eod-report { position: absolute !important; left: 0 !important; top: 0 !important; margin: 0 !important; padding: 0 !important; width: 80mm !important; }
           @page { margin: 0; size: auto; }
         }
       `}</style>
