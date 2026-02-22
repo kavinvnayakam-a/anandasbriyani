@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect, useMemo } from 'react';
@@ -666,6 +665,11 @@ export default function OrderManager() {
                 <Label className="text-[10px] font-black uppercase text-zinc-400">Phone</Label>
                 <Input value={printSettings.phone || ""} onChange={(e) => setPrintSettings({...printSettings, phone: e.target.value})} className="rounded-xl border-2 font-bold text-black" />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black uppercase text-zinc-400">Store Address</Label>
+              <Input value={printSettings.address || ""} onChange={(e) => setPrintSettings({...printSettings, address: e.target.value})} className="rounded-xl border-2 font-bold text-black" placeholder="Full address with pincode" />
             </div>
 
             <div className="space-y-2">
