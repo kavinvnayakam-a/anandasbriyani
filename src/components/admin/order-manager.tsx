@@ -545,7 +545,7 @@ export default function OrderManager() {
               style={{ width: '300px' }}
             >
               <div className="text-center border-b-2 border-dashed border-black pb-4 mb-4">
-                <h1 className="text-2xl font-black uppercase">{printSettings.storeName}</h1>
+                <h1 className="text-xl font-black uppercase">{printSettings.storeName}</h1>
                 <p className="uppercase text-[10px] mt-1">{printSettings.address}</p>
                 <p className="text-[10px] mt-1">Tel: {printSettings.phone}</p>
                 <div className="flex justify-center gap-4 mt-2 text-[10px] font-bold">
@@ -620,7 +620,7 @@ export default function OrderManager() {
               style={{ width: '300px' }}
             >
               <p className="text-[12px] font-black uppercase tracking-widest mb-2">Collection Token</p>
-              <h2 className="text-7xl font-black italic">#{printingOrder?.orderNumber}</h2>
+              <h2 className="text-6xl font-black italic">#{printingOrder?.orderNumber}</h2>
               <div className="mt-6 pt-6 border-t-2 border-dashed border-black">
                  <p className="text-xl font-black uppercase">{printingOrder?.customerName}</p>
                  <p className="text-[10px] mt-2 font-bold opacity-60 uppercase">RAVOYI KITCHEN</p>
@@ -712,7 +712,7 @@ export default function OrderManager() {
       <div id="printable-receipt" className="hidden print:block font-mono text-black font-black" style={{ width: '80mm' }}>
         <div className="receipt-section p-2">
           <div className="text-center border-b-4 border-dashed border-black pb-6 mb-6">
-            <h1 className="text-3xl font-black uppercase leading-tight">{printSettings.storeName}</h1>
+            <h1 className="text-xl font-black uppercase leading-tight">{printSettings.storeName}</h1>
             <p className="text-[12px] font-black uppercase mt-2">{printSettings.address}</p>
             <p className="text-[12px] font-black mt-1">Tel: {printSettings.phone}</p>
             <div className="flex justify-center gap-4 mt-4 text-[12px] font-black">
@@ -724,7 +724,7 @@ export default function OrderManager() {
           {printingOrder && (
             <>
               <div className="py-4 border-b-4 border-dashed border-black text-[14px] font-black uppercase">
-                <div className="flex justify-between text-2xl mb-2">
+                <div className="flex justify-between text-lg mb-2">
                   <span>ORDER: #{printingOrder.orderNumber}</span>
                   <span>{formatOrderTime(printingOrder.timestamp)}</span>
                 </div>
@@ -743,9 +743,9 @@ export default function OrderManager() {
                 </div>
                 {printingOrder.items.map((item, idx) => (
                   <div key={idx} className="grid grid-cols-12 gap-1 mb-3 leading-tight">
-                    <span className="col-span-2 text-xl">{item.quantity}x</span>
-                    <span className="col-span-7 text-lg">{item.name}</span>
-                    <span className="col-span-3 text-right text-lg">₹{item.price * item.quantity}</span>
+                    <span className="col-span-2 text-base">{item.quantity}x</span>
+                    <span className="col-span-7 text-sm">{item.name}</span>
+                    <span className="col-span-3 text-right text-sm">₹{item.price * item.quantity}</span>
                   </div>
                 ))}
               </div>
@@ -765,7 +765,7 @@ export default function OrderManager() {
                     <span>₹{printingOrder.sgst?.toFixed(2) || ((printingOrder.totalPrice - (printingOrder.totalPrice / 1.05))/2).toFixed(2)}</span>
                   </div>
                 </div>
-                <div className="text-4xl font-black border-t-4 border-black pt-4 mt-2 flex justify-between">
+                <div className="text-2xl font-black border-t-4 border-black pt-4 mt-2 flex justify-between">
                    <span>TOTAL:</span>
                    <span>₹{printingOrder.totalPrice}</span>
                 </div>
@@ -781,11 +781,11 @@ export default function OrderManager() {
         <div className="print-cut-line" style={{ pageBreakAfter: 'always', borderBottom: '4px dashed #000', margin: '40px 0' }} />
 
         <div className="token-section p-10 text-center font-black">
-           <p className="text-[16px] font-black uppercase mb-6 tracking-widest">Collection Token</p>
-           <h1 className="text-[100px] font-black italic leading-none">#{printingOrder?.orderNumber}</h1>
+           <p className="text-sm font-black uppercase mb-6 tracking-widest">Collection Token</p>
+           <h1 className="text-6xl font-black italic leading-none">#{printingOrder?.orderNumber}</h1>
            <div className="mt-10 pt-10 border-t-4 border-dashed border-black uppercase">
-              <p className="text-3xl font-black mb-2">{printingOrder?.customerName}</p>
-              <p className="text-[14px] font-black opacity-100">RAVOYI KITCHEN • AUTHENTIC TASTE</p>
+              <p className="text-xl font-black mb-2">{printingOrder?.customerName}</p>
+              <p className="text-[12px] font-black opacity-100">RAVOYI KITCHEN • AUTHENTIC TASTE</p>
            </div>
         </div>
       </div>
