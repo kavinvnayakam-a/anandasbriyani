@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils";
 
 const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/dasara-finedine.firebasestorage.app/o/RAVOYI%20LOGO.pdf.webp?alt=media&token=f09f33b3-b303-400e-bbc4-b5dca418c8af";
 
-// Re-using the same decoration component for brand consistency
 const HangingDecoration = ({ className, delay = "0s", height = "h-32", type = "lantern" }: { className?: string, delay?: string, height?: string, type?: "lantern" | "moon" | "star" }) => (
   <div 
     className={cn("absolute flex flex-col items-center z-10", className)}
@@ -60,7 +59,7 @@ export default function ThankYouPage() {
         <HangingDecoration className="right-[8%]" height="h-20" type="star" delay="1.8s" />
       </div>
 
-      <div className="w-full max-w-md space-y-12 text-center relative z-20 pt-16">
+      <div className="w-full max-w-md space-y-10 text-center relative z-20 pt-16">
         
         {/* MASSIVE BRAND LOGO */}
         <div className="relative flex justify-center">
@@ -69,29 +68,38 @@ export default function ThankYouPage() {
             <Image 
               src={LOGO_URL} 
               alt="RAVOYI Logo" 
-              width={180} 
-              height={180}
+              width={160} 
+              height={160}
               className="rounded-full" 
               priority
             />
           </div>
         </div>
 
+        {/* GetPik Branding Relocated */}
+        <Link href="https://www.getpik.in/pos" target="_blank" className="flex flex-col items-center gap-3 group">
+          <span className="text-[8px] font-black uppercase tracking-[0.6em] text-white/40">Digital Experience By</span>
+          <div className="flex items-center gap-3 bg-black px-6 py-2.5 rounded-full shadow-2xl border border-white/10">
+            <span className="text-white font-black text-sm tracking-tighter">GetPik</span>
+            <div className="w-1.5 h-1.5 rounded-full bg-[#b8582e] shadow-[0_0_10px_#fff] animate-pulse" />
+          </div>
+        </Link>
+
         <div className="space-y-6">
-          <div className="flex flex-col items-center gap-3">
-             <Heart size={20} fill="currentColor" className="text-white animate-pulse" />
-             <h2 className="text-[12px] font-black uppercase tracking-[0.6em] text-white/80">Thank You</h2>
+          <div className="flex flex-col items-center gap-2">
+             <Heart size={16} fill="currentColor" className="text-white animate-pulse" />
+             <h2 className="text-[10px] font-black uppercase tracking-[0.6em] text-white/80">Thank You</h2>
           </div>
           
-          <h1 className="text-5xl md:text-6xl font-black italic text-white leading-[0.9] uppercase tracking-tighter drop-shadow-xl">
+          <h1 className="text-3xl md:text-4xl font-black italic text-white leading-[1.1] uppercase tracking-tighter drop-shadow-xl">
             We hope you <br /> <span className="text-black/60">Enjoyed it.</span>
           </h1>
-          <p className="text-white/60 text-[11px] font-bold italic tracking-widest uppercase">
+          <p className="text-white/60 text-[10px] font-bold italic tracking-widest uppercase">
             Your visit means the world to us.
           </p>
         </div>
 
-        {/* Review Card - Restyled to White */}
+        {/* Review Card */}
         <Link 
           href="https://maps.google.com" 
           target="_blank"
@@ -107,15 +115,6 @@ export default function ThankYouPage() {
           
           <div className="inline-flex items-center gap-3 bg-[#b8582e] text-white font-black text-[12px] uppercase tracking-[0.4em] px-8 py-4 rounded-full group-hover:bg-zinc-900 transition-all shadow-xl shadow-[#b8582e]/20">
             Open Maps <ArrowRight size={16} />
-          </div>
-        </Link>
-
-        {/* GetPik Branding */}
-        <Link href="https://www.getpik.in/pos" target="_blank" className="pt-8 flex flex-col items-center gap-4 group">
-          <span className="text-[9px] font-black uppercase tracking-[0.6em] text-white/40">Digital Experience By</span>
-          <div className="flex items-center gap-4 bg-black px-12 py-5 rounded-full shadow-2xl border border-white/10">
-            <span className="text-white font-black text-2xl tracking-tighter">GetPik</span>
-            <div className="w-2 h-2 rounded-full bg-[#b8582e] shadow-[0_0_15px_#fff] animate-pulse" />
           </div>
         </Link>
       </div>
