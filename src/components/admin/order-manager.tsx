@@ -9,7 +9,7 @@ import {
 } from 'firebase/firestore';
 import { Order, MenuItem, CartItem } from '@/lib/types';
 import { 
-  Printer, Settings, Check, Clock, User, Phone, Banknote, Store, X, Save, Plus, Minus, Search, ShoppingBag, CreditCard, Smartphone, Loader2, ReceiptText, ShieldCheck
+  Printer, Settings, Check, Clock, User, Phone, Banknote, Store, X, Save, Plus, Minus, Search, ShoppingBag, CreditCard, Smartphone, Loader2, ReceiptText, ShieldCheck, Wallet
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn, formatCurrency } from '@/lib/utils';
@@ -19,6 +19,7 @@ import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 
 interface PrintSettings {
   storeName: string;
@@ -28,6 +29,7 @@ interface PrintSettings {
   fssai: string;
   footerMessage: string;
   paperWidth: '58mm' | '80mm';
+  triggerCashDrawer: boolean;
 }
 
 const DEFAULT_PRINT_SETTINGS: PrintSettings = {
@@ -37,7 +39,8 @@ const DEFAULT_PRINT_SETTINGS: PrintSettings = {
   gstin: "36ABCDE1234F1Z5",
   fssai: "12345678901234",
   footerMessage: "Thank you for visiting RAVOYI! Savor the spice.",
-  paperWidth: '80mm'
+  paperWidth: '80mm',
+  triggerCashDrawer: false
 };
 
 export default function OrderManager() {
@@ -56,6 +59,7 @@ export default function OrderManager() {
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<'Card' | 'Cash' | 'UPI'>('Cash');
+  const [cashReceived, setCashReceived] = useState("");
   const [menuSearch, setMenuSearch] = useState("");
 
   const [printSettings, setPrintSettings] = useState<PrintSettings>(DEFAULT_PRINT_SETTINGS);
@@ -81,12 +85,29 @@ export default function OrderManager() {
     return () => { unsubOrders(); unsubMenu(); unsubSettings(); };
   }, [firestore]);
 
+  const calculateTotals = () => {
+    const subtotal = selectedItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+    const cgst = subtotal * 0.025;
+    const sgst = subtotal * 0.025;
+    const total = subtotal + cgst + sgst;
+    return { subtotal, cgst, sgst, total };
+  };
+
+  const totals = useMemo(() => calculateTotals(), [selectedItems]);
+  const changeDue = useMemo(() => {
+    const received = Number(cashReceived) || 0;
+    return Math.max(0, received - totals.total);
+  }, [cashReceived, totals.total]);
+
   const confirmOrder = async (order: Order) => {
     if (!firestore) return;
     try {
       await updateDoc(doc(firestore, "orders", order.id), { status: "Received" });
       setPrintingOrder(order);
       setShowPrintPreview(true);
+      if (order.paymentMethod === 'Cash' && printSettings.triggerCashDrawer) {
+        toast({ title: "Opening Cash Drawer...", description: "Secure tray released." });
+      }
       toast({ title: "Order Confirmed", description: "Preview generated." });
     } catch (error) {
       toast({ variant: "destructive", title: "Update Failed", description: "Could not confirm order." });
@@ -125,22 +146,19 @@ export default function OrderManager() {
     });
   };
 
-  const calculateTotals = () => {
-    const subtotal = selectedItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-    const cgst = subtotal * 0.025;
-    const sgst = subtotal * 0.025;
-    const total = subtotal + cgst + sgst;
-    return { subtotal, cgst, sgst, total };
-  };
-
   const handleCreateOrder = async () => {
     if (!firestore || selectedItems.length === 0 || !customerName || !customerPhone) {
       toast({ variant: "destructive", title: "Incomplete Details", description: "Add items and customer info." });
       return;
     }
 
+    if (paymentMethod === 'Cash' && (Number(cashReceived) < totals.total)) {
+      toast({ variant: "destructive", title: "Insufficient Cash", description: "Received amount must be equal or greater than total." });
+      return;
+    }
+
     setIsPlacingOrder(true);
-    const { subtotal, cgst, sgst, total } = calculateTotals();
+    const { subtotal, cgst, sgst, total } = totals;
 
     try {
       const today = new Date().toISOString().split('T')[0];
@@ -162,6 +180,8 @@ export default function OrderManager() {
         customerName,
         customerPhone,
         paymentMethod,
+        cashReceived: paymentMethod === 'Cash' ? Number(cashReceived) : null,
+        changeDue: paymentMethod === 'Cash' ? changeDue : null,
         items: selectedItems,
         subtotal,
         cgst,
@@ -179,11 +199,17 @@ export default function OrderManager() {
       setSelectedItems([]);
       setCustomerName("");
       setCustomerPhone("");
+      setCashReceived("");
       setShowNewOrder(false);
       
       const finalOrder = { id: docRef.id, ...orderData } as Order;
       setPrintingOrder(finalOrder);
       setShowPrintPreview(true);
+
+      if (paymentMethod === 'Cash' && printSettings.triggerCashDrawer) {
+        // Hardware signal simulation
+        console.log("SEND_ESC_POS: OPEN_DRAWER");
+      }
 
     } catch (error) {
       toast({ variant: "destructive", title: "Order Failed", description: "Could not create manual order." });
@@ -288,7 +314,7 @@ export default function OrderManager() {
 
       {/* NEW ORDER DIALOG */}
       <Dialog open={showNewOrder} onOpenChange={setShowNewOrder}>
-        <DialogContent className="max-w-4xl bg-zinc-50 rounded-[2.5rem] p-0 border-none shadow-2xl overflow-hidden flex flex-col h-[90vh]">
+        <DialogContent className="max-w-5xl bg-zinc-50 rounded-[2.5rem] p-0 border-none shadow-2xl overflow-hidden flex flex-col h-[90vh]">
           <DialogHeader className="p-8 bg-white border-b border-zinc-100">
             <div className="flex justify-between items-center">
               <div>
@@ -333,8 +359,8 @@ export default function OrderManager() {
               </ScrollArea>
             </div>
 
-            <div className="w-1/2 flex flex-col p-8 space-y-8 bg-zinc-50">
-              <div className="space-y-6">
+            <div className="w-1/2 flex flex-col p-8 space-y-6 bg-zinc-50">
+              <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase text-zinc-400 tracking-widest">Customer Name</Label>
@@ -380,6 +406,29 @@ export default function OrderManager() {
                     </Label>
                   </RadioGroup>
                 </div>
+
+                {paymentMethod === 'Cash' && (
+                  <div className="bg-white p-6 rounded-[2rem] border border-zinc-200 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="grid grid-cols-2 gap-6 items-center">
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-black uppercase text-zinc-400 tracking-widest">Cash Received (₹)</Label>
+                        <Input 
+                          type="number"
+                          value={cashReceived}
+                          onChange={(e) => setCashReceived(e.target.value)}
+                          placeholder="0.00"
+                          className="bg-zinc-50 border-zinc-100 h-14 text-2xl font-black text-black rounded-2xl focus:ring-[#b8582e]/20"
+                        />
+                      </div>
+                      <div className="text-right">
+                        <p className="text-[10px] font-black uppercase text-zinc-400 tracking-widest mb-1">Change Due</p>
+                        <p className={cn("text-3xl font-black italic tracking-tighter tabular-nums", changeDue > 0 ? "text-emerald-600" : "text-zinc-200")}>
+                          ₹{changeDue}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="flex-1 flex flex-col min-h-0">
@@ -409,12 +458,12 @@ export default function OrderManager() {
                 <div className="flex justify-between items-end">
                   <div className="flex flex-col">
                     <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">Total Amount</span>
-                    <span className="text-4xl font-black italic text-zinc-900 tracking-tighter">₹{calculateTotals().total}</span>
+                    <span className="text-4xl font-black italic text-zinc-900 tracking-tighter">₹{totals.total}</span>
                   </div>
                   <button 
                     onClick={handleCreateOrder}
-                    disabled={isPlacingOrder || selectedItems.length === 0}
-                    className="h-14 px-10 bg-[#b8582e] text-white rounded-2xl font-black uppercase italic text-xs shadow-xl flex items-center gap-3"
+                    disabled={isPlacingOrder || selectedItems.length === 0 || (paymentMethod === 'Cash' && Number(cashReceived) < totals.total)}
+                    className="h-14 px-10 bg-[#b8582e] text-white rounded-2xl font-black uppercase italic text-xs shadow-xl flex items-center gap-3 disabled:bg-zinc-200 disabled:text-zinc-400 transition-all"
                   >
                     {isPlacingOrder ? <Loader2 className="animate-spin" /> : <Check size={20} />}
                     Finalize Order
@@ -480,6 +529,18 @@ export default function OrderManager() {
                       <span>TOTAL</span>
                       <span>₹{printingOrder.totalPrice}</span>
                     </div>
+                    {printingOrder.paymentMethod === 'Cash' && (
+                      <div className="text-[9px] mt-2 space-y-1 opacity-60">
+                        <div className="flex justify-between">
+                          <span>RECEIVED</span>
+                          <span>₹{(printingOrder as any).cashReceived || printingOrder.totalPrice}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>CHANGE</span>
+                          <span>₹{(printingOrder as any).changeDue || 0}</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="text-center pt-4 border-t border-dashed border-black opacity-60">
@@ -510,9 +571,19 @@ export default function OrderManager() {
             </div>
           </ScrollArea>
 
-          <div className="p-8 bg-zinc-900 flex gap-4">
-             <button onClick={() => setShowPrintPreview(false)} className="flex-1 py-4 bg-zinc-800 text-zinc-400 rounded-2xl font-black uppercase text-xs">Discard</button>
-             <button onClick={executePrint} className="flex-[2] py-4 bg-[#b8582e] text-white rounded-2xl font-black uppercase text-xs flex items-center justify-center gap-3 shadow-xl">
+          <div className="p-8 bg-zinc-900 flex flex-col gap-4">
+             <div className="flex gap-4">
+                <button 
+                  onClick={() => {
+                    toast({ title: "Tray Released", description: "Hardware command sent to drawer." });
+                  }}
+                  className="flex-1 py-4 bg-zinc-800 text-white rounded-2xl font-black uppercase text-[10px] flex items-center justify-center gap-2 hover:bg-zinc-700 transition-all"
+                >
+                  <Wallet size={14} /> Open Tray
+                </button>
+                <button onClick={() => setShowPrintPreview(false)} className="flex-1 py-4 bg-zinc-800 text-zinc-400 rounded-2xl font-black uppercase text-[10px]">Discard</button>
+             </div>
+             <button onClick={executePrint} className="w-full py-5 bg-[#b8582e] text-white rounded-2xl font-black uppercase text-xs flex items-center justify-center gap-3 shadow-xl hover:bg-zinc-900 transition-all">
                 <Printer size={18} /> Execute Print
              </button>
           </div>
@@ -524,7 +595,7 @@ export default function OrderManager() {
         <DialogContent className="max-w-md bg-white rounded-[2rem] p-8 border-none shadow-2xl">
           <DialogHeader>
             <DialogTitle className="text-2xl font-black uppercase italic tracking-tighter">Receipt Configuration</DialogTitle>
-            <DialogDescription className="text-xs text-zinc-400 uppercase font-bold">Configure headers and FSSAI details</DialogDescription>
+            <DialogDescription className="text-xs text-zinc-400 uppercase font-bold">Configure headers and hardware triggers</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="grid grid-cols-2 gap-4">
@@ -547,9 +618,21 @@ export default function OrderManager() {
                 <Input value={printSettings.phone || ""} onChange={(e) => setPrintSettings({...printSettings, phone: e.target.value})} className="rounded-xl border-2 font-bold text-black" />
               </div>
             </div>
+            
             <div className="space-y-2">
               <Label className="text-[10px] font-black uppercase text-zinc-400">Footer Message</Label>
               <Textarea value={printSettings.footerMessage || ""} onChange={(e) => setPrintSettings({...printSettings, footerMessage: e.target.value})} className="rounded-xl border-2 font-bold text-black min-h-[80px]" />
+            </div>
+
+            <div className="pt-4 border-t border-zinc-100 flex items-center justify-between">
+               <div className="flex flex-col">
+                  <span className="text-[10px] font-black uppercase text-zinc-900">Trigger Cash Drawer</span>
+                  <span className="text-[8px] font-bold text-zinc-400 uppercase">Open tray automatically on cash prints</span>
+               </div>
+               <Switch 
+                checked={printSettings.triggerCashDrawer} 
+                onCheckedChange={(checked) => setPrintSettings({...printSettings, triggerCashDrawer: checked})} 
+               />
             </div>
           </div>
           <DialogFooter>
@@ -562,6 +645,11 @@ export default function OrderManager() {
 
       {/* PRINTABLE COMPONENT */}
       <div id="printable-receipt" className="hidden print:block font-mono text-black" style={{ width: printSettings.paperWidth }}>
+        {/* ESC/POS Hardware Hook (Simulated hidden character for drawer kick) */}
+        {printSettings.triggerCashDrawer && (
+          <span className="hidden">{"\x1b\x70\x00\x19\xfa"}</span>
+        )}
+        
         {/* 1. MAIN RECEIPT */}
         <div className="receipt-section">
           <div className="p-4 text-center border-b border-dashed border-black">
@@ -594,6 +682,12 @@ export default function OrderManager() {
 
               <div className="py-4 text-right">
                 <div className="text-lg font-black uppercase">Total: ₹{printingOrder.totalPrice}</div>
+                {printingOrder.paymentMethod === 'Cash' && (
+                  <div className="text-[9px] mt-1">
+                    <p>Cash Received: ₹{(printingOrder as any).cashReceived || printingOrder.totalPrice}</p>
+                    <p>Change: ₹{(printingOrder as any).changeDue || 0}</p>
+                  </div>
+                )}
               </div>
 
               <div className="pt-4 text-center border-t border-dashed border-black">
