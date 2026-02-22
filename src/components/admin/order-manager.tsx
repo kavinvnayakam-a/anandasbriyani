@@ -448,17 +448,17 @@ export default function OrderManager() {
       {/* PRINT PREVIEW DIALOG */}
       <Dialog open={showPrintPreview} onOpenChange={setShowPrintPreview}>
         <DialogContent className="max-w-lg bg-zinc-900 border-zinc-800 p-0 overflow-hidden rounded-[3rem] shadow-2xl">
-          <div className="p-8 border-b border-zinc-800 flex justify-between items-center bg-black/40">
+          <DialogHeader className="p-8 border-b border-zinc-800 flex justify-between items-center bg-black/40">
              <div>
-                <h2 className="text-xl font-black uppercase italic text-white flex items-center gap-3">
+                <DialogTitle className="text-xl font-black uppercase italic text-white flex items-center gap-3">
                    <ReceiptText className="text-[#b8582e]" /> Receipt Preview
-                </h2>
-                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Verification Before Printing</p>
+                </DialogTitle>
+                <DialogDescription className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Verification Before Printing</DialogDescription>
              </div>
              <button onClick={() => setShowPrintPreview(false)} className="p-2 text-zinc-500 hover:text-white">
                 <X size={20} />
              </button>
-          </div>
+          </DialogHeader>
           
           <ScrollArea className="max-h-[60vh] p-10 bg-zinc-950 flex justify-center">
             {/* Virtual Thermal Paper */}
@@ -548,6 +548,7 @@ export default function OrderManager() {
         <DialogContent className="max-w-md bg-white rounded-[2rem] p-8 border-none shadow-2xl">
           <DialogHeader>
             <DialogTitle className="text-2xl font-black uppercase italic tracking-tighter">Receipt Configuration</DialogTitle>
+            <DialogDescription className="sr-only">Configure thermal printer receipt template</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="grid gap-2">
