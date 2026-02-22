@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect } from 'react';
-import { Heart, Instagram, MessageCircle, Facebook, Star, QrCode, ArrowRight, Moon } from "lucide-react";
+import { Heart, Star, ArrowRight, Moon } from "lucide-react";
 import Link from 'next/link';
 import Image from 'next/image';
 import { cn } from "@/lib/utils";
@@ -52,7 +52,7 @@ export default function ThankYouPage() {
         }
       `}</style>
 
-      {/* 🏮 RAMADAN DECORATIONS (Same as Customer View) */}
+      {/* 🏮 DECORATIONS */}
       <div className="absolute top-0 left-0 w-full h-64 overflow-hidden pointer-events-none z-10">
         <HangingDecoration className="left-[8%]" height="h-24" type="moon" delay="0s" />
         <HangingDecoration className="left-[25%]" height="h-16" type="star" delay="1s" />
@@ -79,33 +79,33 @@ export default function ThankYouPage() {
 
         <div className="space-y-6">
           <div className="flex flex-col items-center gap-3">
-             <Star size={16} fill="currentColor" className="text-white animate-pulse" />
-             <h2 className="text-[12px] font-black uppercase tracking-[0.6em] text-white/80">Ramadan Mubarak</h2>
+             <Heart size={20} fill="currentColor" className="text-white animate-pulse" />
+             <h2 className="text-[12px] font-black uppercase tracking-[0.6em] text-white/80">Thank You</h2>
           </div>
           
           <h1 className="text-5xl md:text-6xl font-black italic text-white leading-[0.9] uppercase tracking-tighter drop-shadow-xl">
-            A Blessed Meal, <br /> <span className="text-black/60">Shubh Iftar.</span>
+            We hope you <br /> <span className="text-black/60">Enjoyed it.</span>
           </h1>
           <p className="text-white/60 text-[11px] font-bold italic tracking-widest uppercase">
-            "Blessings in every bite, traditions in every spice."
+            Your visit means the world to us.
           </p>
         </div>
 
-        {/* Review Card */}
+        {/* Review Card - Restyled to White */}
         <Link 
           href="https://maps.google.com" 
           target="_blank"
-          className="block w-full bg-black/90 backdrop-blur-2xl p-10 rounded-[3.5rem] shadow-2xl border border-white/10 group transition-all duration-500"
+          className="block w-full bg-white p-10 rounded-[3.5rem] shadow-2xl border border-white/10 group transition-all duration-500 hover:scale-[1.02]"
         >
           <div className="flex items-center justify-center gap-1.5 mb-5">
             {[...Array(5)].map((_, i) => (
               <Star key={i} className="h-6 w-6 fill-[#b8582e] text-[#b8582e]" />
             ))}
           </div>
-          <p className="font-black italic uppercase text-white text-xl mb-1 tracking-tighter">Loved the spices?</p>
-          <p className="text-[10px] text-white/40 mb-8 font-black uppercase tracking-widest">Rate your experience on Google</p>
+          <p className="font-black italic uppercase text-zinc-900 text-xl mb-1 tracking-tighter">Loved the taste?</p>
+          <p className="text-[10px] text-zinc-400 mb-8 font-black uppercase tracking-widest">Rate your experience on Google</p>
           
-          <div className="inline-flex items-center gap-3 bg-white text-black font-black text-[12px] uppercase tracking-[0.4em] px-8 py-4 rounded-full group-hover:bg-[#b8582e] group-hover:text-white transition-all shadow-xl">
+          <div className="inline-flex items-center gap-3 bg-[#b8582e] text-white font-black text-[12px] uppercase tracking-[0.4em] px-8 py-4 rounded-full group-hover:bg-zinc-900 transition-all shadow-xl shadow-[#b8582e]/20">
             Open Maps <ArrowRight size={16} />
           </div>
         </Link>
