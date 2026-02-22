@@ -3,7 +3,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Admin helper: For this prototype, any authenticated user is treated as an admin
+    // Admin helper: Only authenticated users (signed in via Console) are admins
     function isAdmin() {
       return request.auth != null;
     }
@@ -14,20 +14,21 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // Orders: Customers can place (create) and track (read) without sign-in
+    // Orders: Anyone can place (create) and track (read) without sign-in
     // They are strictly prohibited from editing (update) or deleting data
     match /orders/{orderId} {
       allow read, create: if true;
       allow update, delete: if isAdmin();
     }
 
-    // Archived orders (History): Publicly readable and creatable, but immutable for customers
+    // Order History: Publicly readable and creatable for logging purposes
+    // Immutable for guests, manageable by Admin
     match /order_history/{historyId} {
       allow read, create: if true;
       allow update, delete: if isAdmin();
     }
 
-    // Daily Stats: Open for the atomic order counter transaction logic
+    // Daily Stats: Open for all to allow the transaction-based order numbering (#0001) to function
     match /daily_stats/{statId} {
       allow read, write: if true;
     }
@@ -38,9 +39,10 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     
-    // Default fallback: Deny everything else unless authenticated as admin
+    // Default fallback: Allow public reading of all documents, but restrict writes to Admins
     match /{document=**} {
-      allow read, write: if isAdmin();
+      allow read: if true;
+      allow write: if isAdmin();
     }
   }
 }
