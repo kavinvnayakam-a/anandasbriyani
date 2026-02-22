@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect, useRef } from "react";
@@ -9,7 +8,6 @@ import OrderManager from "@/components/admin/order-manager";
 import KotView from "@/components/admin/kot-view";
 import AnalyticsDashboard from "@/components/admin/analytics-dashboard";
 import OrderHistory from "@/components/admin/order-history"; 
-import AiMenuImporter from "@/components/admin/ai-menu-importer";
 import { useFirestore } from "@/firebase";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { collection, onSnapshot, query } from "firebase/firestore";
@@ -21,7 +19,6 @@ import {
   TrendingUp,
   Settings,
   ShieldCheck,
-  Sparkles,
   ChefHat,
   Store,
   PanelLeft,
@@ -43,7 +40,7 @@ import {
 
 const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/dasara-finedine.firebasestorage.app/o/RAVOYI%20LOGO.pdf.webp?alt=media&token=f09f33b3-b303-400e-bbc4-b5dca418c8af";
 
-type TabType = 'counter' | 'packing' | 'history' | 'menu' | 'analytics' | 'ai-import';
+type TabType = 'counter' | 'packing' | 'history' | 'menu' | 'analytics';
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -96,7 +93,6 @@ export default function AdminDashboard() {
     { id: 'packing', label: 'Kitchen Packing', icon: ChefHat },
     { id: 'history', label: 'Order Archives', icon: Clock },
     { id: 'menu', label: 'Menu Config', icon: Settings },
-    { id: 'ai-import', label: 'AI Importer', icon: Sparkles },
     { id: 'analytics', label: 'Business', icon: TrendingUp },
   ];
 
@@ -186,7 +182,7 @@ export default function AdminDashboard() {
                   Console / {activeTab}
                 </span>
                 <h2 className="text-3xl font-black italic uppercase text-zinc-900 tracking-tighter leading-none mt-1">
-                  {activeTab === 'counter' ? 'Counter Feed' : activeTab === 'packing' ? 'Packing KOT' : activeTab === 'menu' ? 'Menu Settings' : activeTab === 'history' ? 'Order Archives' : activeTab === 'ai-import' ? 'AI Digitizer' : 'Business Insights'}
+                  {activeTab === 'counter' ? 'Counter Feed' : activeTab === 'packing' ? 'Packing KOT' : activeTab === 'menu' ? 'Menu Settings' : activeTab === 'history' ? 'Order Archives' : 'Business Insights'}
                 </h2>
               </div>
             </div>
@@ -215,7 +211,6 @@ export default function AdminDashboard() {
               {activeTab === 'packing' && <KotView />}
               {activeTab === 'history' && <OrderHistory />}
               {activeTab === 'menu' && <MenuManager />}
-              {activeTab === 'ai-import' && <AiMenuImporter />}
               {activeTab === 'analytics' && <AnalyticsDashboard />}
             </div>
 

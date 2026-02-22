@@ -16,14 +16,20 @@ import {
     Receipt,
     Wallet,
     CreditCard,
-    Smartphone
+    Smartphone,
+    X,
+    ReceiptText
   } from 'lucide-react';
 import { formatCurrency, cn } from '@/lib/utils';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface PrintSettings {
   storeName: string;
   address: string;
   phone: string;
+  gstin: string;
+  fssai: string;
 }
 
 export default function AnalyticsDashboard() {
@@ -33,6 +39,7 @@ export default function AnalyticsDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [printSettings, setPrintSettings] = useState<PrintSettings | null>(null);
+  const [showPrintPreview, setShowPrintPreview] = useState(false);
   const firestore = useFirestore();
 
   useEffect(() => {
@@ -107,7 +114,12 @@ export default function AnalyticsDashboard() {
   );
 
   const handlePrintReport = () => {
+    setShowPrintPreview(true);
+  };
+
+  const executePrint = () => {
     window.print();
+    setShowPrintPreview(false);
   };
 
   return (
@@ -280,55 +292,79 @@ export default function AnalyticsDashboard() {
         </div>
       </div>
 
-      {/* HIDDEN PRINTABLE REPORT */}
-      <div id="printable-eod-report" className="hidden print:block font-mono text-black p-8 bg-white" style={{ width: '80mm' }}>
-        <div className="text-center border-b border-dashed border-black pb-4 mb-4">
-          <h1 className="text-lg font-black uppercase">{printSettings?.storeName || 'RAVOYI KITCHEN'}</h1>
-          <p className="uppercase text-[9px]">{printSettings?.address}</p>
-          <p className="text-[9px] font-bold mt-2">DAILY SALES SUMMARY</p>
-          <p className="text-[10px] mt-1">DATE: {new Date(selectedDate).toLocaleDateString()}</p>
-        </div>
+      {/* PRINT PREVIEW DIALOG */}
+      <Dialog open={showPrintPreview} onOpenChange={setShowPrintPreview}>
+        <DialogContent className="max-w-md bg-zinc-900 border-zinc-800 p-0 overflow-hidden rounded-[3rem] shadow-2xl">
+          <DialogHeader className="p-8 border-b border-zinc-800 flex justify-between items-center bg-black/40">
+             <div>
+                <DialogTitle className="text-xl font-black uppercase italic text-white flex items-center gap-3">
+                   <ReceiptText className="text-[#b8582e]" /> EOD Report Preview
+                </DialogTitle>
+                <DialogDescription className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Verify Daily Summary Before Printing</DialogDescription>
+             </div>
+             <button onClick={() => setShowPrintPreview(false)} className="p-2 text-zinc-500 hover:text-white">
+                <X size={20} />
+             </button>
+          </DialogHeader>
+          
+          <ScrollArea className="max-h-[60vh] p-10 bg-zinc-950 flex flex-col items-center">
+            <div id="printable-eod-report" className="bg-white text-black p-8 shadow-2xl font-mono text-[11px] w-[300px]">
+              <div className="text-center border-b border-dashed border-black pb-4 mb-4">
+                <h1 className="text-lg font-black uppercase">{printSettings?.storeName || 'RAVOYI KITCHEN'}</h1>
+                <p className="uppercase text-[9px]">{printSettings?.address}</p>
+                <p className="text-[9px] font-bold mt-2">DAILY SALES SUMMARY</p>
+                <p className="text-[10px] mt-1">DATE: {new Date(selectedDate).toLocaleDateString()}</p>
+              </div>
 
-        <div className="space-y-2 border-b border-dashed border-black pb-4 mb-4 text-[11px]">
-          <div className="flex justify-between font-black">
-            <span>TOTAL TRANSACTIONS</span>
-            <span>{allOrders.length}</span>
-          </div>
-          <div className="flex justify-between">
-            <span>NET SALES</span>
-            <span>{formatCurrency(stats.revenue.subtotal)}</span>
-          </div>
-          <div className="flex justify-between">
-            <span>TOTAL TAX (GST)</span>
-            <span>{formatCurrency(stats.revenue.gst)}</span>
-          </div>
-          <div className="flex justify-between text-lg font-black border-t border-dashed border-black pt-2 mt-2">
-            <span>GRAND TOTAL</span>
-            <span>{formatCurrency(stats.revenue.total)}</span>
-          </div>
-        </div>
+              <div className="space-y-2 border-b border-dashed border-black pb-4 mb-4">
+                <div className="flex justify-between font-black">
+                  <span>TOTAL TRANSACTIONS</span>
+                  <span>{allOrders.length}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>NET SALES</span>
+                  <span>{formatCurrency(stats.revenue.subtotal)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>TOTAL TAX (GST)</span>
+                  <span>{formatCurrency(stats.revenue.gst)}</span>
+                </div>
+                <div className="flex justify-between text-lg font-black border-t border-dashed border-black pt-2 mt-2">
+                  <span>GRAND TOTAL</span>
+                  <span>{formatCurrency(stats.revenue.total)}</span>
+                </div>
+              </div>
 
-        <div className="space-y-2 text-[11px] mb-6">
-          <p className="font-black text-center mb-2 border-b border-black">PAYMENT SPLITS</p>
-          <div className="flex justify-between">
-            <span>UPI ({stats.payments.count_UPI || 0})</span>
-            <span>{formatCurrency(stats.payments.UPI || 0)}</span>
-          </div>
-          <div className="flex justify-between">
-            <span>CASH ({stats.payments.count_Cash || 0})</span>
-            <span>{formatCurrency(stats.payments.Cash || 0)}</span>
-          </div>
-          <div className="flex justify-between">
-            <span>CARD ({stats.payments.count_Card || 0})</span>
-            <span>{formatCurrency(stats.payments.Card || 0)}</span>
-          </div>
-        </div>
+              <div className="space-y-2 mb-6">
+                <p className="font-black text-center mb-2 border-b border-black">PAYMENT SPLITS</p>
+                <div className="flex justify-between">
+                  <span>UPI ({stats.payments.count_UPI || 0})</span>
+                  <span>{formatCurrency(stats.payments.UPI || 0)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>CASH ({stats.payments.count_Cash || 0})</span>
+                  <span>{formatCurrency(stats.payments.Cash || 0)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>CARD ({stats.payments.count_Card || 0})</span>
+                  <span>{formatCurrency(stats.payments.Card || 0)}</span>
+                </div>
+              </div>
 
-        <div className="text-center pt-4 border-t border-dashed border-black opacity-60">
-          <p className="italic text-[8px]">End of Day Audit Report • {new Date().toLocaleTimeString()}</p>
-          <p className="text-[7px] mt-1">RAVOYI Management System</p>
-        </div>
-      </div>
+              <div className="text-center pt-4 border-t border-dashed border-black opacity-60">
+                <p className="italic text-[8px]">End of Day Audit Report • {new Date().toLocaleTimeString()}</p>
+                <p className="text-[7px] mt-1">RAVOYI Management System</p>
+              </div>
+            </div>
+          </ScrollArea>
+
+          <div className="p-8 bg-zinc-900 flex flex-col gap-4">
+             <button onClick={executePrint} className="w-full py-5 bg-[#b8582e] text-white rounded-2xl font-black uppercase text-xs flex items-center justify-center gap-3 shadow-xl hover:bg-zinc-900 transition-all">
+                <Printer size={18} /> Execute Report Print
+             </button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <style jsx global>{`
         @media print {
