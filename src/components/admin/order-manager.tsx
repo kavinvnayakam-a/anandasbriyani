@@ -8,7 +8,7 @@ import {
 } from 'firebase/firestore';
 import { Order, MenuItem, CartItem } from '@/lib/types';
 import { 
-  Printer, Settings, Check, Clock, User, Phone, Banknote, Store, X, Save, Plus, Minus, Search, ShoppingBag, CreditCard, Smartphone, Loader2
+  Printer, Settings, Check, Clock, User, Phone, Banknote, Store, X, Save, Plus, Minus, Search, ShoppingBag, CreditCard, Smartphone, Loader2, ReceiptText
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn, formatCurrency } from '@/lib/utils';
@@ -33,6 +33,7 @@ export default function OrderManager() {
   const [printingOrder, setPrintingOrder] = useState<Order | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [showNewOrder, setShowNewOrder] = useState(false);
+  const [showPrintPreview, setShowPrintPreview] = useState(false);
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const firestore = useFirestore();
   const { toast } = useToast();
@@ -80,11 +81,16 @@ export default function OrderManager() {
     try {
       await updateDoc(doc(firestore, "orders", order.id), { status: "Received" });
       setPrintingOrder(order);
-      toast({ title: "Order Confirmed", description: "Receipt generating..." });
-      setTimeout(() => { window.print(); }, 500);
+      setShowPrintPreview(true);
+      toast({ title: "Order Confirmed", description: "Preview generated." });
     } catch (error) {
       toast({ variant: "destructive", title: "Update Failed", description: "Could not confirm order." });
     }
+  };
+
+  const executePrint = () => {
+    window.print();
+    setShowPrintPreview(false);
   };
 
   const saveSettings = async () => {
@@ -156,14 +162,14 @@ export default function OrderManager() {
         cgst,
         sgst,
         totalPrice: total,
-        status: 'Received', // Counter orders are confirmed immediately
+        status: 'Received',
         timestamp: serverTimestamp(),
         createdAt: Date.now(),
       };
 
       const docRef = await addDoc(collection(firestore, "orders"), orderData);
       
-      toast({ title: `Order #${orderNumber} Created`, description: "Sending to kitchen." });
+      toast({ title: `Order #${orderNumber} Created`, description: "Opening preview." });
       
       // Reset State
       setSelectedItems([]);
@@ -171,10 +177,10 @@ export default function OrderManager() {
       setCustomerPhone("");
       setShowNewOrder(false);
       
-      // Print Receipt
+      // Open Preview
       const finalOrder = { id: docRef.id, ...orderData } as Order;
       setPrintingOrder(finalOrder);
-      setTimeout(() => { window.print(); }, 500);
+      setShowPrintPreview(true);
 
     } catch (error) {
       toast({ variant: "destructive", title: "Order Failed", description: "Could not create manual order." });
@@ -301,7 +307,6 @@ export default function OrderManager() {
           </DialogHeader>
 
           <div className="flex-1 flex overflow-hidden">
-            {/* Left Side: Menu Selection */}
             <div className="w-1/2 border-r border-zinc-200 flex flex-col bg-white">
               <div className="p-6 border-b border-zinc-100">
                 <div className="relative">
@@ -338,7 +343,6 @@ export default function OrderManager() {
               </ScrollArea>
             </div>
 
-            {/* Right Side: Order Summary & Customer Info */}
             <div className="w-1/2 flex flex-col p-8 space-y-8 bg-zinc-50">
               <div className="space-y-6">
                 <div className="grid grid-cols-2 gap-4">
@@ -441,7 +445,105 @@ export default function OrderManager() {
         </DialogContent>
       </Dialog>
 
-      {/* PRINT SETTINGS DIALOG */}
+      {/* PRINT PREVIEW DIALOG */}
+      <Dialog open={showPrintPreview} onOpenChange={setShowPrintPreview}>
+        <DialogContent className="max-w-lg bg-zinc-900 border-zinc-800 p-0 overflow-hidden rounded-[3rem] shadow-2xl">
+          <div className="p-8 border-b border-zinc-800 flex justify-between items-center bg-black/40">
+             <div>
+                <h2 className="text-xl font-black uppercase italic text-white flex items-center gap-3">
+                   <ReceiptText className="text-[#b8582e]" /> Receipt Preview
+                </h2>
+                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Verification Before Printing</p>
+             </div>
+             <button onClick={() => setShowPrintPreview(false)} className="p-2 text-zinc-500 hover:text-white">
+                <X size={20} />
+             </button>
+          </div>
+          
+          <ScrollArea className="max-h-[60vh] p-10 bg-zinc-950 flex justify-center">
+            {/* Virtual Thermal Paper */}
+            <div 
+              className="bg-white text-black p-8 shadow-2xl font-mono text-[11px] animate-in fade-in slide-in-from-top-full duration-1000" 
+              style={{ width: printSettings.paperWidth === '58mm' ? '220px' : '300px' }}
+            >
+              <div className="text-center border-b border-dashed border-black pb-4 mb-4">
+                <h1 className="text-lg font-black uppercase">{printSettings.storeName}</h1>
+                <p className="uppercase text-[9px] leading-tight">{printSettings.address}</p>
+                <p className="text-[9px]">Tel: {printSettings.phone}</p>
+                <p className="text-[9px] font-bold">GST: {printSettings.gstin}</p>
+              </div>
+
+              {printingOrder && (
+                <>
+                  <div className="mb-4 border-b border-dashed border-black pb-2">
+                    <div className="flex justify-between font-bold">
+                      <span>ORD: #{printingOrder.orderNumber}</span>
+                      <span>{formatOrderTime(printingOrder.timestamp)}</span>
+                    </div>
+                    <p className="truncate uppercase mt-1">CUST: {printingOrder.customerName}</p>
+                  </div>
+
+                  <div className="border-b border-dashed border-black pb-2 mb-2">
+                    <div className="grid grid-cols-12 font-bold mb-1 border-b border-black pb-1">
+                      <span className="col-span-2">QTY</span>
+                      <span className="col-span-7">ITEM</span>
+                      <span className="col-span-3 text-right">AMT</span>
+                    </div>
+                    {printingOrder.items.map((item, idx) => (
+                      <div key={idx} className="grid grid-cols-12 mb-1">
+                        <span className="col-span-2">{item.quantity}</span>
+                        <span className="col-span-7 uppercase truncate">{item.name}</span>
+                        <span className="col-span-3 text-right">₹{item.price * item.quantity}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="text-right space-y-1 mb-4">
+                    <div className="flex justify-between">
+                      <span>SUBTOTAL</span>
+                      <span>₹{printingOrder.subtotal?.toFixed(0) || (printingOrder.totalPrice / 1.05).toFixed(0)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>CGST (2.5%)</span>
+                      <span>₹{printingOrder.cgst?.toFixed(0) || (printingOrder.totalPrice * 0.025 / 1.05).toFixed(0)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>SGST (2.5%)</span>
+                      <span>₹{printingOrder.sgst?.toFixed(0) || (printingOrder.totalPrice * 0.025 / 1.05).toFixed(0)}</span>
+                    </div>
+                    <div className="flex justify-between border-t border-black pt-2 mt-2 font-black text-sm">
+                      <span>GRAND TOTAL</span>
+                      <span>₹{printingOrder.totalPrice}</span>
+                    </div>
+                  </div>
+
+                  <div className="text-center pt-4 border-t border-dashed border-black opacity-60">
+                    <p className="italic text-[8px]">{printSettings.footerMessage}</p>
+                    <p className="mt-2 font-black uppercase">Token #{printingOrder.orderNumber}</p>
+                  </div>
+                </>
+              )}
+            </div>
+          </ScrollArea>
+
+          <div className="p-8 bg-zinc-900 flex gap-4">
+             <button 
+               onClick={() => setShowPrintPreview(false)}
+               className="flex-1 py-4 bg-zinc-800 text-zinc-400 rounded-2xl font-black uppercase text-xs hover:bg-zinc-700 transition-all"
+             >
+                Discard
+             </button>
+             <button 
+               onClick={executePrint}
+               className="flex-[2] py-4 bg-[#b8582e] text-white rounded-2xl font-black uppercase text-xs flex items-center justify-center gap-3 shadow-xl hover:bg-white hover:text-black transition-all group"
+             >
+                <Printer size={18} className="group-hover:animate-bounce" /> Execute Print
+             </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* SETTINGS DIALOG */}
       <Dialog open={showSettings} onOpenChange={setShowSettings}>
         <DialogContent className="max-w-md bg-white rounded-[2rem] p-8 border-none shadow-2xl">
           <DialogHeader>
@@ -501,7 +603,7 @@ export default function OrderManager() {
         </DialogContent>
       </Dialog>
 
-      {/* PRINTABLE COMPONENT */}
+      {/* HIDDEN PRINTABLE COMPONENT */}
       <div id="printable-receipt" className="hidden print:block font-mono text-black" style={{ width: printSettings.paperWidth }}>
         <div className="p-4 text-center border-b border-dashed border-black">
           <h1 className="text-xl font-black uppercase">{printSettings.storeName}</h1>
