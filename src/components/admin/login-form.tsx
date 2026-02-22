@@ -34,9 +34,11 @@ export default function LoginForm() {
     e.preventDefault();
     setIsLoading(true);
     
+    const allowedEmails = ["info@getpik.in", "ravoyiatelanganakitchen@gmail.com"];
+    
     // Simulate authentication logic with strict email check
     setTimeout(() => {
-      if (email === "info@getpik.in" && password.length >= 4) {
+      if (allowedEmails.includes(email.toLowerCase().trim()) && password.length >= 4) {
         // 1. Grant Local Storage Auth
         setAuth(true);
         
@@ -101,7 +103,7 @@ export default function LoginForm() {
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300 w-4 h-4" />
                 <Input 
                   type="email" 
-                  placeholder="info@getpik.in" 
+                  placeholder="ravoyiatelanganakitchen@gmail.com" 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="pl-12 h-14 bg-zinc-50 border-zinc-100 rounded-2xl font-bold text-black placeholder:text-zinc-300 focus:ring-[#b8582e]/20 focus:border-[#b8582e] transition-all"
@@ -111,7 +113,7 @@ export default function LoginForm() {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-[10px) font-black uppercase tracking-widest text-zinc-400 ml-1">Security Key</Label>
+              <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Security Key</Label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300 w-4 h-4" />
                 <Input 
