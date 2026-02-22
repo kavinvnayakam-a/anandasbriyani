@@ -16,8 +16,8 @@ export function Header({ tableId }: HeaderProps) {
     <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur-xl border-b border-white/5 py-4 shadow-xl">
       <div className="container mx-auto flex items-center justify-between px-6">
         
-        {/* Brand Section: Logo stacked with Tagline */}
-        <div className="flex flex-col items-start gap-2">
+        {/* Brand Section: Logo stacked with Tagline (Center Aligned with each other) */}
+        <div className="flex flex-col items-center gap-2">
           <div className="
             relative 
             h-14 w-14           
@@ -39,7 +39,7 @@ export function Header({ tableId }: HeaderProps) {
             />
           </div>
           
-          <p className="text-[7px] font-black text-white/50 uppercase tracking-[0.4em] ml-1">
+          <p className="text-[7px] font-black text-white/50 uppercase tracking-[0.4em] text-center">
             A Telangana Kitchen
           </p>
         </div>
