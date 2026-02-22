@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useFirestore } from '@/firebase';
-import { collection, onSnapshot, query, where, Timestamp, getDocs, orderBy } from 'firebase/firestore';
+import { collection, onSnapshot, query, where, Timestamp, getDocs, orderBy, doc } from 'firebase/firestore';
 import { Order } from '@/lib/types';
 import { 
     Banknote, 
@@ -12,10 +12,19 @@ import {
     ArrowUpRight,
     ShoppingBag,
     Search,
-    Filter
+    Printer,
+    Receipt,
+    Wallet,
+    CreditCard,
+    Smartphone
   } from 'lucide-react';
 import { formatCurrency, cn } from '@/lib/utils';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+interface PrintSettings {
+  storeName: string;
+  address: string;
+  phone: string;
+}
 
 export default function AnalyticsDashboard() {
   const [liveOrders, setLiveOrders] = useState<Order[]>([]);
@@ -23,6 +32,7 @@ export default function AnalyticsDashboard() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
+  const [printSettings, setPrintSettings] = useState<PrintSettings | null>(null);
   const firestore = useFirestore();
 
   useEffect(() => {
@@ -43,6 +53,10 @@ export default function AnalyticsDashboard() {
     const unsubLive = onSnapshot(qLive, (snapshot) => {
       const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Order[];
       setLiveOrders(data);
+    });
+
+    const unsubSettings = onSnapshot(doc(firestore, "settings", "print_template"), (d) => {
+      if (d.exists()) setPrintSettings(d.data() as PrintSettings);
     });
 
     const fetchHistory = async () => {
@@ -67,15 +81,34 @@ export default function AnalyticsDashboard() {
     return () => unsubLive();
   }, [selectedDate, firestore]);
 
-  const allOrders = [...liveOrders, ...historyOrders];
-  const totalRevenue = allOrders.reduce((sum, order) => sum + (Number(order.totalPrice) || 0), 0);
-  const totalOrders = allOrders.length;
-  const averageOrderValue = totalOrders > 0 ? (totalRevenue / totalOrders) : 0;
-  
+  const allOrders = useMemo(() => [...liveOrders, ...historyOrders], [liveOrders, historyOrders]);
+
+  // Financial Calculations
+  const stats = useMemo(() => {
+    const revenue = allOrders.reduce((acc, order) => ({
+      total: acc.total + (Number(order.totalPrice) || 0),
+      subtotal: acc.subtotal + (Number((order as any).subtotal) || (Number(order.totalPrice) / 1.05)),
+      gst: acc.gst + (Number((order as any).cgst || 0) + Number((order as any).sgst || 0) || (Number(order.totalPrice) - (Number(order.totalPrice) / 1.05)))
+    }), { total: 0, subtotal: 0, gst: 0 });
+
+    const payments = allOrders.reduce((acc, order) => {
+      const method = order.paymentMethod || 'Cash';
+      acc[method] = (acc[method] || 0) + Number(order.totalPrice);
+      acc[`count_${method}`] = (acc[`count_${method}`] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    return { revenue, payments };
+  }, [allOrders]);
+
   const filteredOrders = allOrders.filter(order => 
     order.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     order.orderNumber?.includes(searchTerm)
   );
+
+  const handlePrintReport = () => {
+    window.print();
+  };
 
   return (
     <div className="space-y-10 pb-24 animate-in fade-in duration-700">
@@ -84,7 +117,7 @@ export default function AnalyticsDashboard() {
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 bg-white p-8 rounded-[2.5rem] border border-zinc-200 shadow-xl">
         <div className="flex flex-col">
           <h3 className="text-2xl font-black uppercase italic tracking-tighter text-zinc-900 leading-none">Business Analytics</h3>
-          <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-2">Performance & Revenue Tracking</p>
+          <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-2">Financial & Tax Performance</p>
         </div>
         
         <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
@@ -92,10 +125,10 @@ export default function AnalyticsDashboard() {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300" size={16} />
             <input 
               type="text"
-              placeholder="Search Orders..."
+              placeholder="Search Transactions..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-12 pr-6 py-3 bg-zinc-50 border border-zinc-200 rounded-2xl text-xs font-bold uppercase outline-none focus:border-[#b8582e] transition-all w-full md:w-64"
+              className="pl-12 pr-6 py-3 bg-zinc-50 border border-zinc-200 rounded-2xl text-xs font-bold uppercase outline-none focus:border-[#b8582e] transition-all w-full md:w-64 text-black"
             />
           </div>
           <div className="relative flex-1 md:flex-none">
@@ -104,45 +137,71 @@ export default function AnalyticsDashboard() {
               type="date" 
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="pl-12 pr-6 py-3 bg-zinc-50 border border-zinc-200 rounded-2xl text-xs font-bold uppercase outline-none focus:border-[#b8582e] transition-all w-full md:w-auto"
+              className="pl-12 pr-6 py-3 bg-zinc-50 border border-zinc-200 rounded-2xl text-xs font-bold uppercase outline-none focus:border-[#b8582e] transition-all w-full md:w-auto text-black"
             />
           </div>
+          <button 
+            onClick={handlePrintReport}
+            className="flex items-center gap-2 bg-[#b8582e] text-white px-6 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg hover:bg-zinc-900 transition-all active:scale-95"
+          >
+            <Printer size={16} /> Print EOD Report
+          </button>
         </div>
       </div>
 
-      {/* STATS GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* TOP STATS - REVENUE & TAX */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <StatCard 
-          title="Daily Revenue" 
-          value={formatCurrency(totalRevenue)} 
+          title="Grand Total (Sales)" 
+          value={formatCurrency(stats.revenue.total)} 
           icon={<Banknote size={24} />} 
-          trend="+12% vs last week"
+          trend="Incl. all taxes"
           color="text-[#b8582e]"
           bgColor="bg-[#b8582e]/10"
         />
         <StatCard 
-          title="Total Orders" 
-          value={totalOrders} 
-          icon={<ShoppingBag size={24} />} 
-          trend={`${liveOrders.length} live right now`}
-          color="text-zinc-900"
-          bgColor="bg-zinc-100"
-        />
-        <StatCard 
-          title="Avg Order Value" 
-          value={formatCurrency(averageOrderValue)} 
+          title="Net Revenue" 
+          value={formatCurrency(stats.revenue.subtotal)} 
           icon={<TrendingUp size={24} />} 
-          trend="Per collection token"
+          trend="Excl. GST Charges"
           color="text-emerald-600"
           bgColor="bg-emerald-50"
         />
         <StatCard 
-          title="Customer Reach" 
-          value={totalOrders} 
-          icon={<Users size={24} />} 
-          trend="All takeaway mode"
+          title="GST Collections" 
+          value={formatCurrency(stats.revenue.gst)} 
+          icon={<Receipt size={24} />} 
+          trend="Payable Liability"
           color="text-blue-600"
           bgColor="bg-blue-50"
+        />
+      </div>
+
+      {/* PAYMENT SPLITS */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <StatCard 
+          title="UPI Collections" 
+          value={formatCurrency(stats.payments.UPI || 0)} 
+          icon={<Smartphone size={24} />} 
+          trend={`${stats.payments.count_UPI || 0} Transactions`}
+          color="text-purple-600"
+          bgColor="bg-purple-50"
+        />
+        <StatCard 
+          title="Cash Collections" 
+          value={formatCurrency(stats.payments.Cash || 0)} 
+          icon={<Wallet size={24} />} 
+          trend={`${stats.payments.count_Cash || 0} Transactions`}
+          color="text-amber-600"
+          bgColor="bg-amber-50"
+        />
+        <StatCard 
+          title="Card Collections" 
+          value={formatCurrency(stats.payments.Card || 0)} 
+          icon={<CreditCard size={24} />} 
+          trend={`${stats.payments.count_Card || 0} Transactions`}
+          color="text-zinc-900"
+          bgColor="bg-zinc-100"
         />
       </div>
 
@@ -156,7 +215,7 @@ export default function AnalyticsDashboard() {
           <div className="flex items-center gap-4">
              <div className="px-5 py-2 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-full text-[10px] font-black uppercase flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                Live Sync Active
+                Audit Trail Active
              </div>
           </div>
         </div>
@@ -167,41 +226,45 @@ export default function AnalyticsDashboard() {
               <tr>
                 <th className="px-10 py-5 text-left text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400">Order Token</th>
                 <th className="px-10 py-5 text-left text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400">Customer Info</th>
-                <th className="px-10 py-5 text-left text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400">Status</th>
                 <th className="px-10 py-5 text-left text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400">Method</th>
-                <th className="px-10 py-5 text-right text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400">Amount (Incl. GST)</th>
+                <th className="px-10 py-5 text-right text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400">Net Sale</th>
+                <th className="px-10 py-5 text-right text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400">Tax</th>
+                <th className="px-10 py-5 text-right text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400">Grand Total</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-50">
-              {filteredOrders.length > 0 ? filteredOrders.map((order) => (
-                <tr key={order.id} className="hover:bg-zinc-50/50 transition-colors group">
-                  <td className="px-10 py-8">
-                    <span className="text-2xl font-black italic text-zinc-900 tracking-tighter">#{order.orderNumber}</span>
-                  </td>
-                  <td className="px-10 py-8">
-                    <p className="font-black uppercase italic text-zinc-800 text-xs leading-none">{order.customerName}</p>
-                    <p className="text-[9px] font-bold text-zinc-400 mt-1.5 uppercase tracking-widest">{order.customerPhone}</p>
-                  </td>
-                  <td className="px-10 py-8">
-                     <span className={cn(
-                       "px-4 py-1.5 rounded-full text-[8px] font-black uppercase border",
-                       order.status === 'Completed' ? 'bg-zinc-100 text-zinc-500 border-zinc-200' :
-                       order.status === 'Handover' ? 'bg-emerald-100 text-emerald-600 border-emerald-200' :
-                       'bg-[#b8582e]/10 text-[#b8582e] border-[#b8582e]/20'
-                     )}>
-                       {order.status}
-                     </span>
-                  </td>
-                  <td className="px-10 py-8">
-                    <span className="text-[10px] font-black uppercase text-zinc-400">{order.paymentMethod}</span>
-                  </td>
-                  <td className="px-10 py-8 text-right">
-                    <span className="text-lg font-black italic text-zinc-900">{formatCurrency(order.totalPrice)}</span>
-                  </td>
-                </tr>
-              )) : (
+              {filteredOrders.length > 0 ? filteredOrders.map((order) => {
+                const subTotal = Number((order as any).subtotal) || (Number(order.totalPrice) / 1.05);
+                const taxTotal = (Number((order as any).cgst || 0) + Number((order as any).sgst || 0)) || (Number(order.totalPrice) - subTotal);
+                
+                return (
+                  <tr key={order.id} className="hover:bg-zinc-50/50 transition-colors group">
+                    <td className="px-10 py-8">
+                      <span className="text-2xl font-black italic text-zinc-900 tracking-tighter">#{order.orderNumber}</span>
+                    </td>
+                    <td className="px-10 py-8">
+                      <p className="font-black uppercase italic text-zinc-800 text-xs leading-none">{order.customerName}</p>
+                      <p className="text-[9px] font-bold text-zinc-400 mt-1.5 uppercase tracking-widest">{order.customerPhone}</p>
+                    </td>
+                    <td className="px-10 py-8">
+                      <span className="px-4 py-1.5 rounded-full text-[8px] font-black uppercase border bg-zinc-50 border-zinc-200 text-zinc-500">
+                        {order.paymentMethod}
+                      </span>
+                    </td>
+                    <td className="px-10 py-8 text-right">
+                      <span className="text-xs font-bold text-zinc-400 tracking-tight">{formatCurrency(subTotal)}</span>
+                    </td>
+                    <td className="px-10 py-8 text-right">
+                      <span className="text-xs font-bold text-[#b8582e] tracking-tight">{formatCurrency(taxTotal)}</span>
+                    </td>
+                    <td className="px-10 py-8 text-right">
+                      <span className="text-lg font-black italic text-zinc-900">{formatCurrency(order.totalPrice)}</span>
+                    </td>
+                  </tr>
+                );
+              }) : (
                 <tr>
-                  <td colSpan={5} className="py-32 text-center">
+                  <td colSpan={6} className="py-32 text-center">
                     <div className="flex flex-col items-center gap-4">
                       <ShoppingBag size={48} className="text-zinc-100" />
                       <div>
@@ -215,12 +278,66 @@ export default function AnalyticsDashboard() {
             </tbody>
           </table>
         </div>
-        
-        <div className="p-8 bg-zinc-50 border-t border-zinc-100 flex justify-between items-center">
-           <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Showing {filteredOrders.length} records</p>
-           <button className="text-[10px] font-black uppercase tracking-widest text-[#b8582e] hover:underline">Export CSV Report</button>
+      </div>
+
+      {/* HIDDEN PRINTABLE REPORT */}
+      <div id="printable-eod-report" className="hidden print:block font-mono text-black p-8 bg-white" style={{ width: '80mm' }}>
+        <div className="text-center border-b border-dashed border-black pb-4 mb-4">
+          <h1 className="text-lg font-black uppercase">{printSettings?.storeName || 'RAVOYI KITCHEN'}</h1>
+          <p className="uppercase text-[9px]">{printSettings?.address}</p>
+          <p className="text-[9px] font-bold mt-2">DAILY SALES SUMMARY</p>
+          <p className="text-[10px] mt-1">DATE: {new Date(selectedDate).toLocaleDateString()}</p>
+        </div>
+
+        <div className="space-y-2 border-b border-dashed border-black pb-4 mb-4 text-[11px]">
+          <div className="flex justify-between font-black">
+            <span>TOTAL TRANSACTIONS</span>
+            <span>{allOrders.length}</span>
+          </div>
+          <div className="flex justify-between">
+            <span>NET SALES</span>
+            <span>{formatCurrency(stats.revenue.subtotal)}</span>
+          </div>
+          <div className="flex justify-between">
+            <span>TOTAL TAX (GST)</span>
+            <span>{formatCurrency(stats.revenue.gst)}</span>
+          </div>
+          <div className="flex justify-between text-lg font-black border-t border-dashed border-black pt-2 mt-2">
+            <span>GRAND TOTAL</span>
+            <span>{formatCurrency(stats.revenue.total)}</span>
+          </div>
+        </div>
+
+        <div className="space-y-2 text-[11px] mb-6">
+          <p className="font-black text-center mb-2 border-b border-black">PAYMENT SPLITS</p>
+          <div className="flex justify-between">
+            <span>UPI ({stats.payments.count_UPI || 0})</span>
+            <span>{formatCurrency(stats.payments.UPI || 0)}</span>
+          </div>
+          <div className="flex justify-between">
+            <span>CASH ({stats.payments.count_Cash || 0})</span>
+            <span>{formatCurrency(stats.payments.Cash || 0)}</span>
+          </div>
+          <div className="flex justify-between">
+            <span>CARD ({stats.payments.count_Card || 0})</span>
+            <span>{formatCurrency(stats.payments.Card || 0)}</span>
+          </div>
+        </div>
+
+        <div className="text-center pt-4 border-t border-dashed border-black opacity-60">
+          <p className="italic text-[8px]">End of Day Audit Report • {new Date().toLocaleTimeString()}</p>
+          <p className="text-[7px] mt-1">RAVOYI Management System</p>
         </div>
       </div>
+
+      <style jsx global>{`
+        @media print {
+          body * { visibility: hidden; background: white !important; }
+          #printable-eod-report, #printable-eod-report * { visibility: visible; }
+          #printable-eod-report { position: absolute; left: 0; top: 0; margin: 0; padding: 0; width: 80mm !important; }
+          @page { margin: 0; size: auto; }
+        }
+      `}</style>
     </div>
   );
 }
