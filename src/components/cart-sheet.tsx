@@ -34,7 +34,8 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
   const subtotal = cartTotal;
   const cgst = subtotal * 0.025;
   const sgst = subtotal * 0.025;
-  const grandTotal = subtotal + cgst + sgst;
+  // Round the grand total to the nearest whole number
+  const grandTotal = Math.round(subtotal + cgst + sgst);
 
   // Checkout Form State
   const [customerName, setCustomerName] = useState("");

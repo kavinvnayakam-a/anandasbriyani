@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect, useMemo } from 'react';
@@ -92,7 +91,8 @@ export default function OrderManager() {
     const subtotal = selectedItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
     const cgst = subtotal * 0.025;
     const sgst = subtotal * 0.025;
-    const total = subtotal + cgst + sgst;
+    // Round the grand total to the nearest whole number
+    const total = Math.round(subtotal + cgst + sgst);
     return { subtotal, cgst, sgst, total };
   };
 
