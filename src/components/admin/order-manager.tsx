@@ -277,9 +277,6 @@ export default function OrderManager() {
         {pendingOrders.map((order) => {
           const cashInputVal = feedCashReceived[order.id] || "";
           const change = Math.max(0, (Number(cashInputVal) || order.totalPrice) - order.totalPrice);
-          const orderSubtotal = order.subtotal || (order.totalPrice / 1.05);
-          const orderCgst = order.cgst || ((order.totalPrice - orderSubtotal) / 2);
-          const orderSgst = order.sgst || ((order.totalPrice - orderSubtotal) / 2);
 
           return (
             <div key={order.id} className="bg-white border border-zinc-200 rounded-[2.5rem] p-8 flex flex-col transition-all shadow-lg hover:shadow-2xl hover:border-[#b8582e]/30 group">
@@ -360,158 +357,172 @@ export default function OrderManager() {
       </div>
 
       <Dialog open={showNewOrder} onOpenChange={setShowNewOrder}>
-        <DialogContent className="max-w-5xl bg-zinc-50 rounded-[2.5rem] p-0 border-none shadow-2xl overflow-hidden flex flex-col h-[90vh]">
-          <DialogHeader className="p-8 bg-white border-b border-zinc-100">
+        <DialogContent className="max-w-6xl bg-zinc-50 rounded-[2.5rem] p-0 border-none shadow-2xl overflow-hidden flex flex-col h-[90vh]">
+          <DialogHeader className="p-6 bg-white border-b border-zinc-100 flex-shrink-0">
             <div className="flex justify-between items-center">
               <div>
-                <DialogTitle className="text-3xl font-black uppercase italic tracking-tighter text-zinc-900">Manual Order Entry</DialogTitle>
-                <DialogDescription className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">Take orders directly at the counter</DialogDescription>
+                <DialogTitle className="text-2xl font-black uppercase italic tracking-tighter text-zinc-900">Manual Order Entry</DialogTitle>
+                <DialogDescription className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">Take orders directly at the counter</DialogDescription>
               </div>
               <button onClick={() => setShowNewOrder(false)} className="p-2 hover:bg-zinc-100 rounded-full transition-colors">
-                <X size={24} className="text-zinc-400" />
+                <X size={20} className="text-zinc-400" />
               </button>
             </div>
           </DialogHeader>
 
           <div className="flex-1 flex overflow-hidden">
+            {/* Left Column: Menu Selection */}
             <div className="w-1/2 border-r border-zinc-200 flex flex-col bg-white">
-              <div className="p-6 border-b border-zinc-100">
+              <div className="p-4 border-b border-zinc-100 bg-zinc-50/50">
                 <div className="relative">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300" size={18} />
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300" size={16} />
                   <Input 
                     placeholder="Search Menu..." 
-                    className="pl-12 h-12 bg-zinc-50 border-none rounded-2xl font-bold text-black"
+                    className="pl-12 h-11 bg-white border-zinc-200 rounded-xl font-bold text-black text-sm"
                     value={menuSearch}
                     onChange={(e) => setMenuSearch(e.target.value)}
                   />
                 </div>
               </div>
-              <ScrollArea className="flex-1 p-6">
-                <div className="grid grid-cols-1 gap-3">
+              <ScrollArea className="flex-1 p-4">
+                <div className="grid grid-cols-1 gap-2">
                   {filteredMenu.map(item => (
                     <button
                       key={item.id}
                       onClick={() => handleAddItem(item)}
-                      className="flex items-center justify-between p-4 bg-zinc-50 hover:bg-[#b8582e]/5 border border-zinc-100 rounded-2xl transition-all group"
+                      className="flex items-center justify-between p-3.5 bg-zinc-50 hover:bg-[#b8582e]/5 border border-zinc-100 rounded-xl transition-all group"
                     >
                       <div className="text-left">
-                        <p className="font-black italic uppercase text-xs text-zinc-900 leading-none mb-1">{item.name}</p>
-                        <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">{item.category}</p>
+                        <p className="font-black italic uppercase text-[11px] text-zinc-900 leading-none mb-1">{item.name}</p>
+                        <p className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest">{item.category}</p>
                       </div>
-                      <span className="font-black italic text-[#b8582e]">₹{item.price}</span>
+                      <span className="font-black italic text-[#b8582e] text-sm">₹{item.price}</span>
                     </button>
                   ))}
                 </div>
               </ScrollArea>
             </div>
 
-            <div className="w-1/2 flex flex-col p-8 space-y-6 bg-zinc-50">
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-black uppercase text-zinc-400 tracking-widest">Customer Name</Label>
-                    <Input 
-                      value={customerName}
-                      onChange={(e) => setCustomerName(e.target.value)}
-                      placeholder="e.g. Rahul Kumar"
-                      className="bg-white border-zinc-200 h-12 rounded-xl font-bold text-black"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-black uppercase text-zinc-400 tracking-widest">Phone Number (Optional)</Label>
-                    <Input 
-                      value={customerPhone}
-                      onChange={(e) => setCustomerPhone(e.target.value)}
-                      placeholder="Mobile number"
-                      className="bg-white border-zinc-200 h-12 rounded-xl font-bold text-black"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-black uppercase text-zinc-400 tracking-widest">Payment Method</Label>
-                  <RadioGroup 
-                    value={paymentMethod} 
-                    onValueChange={(v: any) => setPaymentMethod(v)}
-                    className="grid grid-cols-3 gap-3"
-                  >
-                    <Label htmlFor="m-upi" className={cn("flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 cursor-pointer transition-all", paymentMethod === 'UPI' ? "bg-white border-[#b8582e] text-[#b8582e] shadow-lg" : "bg-white/50 border-zinc-100 text-zinc-400")}>
-                      <RadioGroupItem value="UPI" id="m-upi" className="sr-only" />
-                      <Smartphone size={18} />
-                      <span className="text-[9px] font-black uppercase">UPI</span>
-                    </Label>
-                    <Label htmlFor="m-cash" className={cn("flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 cursor-pointer transition-all", paymentMethod === 'Cash' ? "bg-white border-[#b8582e] text-[#b8582e] shadow-lg" : "bg-white/50 border-zinc-100 text-zinc-400")}>
-                      <RadioGroupItem value="Cash" id="m-cash" className="sr-only" />
-                      <Banknote size={18} />
-                      <span className="text-[9px] font-black uppercase">Cash</span>
-                    </Label>
-                    <Label htmlFor="m-card" className={cn("flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 cursor-pointer transition-all", paymentMethod === 'Card' ? "bg-white border-[#b8582e] text-[#b8582e] shadow-lg" : "bg-white/50 border-zinc-100 text-zinc-400")}>
-                      <RadioGroupItem value="Card" id="m-card" className="sr-only" />
-                      <CreditCard size={18} />
-                      <span className="text-[9px] font-black uppercase">Card</span>
-                    </Label>
-                  </RadioGroup>
-                </div>
-
-                {paymentMethod === 'Cash' && (
-                  <div className="bg-white p-6 rounded-[2rem] border border-zinc-200 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
-                    <div className="grid grid-cols-2 gap-6 items-center">
-                      <div className="space-y-2">
-                        <Label className="text-[10px] font-black uppercase text-zinc-400 tracking-widest">Cash Received (₹)</Label>
-                        <Input 
-                          type="number"
-                          value={cashReceived}
-                          onChange={(e) => setCashReceived(e.target.value)}
-                          placeholder="0.00"
-                          className="bg-zinc-50 border-zinc-100 h-14 text-2xl font-black text-black rounded-2xl focus:ring-[#b8582e]/20"
-                        />
-                      </div>
-                      <div className="text-right">
-                        <p className="text-[10px] font-black uppercase text-zinc-400 tracking-widest mb-1">Change Due</p>
-                        <p className={cn("text-3xl font-black italic tracking-tighter tabular-nums", changeDue > 0 ? "text-emerald-600" : "text-zinc-200")}>
-                          ₹{changeDue}
-                        </p>
-                      </div>
+            {/* Right Column: Order Details */}
+            <div className="w-1/2 flex flex-col bg-zinc-50 relative">
+              <ScrollArea className="flex-1">
+                <div className="p-6 space-y-6">
+                  {/* Customer Details */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <Label className="text-[9px] font-black uppercase text-zinc-400 tracking-widest">Customer Name</Label>
+                      <Input 
+                        value={customerName}
+                        onChange={(e) => setCustomerName(e.target.value)}
+                        placeholder="e.g. Rahul Kumar"
+                        className="bg-white border-zinc-200 h-11 rounded-xl font-bold text-black text-sm"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-[9px] font-black uppercase text-zinc-400 tracking-widest">Phone Number (Optional)</Label>
+                      <Input 
+                        value={customerPhone}
+                        onChange={(e) => setCustomerPhone(e.target.value)}
+                        placeholder="Mobile number"
+                        className="bg-white border-zinc-200 h-11 rounded-xl font-bold text-black text-sm"
+                      />
                     </div>
                   </div>
-                )}
-              </div>
 
-              <div className="flex-1 flex flex-col min-h-0">
-                <Label className="text-[10px] font-black uppercase text-zinc-400 tracking-widest mb-3">Selected Items ({selectedItems.length})</Label>
-                <ScrollArea className="flex-1 bg-white rounded-[2rem] border border-zinc-100 p-4">
-                  {selectedItems.map((item, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-3 bg-zinc-50 rounded-xl mb-2">
-                      <div className="flex-1 min-w-0 pr-4">
-                        <p className="font-bold text-zinc-900 text-xs truncate leading-none mb-1">{item.name}</p>
-                        <p className="text-[10px] font-black text-[#b8582e]">₹{item.price * item.quantity}</p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <button onClick={() => handleRemoveItem(item.id)} className="p-1.5 hover:bg-white rounded-lg transition-colors text-zinc-400">
-                          {item.quantity > 1 ? <Minus size={14} /> : <X size={14} />}
-                        </button>
-                        <span className="text-xs font-black w-6 text-center text-zinc-900">{item.quantity}</span>
-                        <button onClick={() => handleAddItem(item)} className="p-1.5 hover:bg-white rounded-lg transition-colors text-[#b8582e]">
-                          <Plus size={14} />
-                        </button>
+                  {/* Payment Method */}
+                  <div className="space-y-2">
+                    <Label className="text-[9px] font-black uppercase text-zinc-400 tracking-widest">Payment Method</Label>
+                    <RadioGroup 
+                      value={paymentMethod} 
+                      onValueChange={(v: any) => setPaymentMethod(v)}
+                      className="grid grid-cols-3 gap-2"
+                    >
+                      <Label htmlFor="m-upi" className={cn("flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border-2 cursor-pointer transition-all", paymentMethod === 'UPI' ? "bg-white border-[#b8582e] text-[#b8582e] shadow-md" : "bg-white/50 border-zinc-100 text-zinc-400")}>
+                        <RadioGroupItem value="UPI" id="m-upi" className="sr-only" />
+                        <Smartphone size={16} />
+                        <span className="text-[8px] font-black uppercase">UPI</span>
+                      </Label>
+                      <Label htmlFor="m-cash" className={cn("flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border-2 cursor-pointer transition-all", paymentMethod === 'Cash' ? "bg-white border-[#b8582e] text-[#b8582e] shadow-md" : "bg-white/50 border-zinc-100 text-zinc-400")}>
+                        <RadioGroupItem value="Cash" id="m-cash" className="sr-only" />
+                        <Banknote size={16} />
+                        <span className="text-[8px] font-black uppercase">Cash</span>
+                      </Label>
+                      <Label htmlFor="m-card" className={cn("flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border-2 cursor-pointer transition-all", paymentMethod === 'Card' ? "bg-white border-[#b8582e] text-[#b8582e] shadow-md" : "bg-white/50 border-zinc-100 text-zinc-400")}>
+                        <RadioGroupItem value="Card" id="m-card" className="sr-only" />
+                        <CreditCard size={16} />
+                        <span className="text-[8px] font-black uppercase">Card</span>
+                      </Label>
+                    </RadioGroup>
+                  </div>
+
+                  {/* Cash Section */}
+                  {paymentMethod === 'Cash' && (
+                    <div className="bg-white p-4 rounded-2xl border border-zinc-200 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
+                      <div className="grid grid-cols-2 gap-4 items-center">
+                        <div className="space-y-1.5">
+                          <Label className="text-[9px] font-black uppercase text-zinc-400 tracking-widest">Cash Received (₹)</Label>
+                          <Input 
+                            type="number"
+                            value={cashReceived}
+                            onChange={(e) => setCashReceived(e.target.value)}
+                            placeholder="0.00"
+                            className="bg-zinc-50 border-zinc-100 h-11 text-xl font-black text-black rounded-xl"
+                          />
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[9px] font-black uppercase text-zinc-400 tracking-widest mb-1">Change Due</p>
+                          <p className={cn("text-2xl font-black italic tracking-tighter tabular-nums", changeDue > 0 ? "text-emerald-600" : "text-zinc-200")}>
+                            ₹{changeDue}
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  ))}
-                </ScrollArea>
-              </div>
+                  )}
 
-              <div className="pt-4 border-t border-zinc-200">
+                  {/* Items List */}
+                  <div className="space-y-3">
+                    <Label className="text-[9px] font-black uppercase text-zinc-400 tracking-widest">Selected Items ({selectedItems.length})</Label>
+                    <div className="space-y-2">
+                      {selectedItems.length > 0 ? selectedItems.map((item, idx) => (
+                        <div key={idx} className="flex items-center justify-between p-3 bg-white rounded-xl border border-zinc-100 shadow-sm">
+                          <div className="flex-1 min-w-0 pr-4">
+                            <p className="font-bold text-zinc-900 text-[11px] truncate leading-none mb-1">{item.name}</p>
+                            <p className="text-[10px] font-black text-[#b8582e]">₹{item.price * item.quantity}</p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button onClick={() => handleRemoveItem(item.id)} className="p-1.5 hover:bg-zinc-50 rounded-lg transition-colors text-zinc-400">
+                              {item.quantity > 1 ? <Minus size={14} /> : <X size={14} />}
+                            </button>
+                            <span className="text-xs font-black w-6 text-center text-zinc-900">{item.quantity}</span>
+                            <button onClick={() => handleAddItem(item)} className="p-1.5 hover:bg-zinc-50 rounded-lg transition-colors text-[#b8582e]">
+                              <Plus size={14} />
+                            </button>
+                          </div>
+                        </div>
+                      )) : (
+                        <div className="py-10 text-center border-2 border-dashed border-zinc-200 rounded-2xl">
+                           <ShoppingBag className="mx-auto text-zinc-200 mb-2" size={24} />
+                           <p className="text-[9px] font-black uppercase text-zinc-300">Tray is empty</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </ScrollArea>
+
+              {/* Sticky Order Footer */}
+              <div className="p-6 bg-white border-t border-zinc-200 flex-shrink-0">
                 <div className="flex justify-between items-end">
                   <div className="flex flex-col">
-                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">Total Amount</span>
-                    <span className="text-4xl font-black italic text-zinc-900 tracking-tighter">₹{totals.total}</span>
+                    <span className="text-[9px] font-black uppercase tracking-[0.4em] text-zinc-400">Total Bill</span>
+                    <span className="text-3xl font-black italic text-zinc-900 tracking-tighter">₹{totals.total}</span>
                   </div>
                   <button 
                     onClick={handleCreateOrder}
                     disabled={isPlacingOrder || selectedItems.length === 0 || (paymentMethod === 'Cash' && Number(cashReceived) < totals.total) || !customerName}
-                    className="h-14 px-10 bg-[#b8582e] text-white rounded-2xl font-black uppercase italic text-xs shadow-xl flex items-center gap-3 disabled:bg-zinc-200 disabled:text-zinc-400 transition-all"
+                    className="h-12 px-8 bg-[#b8582e] text-white rounded-xl font-black uppercase italic text-[10px] shadow-lg shadow-[#b8582e]/20 flex items-center gap-3 disabled:bg-zinc-200 disabled:text-zinc-400 transition-all hover:bg-zinc-900 active:scale-95"
                   >
-                    {isPlacingOrder ? <Loader2 className="animate-spin" /> : <Check size={20} />}
+                    {isPlacingOrder ? <Loader2 className="animate-spin" /> : <Check size={18} />}
                     Finalize Order
                   </button>
                 </div>
@@ -701,7 +712,7 @@ export default function OrderManager() {
         </DialogContent>
       </Dialog>
 
-      {/* ACTUAL PRINTABLE AREA (Moved to root level for reliability) */}
+      {/* ACTUAL PRINTABLE AREA */}
       <div id="printable-receipt" className="hidden print:block font-mono text-black font-black" style={{ width: '80mm' }}>
         <div className="receipt-section p-2">
           <div className="text-center border-b-4 border-dashed border-black pb-6 mb-6">
