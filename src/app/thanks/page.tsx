@@ -33,12 +33,21 @@ const HangingDecoration = ({ className, delay = "0s", height = "h-32", type = "l
 
 export default function ThankYouPage() {
   useEffect(() => {
+    // 1. Disable Right-Click
+    const handleContextMenu = (e: MouseEvent) => e.preventDefault();
+    document.addEventListener('contextmenu', handleContextMenu);
+
+    // 2. Prevent Back Navigation
     window.history.pushState(null, "", window.location.href);
     const handlePopState = () => {
       window.history.pushState(null, "", window.location.href);
     };
     window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+
+    return () => {
+      document.removeEventListener('contextmenu', handleContextMenu);
+      window.removeEventListener('popstate', handlePopState);
+    };
   }, []);
 
   return (

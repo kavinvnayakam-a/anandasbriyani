@@ -59,6 +59,13 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
   const [showBackToTop, setShowBackToTop] = useState(false);
 
   useEffect(() => {
+    // Disable right-click
+    const handleContextMenu = (e: MouseEvent) => e.preventDefault();
+    document.addEventListener('contextmenu', handleContextMenu);
+    return () => document.removeEventListener('contextmenu', handleContextMenu);
+  }, []);
+
+  useEffect(() => {
     if (!firestore) return;
     const q = query(collection(firestore, "menu_items")); 
     const unsubscribe = onSnapshot(q, (snapshot) => {

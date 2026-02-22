@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { useEffect, useState, useRef } from 'react';
@@ -41,13 +40,31 @@ export default function OrderStatusPage() {
   const [isTimerActive, setIsTimerActive] = useState(false);
   const audioPlayed = useRef(false);
 
+  // Security and Navigation Restrictions
   useEffect(() => {
+    // 1. Disable Right-Click
+    const handleContextMenu = (e: MouseEvent) => e.preventDefault();
+    document.addEventListener('contextmenu', handleContextMenu);
+
+    // 2. Prevent Back Navigation
     window.history.pushState(null, "", window.location.href);
     const handlePopState = () => {
       window.history.pushState(null, "", window.location.href);
     };
     window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+
+    // 3. Prevent Refresh/Exit Prompt
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "Are you sure you want to refresh? Your tracking session might be interrupted.";
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      document.removeEventListener('contextmenu', handleContextMenu);
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
   }, []);
 
   useEffect(() => {
