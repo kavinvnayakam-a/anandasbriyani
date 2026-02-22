@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect, useMemo } from 'react';
@@ -37,12 +36,10 @@ export default function KotView() {
     const performAutoArchive = async () => {
       setIsCleaning(true);
       try {
-        // Calculate the most recent 4:00 AM cutoff
         const now = new Date();
         const cutoff = new Date();
         cutoff.setHours(4, 0, 0, 0);
         
-        // If it's currently before 4 AM today, the cutoff was yesterday at 4 AM
         if (now < cutoff) {
           cutoff.setDate(cutoff.getDate() - 1);
         }
@@ -115,32 +112,12 @@ export default function KotView() {
     toast({ title: "Order Handovered", description: "Moved to handover section." });
   };
 
-  const archiveOrder = async (orderId: string) => {
-    if (!firestore) return;
-    const orderRef = doc(firestore, "orders", orderId);
-    const snap = await getDoc(orderRef);
-    if (!snap.exists()) return;
-
-    const data = snap.data();
-    const batch = writeBatch(firestore);
-    batch.set(doc(collection(firestore, "order_history")), { 
-      ...data, 
-      status: "Completed",
-      archivedAt: serverTimestamp() 
-    });
-    batch.delete(orderRef);
-    await batch.commit();
-
-    toast({ title: "Order Archived" });
-  };
-
   const formatOrderTime = (ts: any) => {
     if (!ts) return "";
     const date = ts.seconds ? new Date(ts.seconds * 1000) : new Date(ts);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  // Split orders into two categories
   const { preparationQueue, handoverQueue } = useMemo(() => {
     return {
       preparationQueue: orders.filter(o => ['Received', 'Preparing', 'Served', 'Ready'].includes(o.status)),
@@ -150,7 +127,6 @@ export default function KotView() {
 
   return (
     <div className="space-y-10">
-      {/* HEADER */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
           <div className="bg-[#b8582e] p-4 rounded-3xl shadow-lg shadow-[#b8582e]/20 text-white">
@@ -178,7 +154,6 @@ export default function KotView() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
         
-        {/* SECTION 1: PREPARATION QUEUE (Left 8 Columns) */}
         <div className="lg:col-span-8 space-y-6">
           <div className="flex items-center gap-3 mb-2">
              <Flame className="text-orange-500" size={20} />
@@ -201,7 +176,6 @@ export default function KotView() {
           </div>
         </div>
 
-        {/* SECTION 2: HANDOVERED QUEUE (Right 4 Columns) */}
         <div className="lg:col-span-4 space-y-6">
           <div className="flex items-center gap-3 mb-2">
              <History className="text-zinc-400" size={20} />
@@ -213,7 +187,6 @@ export default function KotView() {
               <OrderTicket 
                 key={order.id} 
                 order={order} 
-                onArchive={archiveOrder}
                 formatTime={formatOrderTime}
                 isHandover
               />
@@ -230,7 +203,7 @@ export default function KotView() {
   );
 }
 
-function OrderTicket({ order, onPack, onReady, onHandover, onArchive, formatTime, isHandover }: any) {
+function OrderTicket({ order, onPack, onReady, onHandover, formatTime, isHandover }: any) {
   return (
     <div className={cn(
       "bg-white border-2 rounded-[2.5rem] p-6 flex flex-col transition-all shadow-xl hover:shadow-2xl relative overflow-hidden group",
@@ -281,7 +254,7 @@ function OrderTicket({ order, onPack, onReady, onHandover, onArchive, formatTime
       </div>
 
       <div className="mt-auto">
-        {!isHandover ? (
+        {!isHandover && (
           <>
             {order.status !== 'Ready' ? (
               <button 
@@ -305,13 +278,6 @@ function OrderTicket({ order, onPack, onReady, onHandover, onArchive, formatTime
               </button>
             )}
           </>
-        ) : (
-          <button 
-            onClick={() => onArchive(order.id)} 
-            className="w-full py-4 bg-zinc-900 text-white rounded-2xl font-black uppercase italic text-[10px] flex items-center justify-center gap-2 opacity-100 hover:bg-emerald-600 transition-all"
-          >
-            <Check size={16}/> Final Archive
-          </button>
         )}
       </div>
     </div>
