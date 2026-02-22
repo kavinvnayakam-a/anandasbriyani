@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect, useMemo } from 'react';
@@ -34,7 +35,7 @@ interface PrintSettings {
 
 const DEFAULT_PRINT_SETTINGS: PrintSettings = {
   storeName: "RAVOYI Kitchen",
-  address: "Authentic Telangana Kitchen, Hyderabad 500074",
+  address: "Authentic Telangana Kitchen, Hyderabad - 500074",
   phone: "+91 98765 43210",
   gstin: "36ABCDE1234F1Z5",
   fssai: "12345678901234",
