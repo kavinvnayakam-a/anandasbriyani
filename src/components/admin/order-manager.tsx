@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect, useMemo } from 'react';
@@ -167,8 +166,8 @@ export default function OrderManager() {
   };
 
   const handleCreateOrder = async () => {
-    if (!firestore || selectedItems.length === 0 || !customerName || !customerPhone) {
-      toast({ variant: "destructive", title: "Incomplete Details", description: "Add items and customer info." });
+    if (!firestore || selectedItems.length === 0 || !customerName) {
+      toast({ variant: "destructive", title: "Incomplete Details", description: "Add items and customer name." });
       return;
     }
 
@@ -198,7 +197,7 @@ export default function OrderManager() {
         orderNumber,
         tableId: "Takeaway",
         customerName,
-        customerPhone,
+        customerPhone: customerPhone || "N/A",
         paymentMethod,
         cashReceived: paymentMethod === 'Cash' ? Number(cashReceived) : null,
         changeDue: paymentMethod === 'Cash' ? changeDue : null,
@@ -403,11 +402,11 @@ export default function OrderManager() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-[10px] font-black uppercase text-zinc-400 tracking-widest">Phone Number</Label>
+                    <Label className="text-[10px] font-black uppercase text-zinc-400 tracking-widest">Phone Number (Optional)</Label>
                     <Input 
                       value={customerPhone}
                       onChange={(e) => setCustomerPhone(e.target.value)}
-                      placeholder="10-digit mobile"
+                      placeholder="Mobile number"
                       className="bg-white border-zinc-200 h-12 rounded-xl font-bold text-black"
                     />
                   </div>
@@ -493,7 +492,7 @@ export default function OrderManager() {
                   </div>
                   <button 
                     onClick={handleCreateOrder}
-                    disabled={isPlacingOrder || selectedItems.length === 0 || (paymentMethod === 'Cash' && Number(cashReceived) < totals.total)}
+                    disabled={isPlacingOrder || selectedItems.length === 0 || (paymentMethod === 'Cash' && Number(cashReceived) < totals.total) || !customerName}
                     className="h-14 px-10 bg-[#b8582e] text-white rounded-2xl font-black uppercase italic text-xs shadow-xl flex items-center gap-3 disabled:bg-zinc-200 disabled:text-zinc-400 transition-all"
                   >
                     {isPlacingOrder ? <Loader2 className="animate-spin" /> : <Check size={20} />}

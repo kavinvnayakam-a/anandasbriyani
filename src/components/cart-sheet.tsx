@@ -47,10 +47,10 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
   };
 
   const handlePlaceOrder = async () => {
-    if (!customerName || !customerPhone || !firestore) {
+    if (!customerName || !firestore) {
       toast({
         title: "Missing Details",
-        description: "Please provide your name and phone number.",
+        description: "Please provide your name to continue.",
         variant: "destructive",
       });
       return;
@@ -77,7 +77,7 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
         orderNumber,
         tableId: tableId || "Takeaway",
         customerName,
-        customerPhone,
+        customerPhone: customerPhone || "N/A",
         paymentMethod,
         items: cartItems.map(item => ({
           id: item.id,
@@ -96,12 +96,6 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
       };
 
       const docRef = await addDoc(collection(firestore, "orders"), orderData);
-
-      toast({
-        title: `Order #${orderNumber} Confirmed!`,
-        description: "RAVOYI kitchen is preparing your treats.",
-        className: "bg-[#b8582e] text-white border-none shadow-2xl font-black uppercase",
-      });
 
       clearCart();
       setIsCheckoutOpen(false);
@@ -252,7 +246,7 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
           <DialogHeader>
             <DialogTitle className="text-2xl font-black italic uppercase tracking-tighter">Order Details</DialogTitle>
             <DialogDescription className="text-white/60 text-xs font-bold uppercase tracking-widest">
-              Please provide your contact information and select a payment method.
+              Please provide your name. Phone number is optional.
             </DialogDescription>
           </DialogHeader>
           
@@ -268,7 +262,7 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="phone" className="text-[10px] font-black uppercase tracking-widest text-white/60 ml-1">Phone Number</Label>
+              <Label htmlFor="phone" className="text-[10px] font-black uppercase tracking-widest text-white/60 ml-1">Phone Number (Optional)</Label>
               <Input
                 id="phone"
                 type="tel"
@@ -326,7 +320,7 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
           <DialogFooter className="mt-4">
             <Button 
               onClick={handlePlaceOrder}
-              disabled={isPlacingOrder || !customerName || !customerPhone}
+              disabled={isPlacingOrder || !customerName}
               className="w-full h-14 bg-white text-[#b8582e] hover:bg-black hover:text-white rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-xl transition-all active:scale-95 border-none"
             >
               {isPlacingOrder ? <Loader2 className="animate-spin" /> : "Complete Checkout"}
