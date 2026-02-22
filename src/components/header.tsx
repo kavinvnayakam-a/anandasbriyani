@@ -1,6 +1,7 @@
 "use client"
 
 import Image from 'next/image';
+import { Star } from 'lucide-react';
 
 const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/dasara-finedine.firebasestorage.app/o/RAVOYI%20LOGO.pdf.webp?alt=media&token=f09f33b3-b303-400e-bbc4-b5dca418c8af";
 
@@ -16,50 +17,53 @@ export function Header({ tableId }: HeaderProps) {
       <div className="container mx-auto flex items-center justify-between px-6">
         
         {/* Brand Section: Circular Logo + Tagline */}
-        <div className="flex flex-col items-center gap-2">
-          {/* Large Rounded Logo with White Border */}
+        <div className="flex items-center gap-4">
           <div className="
             relative 
-            h-20 w-20           /* Bigger size (80px) */
+            h-16 w-16           
             rounded-full 
-            border-[3px] border-white  /* Distinct white border */
+            border-[2px] border-white  
             bg-white
-            shadow-[0_0_15px_rgba(255,255,255,0.2)] /* Soft outer glow */
+            shadow-[0_0_15px_rgba(255,255,255,0.2)] 
             overflow-hidden
             flex items-center justify-center
+            shrink-0
           ">
             <Image 
               src={LOGO_URL} 
               alt="RAVOYI Logo" 
-              width={80} 
-              height={80} 
+              width={64} 
+              height={64} 
               className="object-contain"
               priority
             />
           </div>
           
-          {/* Centered Tagline */}
-          <p className="text-[8px] font-black text-white/70 uppercase tracking-[0.45em] leading-none text-center">
-            A Telangana Kitchen
+          <div className="flex flex-col">
+            <h1 className="text-white text-lg font-black uppercase tracking-tighter leading-none italic">
+              RAVOYI <span className="text-orange-500">Kitchen</span>
+            </h1>
+            <p className="text-[7px] font-black text-white/50 uppercase tracking-[0.4em] mt-1">
+              A Telangana Kitchen
+            </p>
+          </div>
+        </div>
+
+        {/* Ramadan Message Section (Replaces Takeaway Button) */}
+        <div className="hidden md:flex flex-col items-end text-right space-y-1">
+          <div className="flex items-center gap-2 text-orange-500">
+             <Star size={10} fill="currentColor" className="animate-pulse" />
+             <span className="text-[9px] font-black uppercase tracking-[0.3em] text-orange-200">Ramadan Mubarak</span>
+          </div>
+          <p className="text-white/60 font-medium italic text-[10px] tracking-tight leading-none">
+            "Blessings in every bite, traditions in every spice."
           </p>
         </div>
 
-        {/* Action Button Section */}
-        <div className="flex items-center">
-          <div className="
-            group relative
-            bg-white text-black 
-            h-10 px-6 rounded-full 
-            flex items-center justify-center 
-            cursor-pointer
-            transition-all duration-300
-            hover:shadow-[0_0_20px_rgba(255,255,255,0.3)]
-            active:scale-95
-          ">
-            <span className="text-[10px] font-black tracking-widest uppercase italic">
-              Order Takeaway
-            </span>
-          </div>
+        {/* Mobile Occasion Badge */}
+        <div className="md:hidden flex items-center gap-1.5 bg-orange-500/10 border border-orange-500/20 px-3 py-1.5 rounded-full">
+           <Star size={10} fill="currentColor" className="text-orange-500 animate-pulse" />
+           <span className="text-[8px] font-black uppercase tracking-widest text-orange-200">Iftar Special</span>
         </div>
         
       </div>

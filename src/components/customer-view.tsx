@@ -56,7 +56,6 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
   const firestore = useFirestore();
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeCategory, setActiveCategory] = useState('');
   const [showBackToTop, setShowBackToTop] = useState(false);
 
   useEffect(() => {
@@ -105,7 +104,7 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
 
       <Header tableId={tableId} onCartClick={() => setCartOpen(true)} timeLeft={0} />
 
-      {/* 🏮 DECORATION SEQUENCE: 1 Moon, 2 Star, 3 Star, 4 Lantern, 5 Star */}
+      {/* 🏮 DECORATION SEQUENCE */}
       <div className="absolute top-20 left-0 w-full h-[400px] overflow-hidden pointer-events-none z-10">
         <HangingDecoration className="left-[10%]" height="h-32" type="moon" delay="0s" />
         <HangingDecoration className="left-[28%]" height="h-24" type="star" delay="1.2s" />
@@ -114,21 +113,12 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
         <HangingDecoration className="right-[8%]" height="h-20" type="star" delay="1.5s" />
       </div>
       
-      <main className="max-w-5xl mx-auto px-4 md:px-6 py-24 md:py-40 relative z-20">
-        <header className="mb-24 text-center space-y-8">
-          <div className="flex items-center justify-center gap-3 text-orange-500">
-             <Star size={14} fill="currentColor" className="animate-pulse" />
-             <span className="text-[11px] font-black uppercase tracking-[0.5em] text-orange-200">Ramadan Mubarak</span>
-             <Star size={14} fill="currentColor" className="animate-pulse" />
-          </div>
-          
-          <h1 className="text-6xl md:text-[9rem] font-black text-white tracking-tighter uppercase italic leading-none">
-            Iftar <span className="text-orange-500">Special</span>
+      <main className="max-w-5xl mx-auto px-4 md:px-6 py-12 md:py-24 relative z-20">
+        <header className="mb-24 text-center">
+          {/* Hero Section simplified for space - Ramadan branding moved to Header */}
+          <h1 className="text-7xl md:text-[11rem] font-black text-white tracking-tighter uppercase italic leading-none animate-in fade-in slide-in-from-bottom-8 duration-1000">
+            Iftar <span className="text-orange-500">Specials</span>
           </h1>
-
-          <p className="text-white/60 font-medium text-sm md:text-xl italic max-w-lg mx-auto leading-relaxed">
-            "Blessings in every bite, traditions in every spice."
-          </p>
         </header>
 
         {/* MENU CATEGORIES */}
