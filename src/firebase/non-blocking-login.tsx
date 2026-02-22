@@ -13,7 +13,8 @@ export function initiateAnonymousSignIn(authInstance: Auth): void {
   // We use .catch() to prevent the "auth/admin-restricted-operation" from crashing the app
   // if the provider is disabled in the Firebase Console.
   signInAnonymously(authInstance).catch((error) => {
-    console.error("Firebase Auth Warning:", error.code, " - Anonymous sign-in may be disabled in your Firebase Console.");
+    // Using console.warn instead of console.error to avoid triggering the Next.js error overlay
+    console.warn("Firebase Auth Note:", error.code, " - Anonymous sign-in may be disabled in your Firebase Console. This is required for Admin writes to work.");
   });
   // Code continues immediately. Auth state change is handled by onAuthStateChanged listener.
 }
