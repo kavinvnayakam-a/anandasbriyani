@@ -1,4 +1,3 @@
-
 "use client"
 
 import Image from 'next/image';
@@ -45,14 +44,14 @@ export function Header({ tableId }: HeaderProps) {
           </p>
         </div>
 
-        {/* Ramadan Message Section */}
+        {/* Message Section */}
         <div className="hidden md:flex flex-col items-end text-right space-y-1">
           <div className="flex items-center gap-2 text-accent">
              <Star size={10} fill="currentColor" className="animate-pulse" />
              <span className="text-[9px] font-black uppercase tracking-[0.3em] text-yellow-200">Authentic Briyani</span>
           </div>
           <p className="text-white/60 font-medium italic text-[10px] tracking-tight leading-none">
-            "Blessings in every bite, traditions in every spice."
+            "Since 1989"
           </p>
         </div>
 

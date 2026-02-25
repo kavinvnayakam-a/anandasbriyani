@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useMemo, useEffect } from 'react';
@@ -12,39 +11,10 @@ import { CartIcon } from '@/components/cart-icon';
 import type { MenuItem } from '@/lib/types';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowUp, Moon, Star } from 'lucide-react';
+import { ArrowUp } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
 const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/dindigual_anandas_briyani%2FDAB_logo.webp?alt=media&token=2a082303-daa9-4187-89de-bbeefac2ceec";
-
-const HangingDecoration = ({ className, delay = "0s", height = "h-32", type = "lantern" }: { className?: string, delay?: string, height?: string, type?: "lantern" | "moon" | "star" }) => (
-  <div 
-    className={cn("absolute flex flex-col items-center z-10", className)}
-    style={{ animation: `sway 4s ease-in-out infinite alternate ${delay}` }}
-  >
-    <div className={cn("w-[1px] bg-gradient-to-b from-transparent via-accent to-yellow-300", height)} />
-    
-    {type === "lantern" && (
-      <div className="relative w-7 h-10">
-        <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-5 h-4 bg-gradient-to-b from-amber-300 to-amber-500 rounded-t-full border border-amber-200" />
-        <div className="w-full h-full bg-[#0c1a2b] rounded-sm border border-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.2)] relative overflow-hidden">
-          <div className="absolute inset-x-1 top-1 bottom-1 bg-gradient-to-t from-red-600 via-red-500 to-amber-200 rounded-t-full flex items-center justify-center">
-             <div className="w-1.5 h-3 bg-white rounded-full blur-[2px] opacity-80 animate-pulse" />
-          </div>
-        </div>
-        <div className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-9 h-1.5 bg-amber-600 rounded-sm border-t border-amber-300" />
-      </div>
-    )}
-
-    {type === "moon" && (
-      <Moon size={48} className="text-yellow-400 fill-yellow-400/20 drop-shadow-[0_0_15px_rgba(251,191,36,0.6)]" />
-    )}
-
-    {type === "star" && (
-      <Star size={16} className="text-yellow-300 fill-yellow-300 drop-shadow-[0_0_8px_rgba(251,191,36,0.4)]" />
-    )}
-  </div>
-);
 
 const TimeBanner = () => {
   return (
@@ -166,23 +136,9 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden relative">
-      <style jsx global>{`
-        @keyframes sway {
-          0% { transform: rotate(-2.5deg); transform-origin: top center; }
-          100% { transform: rotate(2.5deg); transform-origin: top center; }
-        }
-      `}</style>
-
+      
       <Header tableId={tableId} onCartClick={() => setCartOpen(true)} timeLeft={0} />
       <TimeBanner />
-
-      <div className="absolute top-20 left-0 w-full h-[400px] overflow-hidden pointer-events-none z-10">
-        <HangingDecoration className="left-[10%]" height="h-32" type="moon" delay="0s" />
-        <HangingDecoration className="left-[28%]" height="h-24" type="star" delay="1.2s" />
-        <HangingDecoration className="left-[50%]" height="h-44" type="star" delay="0.6s" />
-        <HangingDecoration className="right-[22%]" height="h-36" type="lantern" delay="2s" />
-        <HangingDecoration className="right-[8%]" height="h-20" type="star" delay="1.5s" />
-      </div>
       
       <main className="max-w-5xl mx-auto px-4 md:px-6 py-12 md:py-24 relative z-20">
         <header className="mb-24 text-center">

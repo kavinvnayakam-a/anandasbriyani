@@ -1,36 +1,12 @@
-
 "use client"
 
 import { useEffect } from 'react';
-import { Heart, Star, ArrowRight, Moon } from "lucide-react";
+import { Heart, Star, ArrowRight } from "lucide-react";
 import Link from 'next/link';
 import Image from 'next/image';
 import { cn } from "@/lib/utils";
 
 const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/dindigual_anandas_briyani%2FDAB_logo.webp?alt=media&token=2a082303-daa9-4187-89de-bbeefac2ceec";
-
-const HangingDecoration = ({ className, delay = "0s", height = "h-32", type = "lantern" }: { className?: string, delay?: string, height?: string, type?: "lantern" | "moon" | "star" }) => (
-  <div 
-    className={cn("absolute flex flex-col items-center z-10", className)}
-    style={{ animation: `sway 4s ease-in-out infinite alternate ${delay}` }}
-  >
-    <div className={cn("w-[1px] bg-gradient-to-b from-transparent via-white/40 to-white/60", height)} />
-    
-    {type === "lantern" && (
-      <div className="relative w-7 h-10">
-        <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-5 h-4 bg-gradient-to-b from-amber-200 to-amber-400 rounded-t-full border border-white/30" />
-        <div className="w-full h-full bg-[#0c1a2b] rounded-sm border border-amber-300 relative overflow-hidden">
-          <div className="absolute inset-x-1 top-1 bottom-1 bg-gradient-to-t from-red-500 to-white/80 rounded-t-full flex items-center justify-center">
-             <div className="w-1.5 h-3 bg-white rounded-full blur-[2px] opacity-80 animate-pulse" />
-          </div>
-        </div>
-        <div className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-9 h-1.5 bg-amber-500 rounded-sm border-t border-white/20" />
-      </div>
-    )}
-    {type === "moon" && <Moon size={42} className="text-white fill-white/20 drop-shadow-lg" />}
-    {type === "star" && <Star size={16} className="text-white fill-white drop-shadow-md" />}
-  </div>
-);
 
 export default function ThankYouPage() {
   useEffect(() => {
@@ -54,21 +30,6 @@ export default function ThankYouPage() {
   return (
     <div className="min-h-screen bg-primary flex flex-col items-center justify-center p-6 text-white overflow-hidden relative">
       
-      <style jsx global>{`
-        @keyframes sway {
-          0% { transform: rotate(-2.5deg); transform-origin: top center; }
-          100% { transform: rotate(2.5deg); transform-origin: top center; }
-        }
-      `}</style>
-
-      {/* 🏮 DECORATIONS */}
-      <div className="absolute top-0 left-0 w-full h-64 overflow-hidden pointer-events-none z-10">
-        <HangingDecoration className="left-[8%]" height="h-24" type="moon" delay="0s" />
-        <HangingDecoration className="left-[25%]" height="h-16" type="star" delay="1s" />
-        <HangingDecoration className="right-[25%]" height="h-32" type="lantern" delay="0.5s" />
-        <HangingDecoration className="right-[8%]" height="h-20" type="star" delay="1.8s" />
-      </div>
-
       <div className="w-full max-w-md space-y-10 text-center relative z-20 pt-16">
         
         {/* MASSIVE BRAND LOGO */}
