@@ -264,6 +264,8 @@ export default function OrderManager() {
 
   const pendingOrders = orders.filter(o => o.status === 'Pending');
 
+  const tableNumberForPrinting = printingOrder ? tables.find(t => t.id === printingOrder.tableId)?.tableNumber : null;
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center bg-white p-8 rounded-[2.5rem] border border-zinc-200 shadow-xl">
@@ -300,13 +302,15 @@ export default function OrderManager() {
         {pendingOrders.length > 0 ? pendingOrders.map((order) => {
           const cashInputVal = feedCashReceived[order.id] || "";
           const change = Math.max(0, (Number(cashInputVal) || order.totalPrice) - order.totalPrice);
+          const table = tables.find(t => t.id === order.tableId);
+          const orderIdentifier = table ? `Table ${table.tableNumber}` : `Takeaway #${order.orderNumber}`;
 
           return (
             <div key={order.id} className="bg-white border border-zinc-200 rounded-[2.5rem] p-8 flex flex-col transition-all shadow-lg hover:shadow-2xl hover:border-primary/30 group">
               <div className="flex justify-between items-start mb-6">
                 <div className="flex items-center gap-4">
                   <div className="bg-zinc-50 p-4 rounded-2xl border border-zinc-100 flex items-center justify-center">
-                    <span className="text-2xl font-black text-primary italic leading-none">#{order.orderNumber}</span>
+                    <span className="text-xl font-black text-primary italic leading-none">{orderIdentifier}</span>
                   </div>
                   <div>
                      <p className="text-[10px] font-black uppercase text-zinc-400 tracking-widest leading-none mb-1">Status</p>
@@ -619,13 +623,12 @@ export default function OrderManager() {
         </DialogContent>
       </Dialog>
 
-
       <Dialog open={showPrintPreview} onOpenChange={setShowPrintPreview}>
-        <DialogContent className="max-w-lg bg-zinc-900 border-zinc-800 p-0 overflow-hidden rounded-[3rem] shadow-2xl">
+        <DialogContent className="max-w-4xl bg-zinc-900 border-zinc-800 p-0 overflow-hidden rounded-[3rem] shadow-2xl">
           <DialogHeader className="p-8 border-b border-zinc-800 flex justify-between items-center bg-black/40">
              <div>
                 <DialogTitle className="text-xl font-black uppercase italic text-white flex items-center gap-3">
-                   <ReceiptText className="text-primary" /> Receipt Preview
+                   <ReceiptText className="text-primary" /> Print Preview
                 </DialogTitle>
                 <DialogDescription className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Verify Slips Before Printing</DialogDescription>
              </div>
@@ -634,73 +637,103 @@ export default function OrderManager() {
              </button>
           </DialogHeader>
           
-          <div className="p-10 bg-zinc-950 flex flex-col items-center gap-10 no-print">
-            <div 
-              className="bg-white text-black p-6 shadow-2xl font-mono text-[12px] relative font-black leading-snug" 
-              style={{ width: '300px' }}
-            >
-             <div className="text-center mb-2">
-                <h2 className="text-lg font-black uppercase">{printSettings.storeName}</h2>
-                <p className="text-[10px] uppercase font-bold leading-tight">{printSettings.address}</p>
-                <p className="text-[10px] font-bold">PH: {printSettings.phone}</p>
-                <p className="text-[10px] font-bold">GSTIN: {printSettings.gstin}</p>
-                <p className="text-[10px] font-bold">FSSAI: {printSettings.fssai}</p>
-              </div>
+          <div className="p-10 bg-zinc-950 flex flex-col md:flex-row items-start justify-center gap-10 no-print">
+            
+            <div className="w-[300px] flex-shrink-0">
+              <p className="text-center text-white/50 font-bold uppercase text-xs tracking-widest mb-2">Receipt</p>
+              <div 
+                className="bg-white text-black p-6 shadow-2xl font-mono text-[12px] relative font-black leading-snug"
+              >
+              <div className="text-center mb-2">
+                  <h2 className="text-lg font-black uppercase">{printSettings.storeName}</h2>
+                  <p className="text-[10px] uppercase font-bold leading-tight">{printSettings.address}</p>
+                  <p className="text-[10px] font-bold">PH: {printSettings.phone}</p>
+                  <p className="text-[10px] font-bold">GSTIN: {printSettings.gstin}</p>
+                  <p className="text-[10px] font-bold">FSSAI: {printSettings.fssai}</p>
+                </div>
 
-              <div className="border-y-2 border-dashed border-black py-1 my-2 text-[10px]">
-                <div className="flex justify-between">
-                  <span>Date: {formatOrderDate(printingOrder?.timestamp)}</span>
-                  <span>Time: {formatOrderTime(printingOrder?.timestamp)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Token No.: {printingOrder?.orderNumber}</span>
-                  <span className="font-black">{printingOrder?.tableId === 'Takeaway' ? 'Takeaway' : `Table: ${tables.find(t => t.id === printingOrder?.tableId)?.tableNumber}`}</span>
-                </div>
-                 <div className="flex justify-between mt-1 pt-1 border-t border-black/10">
-                  <span className="uppercase">Cust: {printingOrder?.customerName}</span>
-                </div>
-              </div>
-
-              <div className="mb-2">
-                <div className="grid grid-cols-12 font-black border-b-2 border-dashed border-black pb-1 mb-1 text-[10px]">
-                  <span className="col-span-6">Item</span>
-                  <span className="col-span-2 text-center">Qty</span>
-                  <span className="col-span-2 text-right">Rate</span>
-                  <span className="col-span-2 text-right">Amt</span>
-                </div>
-                {printingOrder?.items.map((item, idx) => (
-                  <div key={idx} className="grid grid-cols-12 text-[10px] leading-tight font-bold">
-                    <span className="col-span-6 uppercase truncate pr-1">{item.name}</span>
-                    <span className="col-span-2 text-center">{item.quantity}</span>
-                    <span className="col-span-2 text-right">{item.price.toFixed(2)}</span>
-                    <span className="col-span-2 text-right">{(item.price * item.quantity).toFixed(2)}</span>
+                <div className="border-y-2 border-dashed border-black py-1 my-2 text-[10px]">
+                  <div className="flex justify-between">
+                    <span>Date: {formatOrderDate(printingOrder?.timestamp)}</span>
+                    <span>Time: {formatOrderTime(printingOrder?.timestamp)}</span>
                   </div>
-                ))}
-              </div>
-
-              <div className="border-t-2 border-dashed border-black pt-2 space-y-1 text-right text-[10px] font-bold">
-                <div className="flex justify-between"><span>Sub Total</span> <span>{formatCurrency(printingOrder?.subtotal || 0)}</span></div>
-                <div className="flex justify-between"><span>CGST @ 2.5%</span> <span>{formatCurrency(printingOrder?.cgst || 0)}</span></div>
-                <div className="flex justify-between"><span>SGST @ 2.5%</span> <span>{formatCurrency(printingOrder?.sgst || 0)}</span></div>
-                {(printingOrder?.roundOff || 0) !== 0 && (
-                  <div className="flex justify-between"><span>Round off</span> <span>{printingOrder?.roundOff?.toFixed(2)}</span></div>
-                )}
-                <div className="flex justify-between items-center text-lg font-black border-t-2 border-black pt-1 mt-1">
-                  <span>TOTAL</span>
-                  <span>{formatCurrency(printingOrder?.totalPrice || 0)}</span>
-                </div>
-                 {printingOrder?.paymentMethod === 'Cash' && printingOrder.cashReceived != null && (
-                  <div className="pt-2 mt-2 border-t-2 border-dashed border-black/40 text-xs">
-                    <div className="flex justify-between"><span>CASH RECEIVED</span> <span>{formatCurrency(printingOrder.cashReceived || 0)}</span></div>
-                    <div className="flex justify-between"><span>CHANGE DUE</span> <span>{formatCurrency(printingOrder.changeDue || 0)}</span></div>
+                  <div className="flex justify-between font-black">
+                     {tableNumberForPrinting 
+                        ? <span>Table No.: {tableNumberForPrinting}</span>
+                        : <span>Token No.: {printingOrder?.orderNumber}</span>
+                      }
+                      <span>{tableNumberForPrinting ? "Dine-In" : "Takeaway"}</span>
                   </div>
-                )}
-              </div>
+                  <div className="flex justify-between mt-1 pt-1 border-t border-black/10">
+                    <span className="uppercase">Cust: {printingOrder?.customerName}</span>
+                  </div>
+                </div>
 
-              <div className="text-center mt-4 border-t-2 border-dashed border-black pt-2">
-                <p className="text-[10px] font-bold uppercase italic">{printSettings.footerMessage}</p>
+                <div className="mb-2">
+                  <div className="grid grid-cols-12 font-black border-b-2 border-dashed border-black pb-1 mb-1 text-[10px]">
+                    <span className="col-span-6">Item</span>
+                    <span className="col-span-2 text-center">Qty</span>
+                    <span className="col-span-2 text-right">Rate</span>
+                    <span className="col-span-2 text-right">Amt</span>
+                  </div>
+                  {printingOrder?.items.map((item, idx) => (
+                    <div key={idx} className="grid grid-cols-12 text-[10px] leading-tight font-bold">
+                      <span className="col-span-6 uppercase truncate pr-1">{item.name}</span>
+                      <span className="col-span-2 text-center">{item.quantity}</span>
+                      <span className="col-span-2 text-right">{item.price.toFixed(2)}</span>
+                      <span className="col-span-2 text-right">{(item.price * item.quantity).toFixed(2)}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="border-t-2 border-dashed border-black pt-2 space-y-1 text-right text-[10px] font-bold">
+                  <div className="flex justify-between"><span>Sub Total</span> <span>{formatCurrency(printingOrder?.subtotal || 0)}</span></div>
+                  <div className="flex justify-between"><span>CGST @ 2.5%</span> <span>{formatCurrency(printingOrder?.cgst || 0)}</span></div>
+                  <div className="flex justify-between"><span>SGST @ 2.5%</span> <span>{formatCurrency(printingOrder?.sgst || 0)}</span></div>
+                  {(printingOrder?.roundOff || 0) !== 0 && (
+                    <div className="flex justify-between"><span>Round off</span> <span>{printingOrder?.roundOff?.toFixed(2)}</span></div>
+                  )}
+                  <div className="flex justify-between items-center text-lg font-black border-t-2 border-black pt-1 mt-1">
+                    <span>TOTAL</span>
+                    <span>{formatCurrency(printingOrder?.totalPrice || 0)}</span>
+                  </div>
+                  {printingOrder?.paymentMethod === 'Cash' && printingOrder.cashReceived != null && (
+                    <div className="pt-2 mt-2 border-t-2 border-dashed border-black/40 text-xs">
+                      <div className="flex justify-between"><span>CASH RECEIVED</span> <span>{formatCurrency(printingOrder.cashReceived || 0)}</span></div>
+                      <div className="flex justify-between"><span>CHANGE DUE</span> <span>{formatCurrency(printingOrder.changeDue || 0)}</span></div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="text-center mt-4 border-t-2 border-dashed border-black pt-2">
+                  <p className="text-[10px] font-bold uppercase italic">{printSettings.footerMessage}</p>
+                </div>
               </div>
             </div>
+
+            <div className="w-[300px] flex-shrink-0">
+              <p className="text-center text-white/50 font-bold uppercase text-xs tracking-widest mb-2">Kitchen Order Ticket</p>
+              <div className="bg-white text-black p-6 shadow-2xl font-mono text-[12px] relative font-black leading-snug">
+                <div className="text-center">
+                  <p className="text-lg font-black uppercase tracking-widest">KOT</p>
+                  <h1 className="text-6xl font-black italic leading-none m-0">
+                    {tableNumberForPrinting ? `T${tableNumberForPrinting}` : `#${printingOrder?.orderNumber}`}
+                  </h1>
+                  <p className="text-2xl font-black mt-4">
+                    {tableNumberForPrinting ? '(Dine-In)' : `(${printingOrder?.customerName})`}
+                  </p>
+                </div>
+                <div className="border-y-2 border-dashed border-black my-4 py-2 text-left">
+                  {printingOrder?.items.map((item, idx) => (
+                    <p key={idx} className="text-lg font-black uppercase">
+                      {item.quantity}x {item.name}
+                    </p>
+                  ))}
+                </div>
+                 <p className="text-center text-[10px]">{formatOrderTime(printingOrder?.timestamp)}</p>
+              </div>
+            </div>
+
           </div>
 
           <DialogFooter className="p-8 bg-zinc-900">
@@ -727,9 +760,12 @@ export default function OrderManager() {
                         <span>Date: {formatOrderDate(printingOrder.timestamp)}</span>
                         <span>Time: {formatOrderTime(printingOrder.timestamp)}</span>
                     </div>
-                    <div className="flex justify-between">
-                        <span>Token No.: {printingOrder.orderNumber}</span>
-                        <span className="font-black">{printingOrder?.tableId === 'Takeaway' ? 'Takeaway' : `Table: ${tables.find(t => t.id === printingOrder?.tableId)?.tableNumber}`}</span>
+                    <div className="flex justify-between font-black">
+                        {tableNumberForPrinting
+                          ? <span>Table No.: {tableNumberForPrinting}</span>
+                          : <span>Token No.: {printingOrder.orderNumber}</span>
+                        }
+                        <span>{tableNumberForPrinting ? 'Dine-In' : 'Takeaway'}</span>
                     </div>
                     <div className="flex justify-between mt-1 pt-1 border-t border-black/10">
                         <span className="uppercase">Cust: {printingOrder.customerName}</span>
@@ -776,10 +812,12 @@ export default function OrderManager() {
             
             <div className="kot-section p-4 text-center font-black" style={{breakBefore: 'page'}}>
                <p className="text-xl font-black uppercase mb-4 tracking-widest">KITCHEN ORDER</p>
-               <h1 className="text-8xl font-black italic leading-none m-0">#{printingOrder.orderNumber}</h1>
+               <h1 className="text-8xl font-black italic leading-none m-0">
+                  {tableNumberForPrinting ? `T${tableNumberForPrinting}` : `#${printingOrder.orderNumber}`}
+                </h1>
                <div className="mt-8 pt-8 border-t-4 border-dashed border-black uppercase">
                   <p className="text-3xl font-black mb-4">
-                    {printingOrder.tableId === 'Takeaway' ? printingOrder.customerName : `TABLE: ${tables.find(t => t.id === printingOrder.tableId)?.tableNumber || printingOrder.tableId}`}
+                     {tableNumberForPrinting ? `(Dine-In)` : `(${printingOrder.customerName})`}
                   </p>
                   <div className="space-y-2 text-left">
                     {printingOrder.items.map((item, idx) => (

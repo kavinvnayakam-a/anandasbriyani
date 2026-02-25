@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect, useMemo } from 'react';
@@ -5,7 +6,7 @@ import { useFirestore } from '@/firebase';
 import { 
   collection, onSnapshot, query, where, Timestamp, getDocs, orderBy, doc 
 } from 'firebase/firestore';
-import { Order } from '@/lib/types';
+import { Order, Table as TableType } from '@/lib/types';
 import { 
   Printer,
   ShoppingBag,
@@ -47,6 +48,7 @@ const DEFAULT_PRINT_SETTINGS: PrintSettings = {
 export default function TodayOrders() {
   const [liveOrders, setLiveOrders] = useState<Order[]>([]);
   const [historyOrders, setHistoryOrders] = useState<Order[]>([]);
+  const [tables, setTables] = useState<TableType[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [printSettings, setPrintSettings] = useState<PrintSettings>(DEFAULT_PRINT_SETTINGS);
@@ -66,6 +68,10 @@ export default function TodayOrders() {
         const settings = { ...DEFAULT_PRINT_SETTINGS, ...d.data() } as PrintSettings;
         setPrintSettings(settings);
       }
+    });
+
+    const unsubTables = onSnapshot(query(collection(firestore, "tables"), orderBy("tableNumber")), (snapshot) => {
+      setTables(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as TableType));
     });
 
     const start = new Date(todayDate);
@@ -107,6 +113,7 @@ export default function TodayOrders() {
     return () => {
       unsubLive();
       unsubSettings();
+      unsubTables();
     };
   }, [firestore, todayDate, toast, loading]);
 
@@ -148,6 +155,8 @@ export default function TodayOrders() {
     const date = ts.seconds ? new Date(ts.seconds * 1000) : new Date(ts);
     return date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
   };
+  
+  const tableNumberForPrinting = printingOrder ? tables.find(t => t.id === printingOrder.tableId)?.tableNumber : null;
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -179,10 +188,16 @@ export default function TodayOrders() {
             Loading Today's Orders...
           </div>
         ) : filteredOrders.length > 0 ? (
-          filteredOrders.map(order => (
+          filteredOrders.map(order => {
+            const table = tables.find(t => t.id === order.tableId);
+            const identifier = table ? `Table ${table.tableNumber}` : `Takeaway`;
+            return (
             <div key={order.id} className="bg-white border-2 border-zinc-100 p-6 rounded-[2.5rem] shadow-lg flex flex-col gap-4 group">
               <div className="flex justify-between items-start">
-                <span className="text-2xl font-black italic text-zinc-900 tracking-tighter">#{order.orderNumber}</span>
+                <div>
+                  <span className="text-2xl font-black italic text-zinc-900 tracking-tighter">{identifier}</span>
+                  <p className="text-zinc-400 font-bold text-xs uppercase tracking-widest">#{order.orderNumber}</p>
+                </div>
                 <span className={cn(
                   "px-3 py-1 rounded-full text-[8px] font-black uppercase border",
                   order.status === 'Completed' || order.status === 'Handover' ? 'bg-zinc-100 text-zinc-500 border-zinc-200' : 
@@ -222,7 +237,7 @@ export default function TodayOrders() {
                  </button>
               </div>
             </div>
-          ))
+          )})
         ) : (
           <div className="col-span-full h-64 flex flex-col items-center justify-center bg-zinc-50 border-4 border-dashed border-zinc-100 rounded-[2.5rem] text-zinc-200">
              <ShoppingBag size={48} className="opacity-40" />
@@ -263,10 +278,13 @@ export default function TodayOrders() {
                   <span>Date: {formatDate(printingOrder?.timestamp)}</span>
                   <span>Time: {formatTime(printingOrder?.timestamp)}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Token No.: {printingOrder?.orderNumber}</span>
-                  <span className="font-black">Takeaway</span>
-                </div>
+                 <div className="flex justify-between font-black">
+                     {tableNumberForPrinting 
+                        ? <span>Table No.: {tableNumberForPrinting}</span>
+                        : <span>Token No.: {printingOrder?.orderNumber}</span>
+                      }
+                      <span>{tableNumberForPrinting ? "Dine-In" : "Takeaway"}</span>
+                  </div>
                  <div className="flex justify-between mt-1 pt-1 border-t border-black/10">
                   <span className="uppercase">Cust: {printingOrder?.customerName}</span>
                 </div>
@@ -338,9 +356,12 @@ export default function TodayOrders() {
                         <span>Date: {formatDate(printingOrder.timestamp)}</span>
                         <span>Time: {formatTime(printingOrder.timestamp)}</span>
                     </div>
-                    <div className="flex justify-between">
-                        <span>Token No.: {printingOrder.orderNumber}</span>
-                        <span className="font-black">Takeaway</span>
+                     <div className="flex justify-between font-black">
+                        {tableNumberForPrinting
+                          ? <span>Table No.: {tableNumberForPrinting}</span>
+                          : <span>Token No.: {printingOrder.orderNumber}</span>
+                        }
+                        <span>{tableNumberForPrinting ? 'Dine-In' : 'Takeaway'}</span>
                     </div>
                     <div className="flex justify-between mt-1 pt-1 border-t border-black/10">
                         <span className="uppercase">Cust: {printingOrder.customerName}</span>

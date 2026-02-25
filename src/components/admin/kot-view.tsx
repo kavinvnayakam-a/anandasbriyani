@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect, useMemo } from 'react';
@@ -6,7 +7,7 @@ import {
   collection, onSnapshot, query, orderBy, doc, 
   updateDoc, writeBatch, serverTimestamp, getDoc, getDocs, where, Timestamp 
 } from 'firebase/firestore';
-import { Order } from '@/lib/types';
+import { Order, Table as TableType } from '@/lib/types';
 import { 
   CheckCircle2, Clock, Check, ChefHat, User, Hash, Box, PackageCheck, Handshake, History, Flame
 } from 'lucide-react';
@@ -15,21 +16,29 @@ import { cn } from '@/lib/utils';
 
 export default function KotView() {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [tables, setTables] = useState<TableType[]>([]);
   const [isCleaning, setIsCleaning] = useState(false);
   const firestore = useFirestore();
   const { toast } = useToast();
 
-  // 1. Fetch Live Orders
   useEffect(() => {
     if (!firestore) return;
+
     const q = query(collection(firestore, "orders"), orderBy("timestamp", "desc"));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const unsubOrders = onSnapshot(q, (snapshot) => {
       setOrders(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Order[]);
     });
-    return () => unsubscribe();
+
+    const unsubTables = onSnapshot(query(collection(firestore, "tables"), orderBy("tableNumber")), (snapshot) => {
+        setTables(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as TableType));
+    });
+
+    return () => {
+      unsubOrders();
+      unsubTables();
+    };
   }, [firestore]);
 
-  // 2. Auto-Archive Logic (11:00 PM Cutoff)
   useEffect(() => {
     if (!firestore || orders.length === 0 || isCleaning) return;
 
@@ -165,6 +174,7 @@ export default function KotView() {
               <OrderTicket 
                 key={order.id} 
                 order={order} 
+                tables={tables}
                 onPack={markItemPacked}
                 onReady={markReadyForPickup}
                 onHandover={markHandover}
@@ -186,7 +196,8 @@ export default function KotView() {
             {handoverQueue.length > 0 ? handoverQueue.map((order) => (
               <OrderTicket 
                 key={order.id} 
-                order={order} 
+                order={order}
+                tables={tables}
                 formatTime={formatOrderTime}
                 isHandover
               />
@@ -196,14 +207,18 @@ export default function KotView() {
               </div>
             )}
           </div>
-        </div>
 
+        </div>
       </div>
     </div>
   );
 }
 
-function OrderTicket({ order, onPack, onReady, onHandover, formatTime, isHandover }: any) {
+function OrderTicket({ order, onPack, onReady, onHandover, formatTime, isHandover, tables }: any) {
+  const table = tables.find((t: any) => t.id === order.tableId);
+  const identifier = table ? `Table ${table.tableNumber}` : `#${order.orderNumber}`;
+  const subIdentifier = order.tableId === 'Takeaway' ? 'Takeaway' : order.customerName;
+
   return (
     <div className={cn(
       "bg-white border-2 rounded-[2.5rem] p-6 flex flex-col transition-all shadow-xl hover:shadow-2xl relative overflow-hidden group",
@@ -217,7 +232,7 @@ function OrderTicket({ order, onPack, onReady, onHandover, formatTime, isHandove
               <Hash size={16} className="text-primary" />
            </div>
            <div>
-              <span className="text-xl font-black italic text-zinc-900">#{order.orderNumber}</span>
+              <span className="text-xl font-black italic text-zinc-900">{identifier}</span>
               <div className="flex items-center gap-2 text-zinc-400 text-[8px] font-bold uppercase">
                  <Clock size={10}/> {formatTime(order.timestamp)}
               </div>
@@ -227,7 +242,7 @@ function OrderTicket({ order, onPack, onReady, onHandover, formatTime, isHandove
       </div>
 
       <div className="mb-4 flex items-center justify-between">
-         <span className="text-[9px] font-black uppercase text-zinc-500 truncate max-w-[120px]">{order.customerName}</span>
+         <span className="text-[9px] font-black uppercase text-zinc-500 truncate max-w-[120px]">{subIdentifier}</span>
          <span className="text-[9px] font-black text-primary uppercase italic">{order.items.length} Items</span>
       </div>
 
