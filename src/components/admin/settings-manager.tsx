@@ -43,12 +43,28 @@ export default function SettingsManager() {
   };
 
   const handleDeleteTable = async (id: string) => {
-    if (!firestore || !confirm('Are you sure you want to delete this table?')) return;
+    if (!firestore) return;
+    const isConfirmed = confirm('Are you sure you want to delete this table? This cannot be undone.');
+    if (!isConfirmed) return;
+
     try {
       await deleteDoc(doc(firestore, 'tables', id));
       toast({ title: 'Table Removed' });
-    } catch (error) {
-      toast({ variant: 'destructive', title: 'Error', description: 'Could not remove the table.' });
+    } catch (error: any) {
+      console.error("Error deleting table:", error);
+      if (error.code === 'failed-precondition') {
+        toast({
+          variant: 'destructive',
+          title: 'Deletion Failed',
+          description: 'This table has active orders and cannot be deleted. Please clear associated orders first.',
+        });
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: 'Could not remove the table.',
+        });
+      }
     }
   };
 
