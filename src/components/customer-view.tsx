@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useMemo, useEffect } from 'react';
@@ -146,7 +147,7 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
       <footer className="bg-black/60 border-t border-white/5 py-32 px-6">
         <div className="max-w-5xl mx-auto flex flex-col items-center gap-12">
           <div className="h-28 w-28 rounded-full border-2 border-accent/30 p-1 bg-white">
-            <Image src={LOGO_URL} alt="Dindigul Ananda's Briyani Logo" width={112} height={112} className="rounded-full object-contain p-2" />
+            <Image src={LOGO_URL} alt="Dindigul Ananda's Briyani Logo" width={112} height={112} className="rounded-full object-cover" />
           </div>
           
           <div className="text-center space-y-8">

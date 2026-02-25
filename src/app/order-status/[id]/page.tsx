@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useEffect, useState, useRef } from 'react';
@@ -201,7 +202,7 @@ export default function OrderStatusPage() {
               alt="Dindigul Ananda's Briyani Logo" 
               width={60} 
               height={60} 
-              className="rounded-full object-contain"
+              className="rounded-full object-cover"
             />
           </div>
         </div>

@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useEffect } from 'react';
@@ -79,7 +80,7 @@ export default function ThankYouPage() {
               alt="Dindigul Ananda's Briyani Logo" 
               width={160} 
               height={160}
-              className="rounded-full object-contain p-2" 
+              className="rounded-full object-cover" 
               priority
             />
           </div>

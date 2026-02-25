@@ -1,3 +1,4 @@
+
 "use client"
 
 import Image from 'next/image';
@@ -34,7 +35,7 @@ export function Header({ tableId }: HeaderProps) {
               alt="Dindigul Ananda's Briyani Logo" 
               width={56} 
               height={56} 
-              className="object-contain p-1"
+              className="object-cover"
               priority
             />
           </div>

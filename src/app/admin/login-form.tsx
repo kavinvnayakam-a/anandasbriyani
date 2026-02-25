@@ -9,12 +9,17 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Unlock, Mail, Lock, ShieldCheck } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/firebase";
+import { initiateAnonymousSignIn } from "@/firebase/non-blocking-login";
 import Image from "next/image";
 
-const LOGO_URL = "https://picsum.photos/seed/dindigul/200/200";
+const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/dindigual_anandas_briyani%2FDAB_logo.webp?alt=media&token=2a082303-daa9-4187-89de-bbeefac2ceec";
 
 export default function LoginForm() {
   const router = useRouter();
+  const { toast } = useToast();
+  const authInstance = useAuth();
   const [auth, setAuth, isAuthLoaded] = useLocalStorage('dindigul-admin-auth', false);
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
@@ -30,12 +35,30 @@ export default function LoginForm() {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate authentication logic
+    const allowedEmails = ["info@getpik.in", "admin@dindigul.com"];
+    
+    // Simulate authentication logic with strict email check
     setTimeout(() => {
-      if (email && password) {
+      if (allowedEmails.includes(email.toLowerCase().trim()) && password.length >= 4) {
+        // 1. Grant Local Storage Auth
         setAuth(true);
+        
+        // 2. Grant Firebase Auth (to satisfy Security Rules)
+        if (authInstance) {
+          initiateAnonymousSignIn(authInstance);
+        }
+
+        toast({
+          title: "Authentication Successful",
+          description: "Welcome to the Dindigul Ananda's Briyani Console.",
+        });
       } else {
         setIsLoading(false);
+        toast({
+          variant: "destructive",
+          title: "Access Denied",
+          description: "Invalid administrator credentials provided.",
+        });
       }
     }, 1200);
   };

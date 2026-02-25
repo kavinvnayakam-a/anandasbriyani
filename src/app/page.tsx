@@ -1,3 +1,4 @@
+
 import CustomerView from '@/components/customer-view';
 import { Suspense } from 'react';
 import Image from 'next/image';
@@ -24,7 +25,7 @@ export default async function Home() {
                   alt="Dindigul Ananda's Briyani Logo" 
                   width={120} 
                   height={120} 
-                  className="opacity-90 object-contain"
+                  className="opacity-90 object-cover"
                 />
               </div>
             </div>
