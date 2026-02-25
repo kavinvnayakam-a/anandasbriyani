@@ -72,7 +72,7 @@ export default function ThankYouPage() {
 
         {/* Review Card */}
         <Link 
-          href="https://maps.app.goo.gl/qp28sM23SP4puXeS9" 
+          href="https://maps.app.goo.gl/xsrDeboZjQASi7eE8" 
           target="_blank"
           className="block w-full bg-white p-10 rounded-[3.5rem] shadow-2xl border border-white/10 group transition-all duration-500 hover:scale-[1.02]"
         >
