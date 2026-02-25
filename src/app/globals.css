@@ -8,7 +8,7 @@ body {
 
 @layer base {
   :root {
-    --background: 0 72.2% 50.6%; /* Red */
+    --background: 354 88% 19%; /* Deep Red */
     --foreground: 0 0% 98%;
 
     --card: 0 40% 8%; /* Dark, near-black */
@@ -17,7 +17,7 @@ body {
     --popover: 0 40% 8%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 0 72.2% 50.6%; /* Red */
+    --primary: 354 88% 19%; /* Deep Red */
     --primary-foreground: 0 85.7% 97.3%;
 
     --secondary: 240 4.8% 15.9%;
