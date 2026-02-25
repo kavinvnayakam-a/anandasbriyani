@@ -31,7 +31,7 @@ export default function LoginForm() {
     e.preventDefault();
     setIsLoading(true);
     
-    const allowedEmails = ["info@getpik.in", "admin@dindigul.com"];
+    const allowedEmails = ["info@getpik.in", "admin@dindigul.com", "murugananthands@gmail.com"];
     
     // Simulate authentication logic with strict email check
     setTimeout(() => {
