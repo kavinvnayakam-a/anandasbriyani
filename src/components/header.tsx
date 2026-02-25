@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { Star } from 'lucide-react';
 
-const LOGO_URL = "https://picsum.photos/seed/dindigul/200/200";
+const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/dindigual_anandas_briyani%2FDAB_logo.webp?alt=media&token=2a082303-daa9-4187-89de-bbeefac2ceec";
 
 type HeaderProps = {
   tableId: string | null;
@@ -22,9 +22,9 @@ export function Header({ tableId }: HeaderProps) {
             relative 
             h-14 w-14           
             rounded-full 
-            border-[2px] border-white  
+            border-[2px] border-accent  
             bg-white
-            shadow-[0_0_15px_rgba(255,255,255,0.2)] 
+            shadow-[0_0_15px_hsla(var(--accent),0.4)]
             overflow-hidden
             flex items-center justify-center
             shrink-0
@@ -34,7 +34,7 @@ export function Header({ tableId }: HeaderProps) {
               alt="Dindigul Ananda's Briyani Logo" 
               width={56} 
               height={56} 
-              className="object-contain"
+              className="object-contain p-1"
               priority
             />
           </div>
@@ -46,7 +46,7 @@ export function Header({ tableId }: HeaderProps) {
 
         {/* Ramadan Message Section */}
         <div className="hidden md:flex flex-col items-end text-right space-y-1">
-          <div className="flex items-center gap-2 text-yellow-500">
+          <div className="flex items-center gap-2 text-accent">
              <Star size={10} fill="currentColor" className="animate-pulse" />
              <span className="text-[9px] font-black uppercase tracking-[0.3em] text-yellow-200">Authentic Briyani</span>
           </div>
@@ -56,8 +56,8 @@ export function Header({ tableId }: HeaderProps) {
         </div>
 
         {/* Mobile Occasion Badge */}
-        <div className="md:hidden flex items-center gap-1.5 bg-yellow-500/10 border border-yellow-500/20 px-3 py-1.5 rounded-full">
-           <Star size={10} fill="currentColor" className="text-yellow-500 animate-pulse" />
+        <div className="md:hidden flex items-center gap-1.5 bg-accent/10 border border-accent/20 px-3 py-1.5 rounded-full">
+           <Star size={10} fill="currentColor" className="text-accent animate-pulse" />
            <span className="text-[8px] font-black uppercase tracking-widest text-yellow-200">Since 1989</span>
         </div>
         

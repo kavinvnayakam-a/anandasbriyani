@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: 'Dindigul Ananda\'s Briyani',
   description: 'Authentic Dindigul Briyani experience.',
   icons: {
-    icon: 'https://picsum.photos/seed/dindigul/100/100',
+    icon: 'https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/dindigual_anandas_briyani%2FDAB_logo.webp?alt=media&token=2a082303-daa9-4187-89de-bbeefac2ceec',
   },
   robots: {
     index: false,

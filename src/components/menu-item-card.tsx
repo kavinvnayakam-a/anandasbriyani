@@ -17,9 +17,9 @@ export function MenuItemCard({ item, onAddToCart, globalShowImages = true }: Men
 
   return (
     <div className={cn(
-      "group relative bg-black/10 rounded-[2rem] overflow-hidden transition-all duration-500",
-      "border border-white/10 shadow-2xl backdrop-blur-sm",
-      isSoldOut ? "opacity-60" : "hover:border-white/30 hover:-translate-y-1 hover:shadow-black/20",
+      "group relative bg-card/80 rounded-[2rem] overflow-hidden transition-all duration-500",
+      "border border-border shadow-2xl backdrop-blur-sm",
+      isSoldOut ? "opacity-60" : "hover:border-accent/50 hover:-translate-y-1 hover:shadow-black/20",
       !shouldShowImage && "pt-6"
     )}>
       
@@ -47,8 +47,8 @@ export function MenuItemCard({ item, onAddToCart, globalShowImages = true }: Men
           {!isSoldOut && (
             <div className="absolute top-4 right-4 z-10">
               <div className="bg-black/40 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/20 flex items-center gap-1.5">
-                <Star size={10} className="text-white fill-white" />
-                <span className="text-white font-bold text-xs uppercase tracking-widest">RAVOYI</span>
+                <Star size={10} className="text-accent fill-accent" />
+                <span className="text-white font-bold text-xs uppercase tracking-widest">DAB SPECIAL</span>
               </div>
             </div>
           )}
@@ -58,16 +58,16 @@ export function MenuItemCard({ item, onAddToCart, globalShowImages = true }: Men
       <div className="p-6 space-y-4">
         <div className="space-y-2">
           <div className="flex justify-between items-start gap-4">
-            <h3 className="text-xl font-bold text-white tracking-tight leading-snug group-hover:text-black transition-colors">
+            <h3 className="text-xl font-bold text-white tracking-tight leading-snug">
               {item.name}
             </h3>
-            <span className="text-white font-black text-lg tabular-nums shrink-0">
+            <span className="text-accent font-black text-lg tabular-nums shrink-0">
               {formatCurrency(item.price)}
             </span>
           </div>
           
           <p className="text-white/70 text-xs font-medium leading-relaxed line-clamp-2">
-            {item.description || "A regional masterpiece, carefully prepared with hand-picked spices for an authentic RAVOYI Kitchen experience."}
+            {item.description || "An authentic specialty, carefully prepared with hand-picked spices for a genuine Dindigul Ananda's Briyani experience."}
           </p>
         </div>
 
@@ -78,7 +78,7 @@ export function MenuItemCard({ item, onAddToCart, globalShowImages = true }: Men
             "w-full h-12 rounded-full flex items-center justify-center gap-2.5 transition-all duration-300 font-bold uppercase tracking-widest text-[10px]",
             isSoldOut 
               ? "bg-white/5 text-white/20 cursor-not-allowed" 
-              : "bg-white text-background shadow-lg hover:bg-black hover:text-white active:scale-95"
+              : "bg-accent text-accent-foreground shadow-lg hover:bg-white hover:text-black active:scale-95"
           )}
         >
           {isSoldOut ? (

@@ -38,7 +38,7 @@ import {
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
 
-const LOGO_URL = "https://picsum.photos/seed/dindigul/200/200";
+const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/dindigual_anandas_briyani%2FDAB_logo.webp?alt=media&token=2a082303-daa9-4187-89de-bbeefac2ceec";
 
 type TabType = 'counter' | 'packing' | 'history' | 'menu' | 'analytics';
 
@@ -116,7 +116,7 @@ export default function AdminDashboard() {
               {/* Logo Highlight Glow */}
               <div className="absolute -inset-4 bg-white/20 rounded-full blur-2xl opacity-80 animate-pulse group-hover:opacity-100 transition-opacity" />
               <div className="relative bg-white rounded-full shadow-2xl overflow-hidden w-28 h-28 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:h-10 border-4 border-white/20 flex items-center justify-center transition-all duration-300">
-                 <Image src={LOGO_URL} alt="Dindigul Ananda's Briyani" fill className="object-cover" />
+                 <Image src={LOGO_URL} alt="Dindigul Ananda's Briyani" fill className="object-contain p-1" />
               </div>
             </div>
             

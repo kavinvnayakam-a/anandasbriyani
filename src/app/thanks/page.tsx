@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { cn } from "@/lib/utils";
 
-const LOGO_URL = "https://picsum.photos/seed/dindigul/200/200";
+const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/dindigual_anandas_briyani%2FDAB_logo.webp?alt=media&token=2a082303-daa9-4187-89de-bbeefac2ceec";
 
 const HangingDecoration = ({ className, delay = "0s", height = "h-32", type = "lantern" }: { className?: string, delay?: string, height?: string, type?: "lantern" | "moon" | "star" }) => (
   <div 
@@ -79,7 +79,7 @@ export default function ThankYouPage() {
               alt="Dindigul Ananda's Briyani Logo" 
               width={160} 
               height={160}
-              className="rounded-full" 
+              className="rounded-full object-contain p-2" 
               priority
             />
           </div>

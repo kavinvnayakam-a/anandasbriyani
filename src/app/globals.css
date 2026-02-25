@@ -8,13 +8,13 @@ body {
 
 @layer base {
   :root {
-    --background: 240 10% 3.9%;
+    --background: 0 30% 8%;
     --foreground: 0 0% 98%;
 
-    --card: 240 10% 3.9%;
+    --card: 0 40% 12%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 240 10% 3.9%;
+    --popover: 0 40% 12%;
     --popover-foreground: 0 0% 98%;
 
     --primary: 0 72.2% 50.6%; /* Red */
@@ -32,9 +32,9 @@ body {
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 240 4.8% 15.9%;
-    --input: 240 4.8% 15.9%;
-    --ring: 0 72.2% 50.6%;
+    --border: 0 40% 20%;
+    --input: 0 40% 20%;
+    --ring: 45 93.4% 47.5%;
 
     --radius: 0.75rem;
   }

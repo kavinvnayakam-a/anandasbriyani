@@ -14,7 +14,7 @@ import Image from 'next/image';
 import { ArrowUp, Moon, Star } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
-const LOGO_URL = "https://picsum.photos/seed/dindigul/200/200";
+const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/dindigual_anandas_briyani%2FDAB_logo.webp?alt=media&token=2a082303-daa9-4187-89de-bbeefac2ceec";
 
 const HangingDecoration = ({ className, delay = "0s", height = "h-32", type = "lantern" }: { className?: string, delay?: string, height?: string, type?: "lantern" | "moon" | "star" }) => (
   <div 
@@ -116,7 +116,7 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
       <main className="max-w-5xl mx-auto px-4 md:px-6 py-12 md:py-24 relative z-20">
         <header className="mb-24 text-center">
           <h1 className="text-7xl md:text-[11rem] font-black text-white tracking-tighter uppercase italic leading-none animate-in fade-in slide-in-from-bottom-8 duration-1000">
-            Menu <span className="text-accent">Specials</span>
+            Our <span className="text-accent">Menu</span>
           </h1>
         </header>
 
@@ -146,7 +146,7 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
       <footer className="bg-black/60 border-t border-white/5 py-32 px-6">
         <div className="max-w-5xl mx-auto flex flex-col items-center gap-12">
           <div className="h-28 w-28 rounded-full border-2 border-accent/30 p-1 bg-white">
-            <Image src={LOGO_URL} alt="Dindigul Ananda's Briyani Logo" width={112} height={112} className="rounded-full" />
+            <Image src={LOGO_URL} alt="Dindigul Ananda's Briyani Logo" width={112} height={112} className="rounded-full object-contain p-2" />
           </div>
           
           <div className="text-center space-y-8">

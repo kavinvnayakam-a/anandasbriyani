@@ -2,13 +2,13 @@ import CustomerView from '@/components/customer-view';
 import { Suspense } from 'react';
 import Image from 'next/image';
 
-const LOGO_URL = "https://picsum.photos/seed/dindigul/200/200";
+const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/dindigual_anandas_briyani%2FDAB_logo.webp?alt=media&token=2a082303-daa9-4187-89de-bbeefac2ceec";
 
 export default async function Home() {
   return (
     <Suspense 
       fallback={
-        <div className="h-screen w-full flex flex-col items-center justify-center bg-[#050505] overflow-hidden">
+        <div className="h-screen w-full flex flex-col items-center justify-center bg-background overflow-hidden">
           {/* Background Ambient Glow */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px]" />
           
@@ -24,7 +24,7 @@ export default async function Home() {
                   alt="Dindigul Ananda's Briyani Logo" 
                   width={120} 
                   height={120} 
-                  className="opacity-90 grayscale-[0.2] hover:grayscale-0 transition-all duration-700"
+                  className="opacity-90 object-contain"
                 />
               </div>
             </div>

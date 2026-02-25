@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 import { Order } from '@/lib/types';
 
 const HALEEM_HERO = "https://picsum.photos/seed/briyani_hero/1200/800";
-const LOGO_URL = "https://picsum.photos/seed/dindigul/200/200";
+const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/dindigual_anandas_briyani%2FDAB_logo.webp?alt=media&token=2a082303-daa9-4187-89de-bbeefac2ceec";
 const BEEP_SOUND_URL = "https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3";
 
 const PICKUP_TIMER_DURATION = 3 * 60; // 3 minutes in seconds
@@ -166,7 +166,7 @@ export default function OrderStatusPage() {
   const steps = getStatusSteps();
 
   return (
-    <div className="min-h-screen bg-[#0a0500] text-white pb-10 overflow-hidden relative">
+    <div className="min-h-screen bg-background text-white pb-10 overflow-hidden relative">
       
       {/* PERSISTENT FLOATING TIMER (Top Left) */}
       {isTimerActive && (
@@ -186,13 +186,13 @@ export default function OrderStatusPage() {
       <div className="relative h-[40vh] w-full overflow-hidden">
         <Image 
           src={HALEEM_HERO} 
-          alt="Dindigul Briyani"
+          alt="Dindigul Ananda's Briyani"
           fill
           className="object-cover"
           priority
         />
         
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0500] via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
         
         <div className="absolute top-8 right-6 z-30">
           <div className="relative p-1 bg-white rounded-full shadow-2xl border-2 border-primary">
@@ -201,7 +201,7 @@ export default function OrderStatusPage() {
               alt="Dindigul Ananda's Briyani Logo" 
               width={60} 
               height={60} 
-              className="rounded-full"
+              className="rounded-full object-contain"
             />
           </div>
         </div>

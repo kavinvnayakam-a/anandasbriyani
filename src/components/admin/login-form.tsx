@@ -13,7 +13,7 @@ import { useAuth } from "@/firebase";
 import { initiateAnonymousSignIn } from "@/firebase/non-blocking-login";
 import Image from "next/image";
 
-const LOGO_URL = "https://picsum.photos/seed/dindigul/200/200";
+const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/dindigual_anandas_briyani%2FDAB_logo.webp?alt=media&token=2a082303-daa9-4187-89de-bbeefac2ceec";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -82,7 +82,7 @@ export default function LoginForm() {
                 src={LOGO_URL} 
                 alt="Dindigul Ananda's Briyani" 
                 fill 
-                className="object-cover" 
+                className="object-contain p-2" 
                 priority
               />
             </div>
