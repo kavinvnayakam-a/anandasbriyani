@@ -61,7 +61,7 @@ export default function AdminDashboard() {
   }, [auth, isAuthLoaded, router]);
 
   useEffect(() => {
-    audioRef.current = new Audio('https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3');
+    audioRef.current = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-game-coin-collect-1915.mp3');
   }, []);
 
   useEffect(() => {
