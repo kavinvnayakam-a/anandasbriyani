@@ -8,6 +8,7 @@ import OrderManager from "@/components/admin/order-manager";
 import KotView from "@/components/admin/kot-view";
 import AnalyticsDashboard from "@/components/admin/analytics-dashboard";
 import OrderHistory from "@/components/admin/order-history"; 
+import TodayOrders from "@/components/admin/today-orders";
 import { useFirestore } from "@/firebase";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { collection, onSnapshot, query } from "firebase/firestore";
@@ -22,6 +23,7 @@ import {
   ChefHat,
   Store,
   PanelLeft,
+  LayoutList,
   Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -40,7 +42,7 @@ import {
 
 const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/dindigual_anandas_briyani%2FDAB_logo.webp?alt=media&token=2a082303-daa9-4187-89de-bbeefac2ceec";
 
-type TabType = 'counter' | 'packing' | 'history' | 'menu' | 'analytics';
+type TabType = 'counter' | 'packing' | 'today_orders' | 'history' | 'menu' | 'analytics';
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -91,6 +93,7 @@ export default function AdminDashboard() {
   const navItems: { id: TabType; label: string; icon: any; showBadge?: boolean }[] = [
     { id: 'counter', label: 'Counter Feed', icon: Store, showBadge: newOrderCount > 0 },
     { id: 'packing', label: 'Kitchen Packing', icon: ChefHat },
+    { id: 'today_orders', label: "Today's Orders", icon: LayoutList },
     { id: 'history', label: 'Order Archives', icon: Clock },
     { id: 'menu', label: 'Menu Config', icon: Settings },
     { id: 'analytics', label: 'Business', icon: TrendingUp },
@@ -182,7 +185,7 @@ export default function AdminDashboard() {
                   Console / {activeTab}
                 </span>
                 <h2 className="text-3xl font-black italic uppercase text-zinc-900 tracking-tighter leading-none mt-1">
-                  {activeTab === 'counter' ? 'Counter Feed' : activeTab === 'packing' ? 'Packing KOT' : activeTab === 'menu' ? 'Menu Settings' : activeTab === 'history' ? 'Order Archives' : 'Business Insights'}
+                  {activeTab === 'counter' ? 'Counter Feed' : activeTab === 'packing' ? 'Packing KOT' : activeTab === 'menu' ? 'Menu Settings' : activeTab === 'history' ? 'Order Archives' : activeTab === 'today_orders' ? "Today's Orders" : 'Business Insights'}
                 </h2>
               </div>
             </div>
@@ -209,6 +212,7 @@ export default function AdminDashboard() {
             <div className="max-w-7xl mx-auto pb-20">
               {activeTab === 'counter' && <OrderManager />}
               {activeTab === 'packing' && <KotView />}
+              {activeTab === 'today_orders' && <TodayOrders />}
               {activeTab === 'history' && <OrderHistory />}
               {activeTab === 'menu' && <MenuManager />}
               {activeTab === 'analytics' && <AnalyticsDashboard />}
