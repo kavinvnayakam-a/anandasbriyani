@@ -231,7 +231,7 @@ export default function AdminDashboard() {
                   </div>
                 </div>
                 
-                <Link href="https://www.getpik.in/" target="_blank" className="group flex flex-col items-center gap-3">
+                <Link href="https://www.getpik.in/pos" target="_blank" className="group flex flex-col items-center gap-3">
                     <span className="text-[9px] font-bold uppercase tracking-[0.5em] text-zinc-400">Digital Architecture By</span>
                     <div className="flex items-center gap-4 bg-white px-6 py-2 rounded-xl border border-zinc-200 transition-all group-hover:border-primary group-hover:bg-zinc-50 shadow-sm">
                         <span className="text-zinc-900 font-black text-sm tracking-tighter group-hover:text-primary transition-colors">GetPik</span>

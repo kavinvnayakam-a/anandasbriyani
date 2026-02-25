@@ -295,7 +295,7 @@ export default function MenuManager() {
                       type="number"
                       defaultValue={item.price}
                       onBlur={(e) => handleUpdatePrice(item.id, Number(e.target.value))}
-                      className="w-28 pl-9 font-black text-lg text-stone-800 border-2 border-stone-200 rounded-xl focus:border-amber-500 focus:ring-amber-500"
+                      className="w-28 pl-9 font-black text-lg text-white bg-stone-900 border-2 border-stone-700 rounded-xl focus:border-amber-500 focus:ring-amber-500"
                     />
                   </div>
                 </td>

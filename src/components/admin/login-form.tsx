@@ -7,13 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Unlock, Mail, Lock, ShieldCheck } from "lucide-react";
+import { Loader2, Unlock, Mail, Lock, ShieldCheck, Cpu } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/firebase";
 import { initiateAnonymousSignIn } from "@/firebase/non-blocking-login";
-import Image from "next/image";
-
-const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/dindigual_anandas_briyani%2FDAB_logo.webp?alt=media&token=2a082303-daa9-4187-89de-bbeefac2ceec";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -74,24 +71,22 @@ export default function LoginForm() {
 
       <Card className="w-full max-w-md border-none bg-white shadow-[0_32px_64px_-12px_rgba(0,0,0,0.3)] rounded-[3.5rem] overflow-hidden relative z-10 text-zinc-900">
         <CardHeader className="text-center pt-14 pb-8">
-          <div className="relative mx-auto w-32 h-32 mb-8">
-            {/* Logo Highlight Glow */}
-            <div className="absolute -inset-4 bg-primary/20 rounded-full blur-2xl animate-pulse" />
-            <div className="relative bg-white rounded-full border-4 border-primary/10 shadow-2xl overflow-hidden h-full w-full flex items-center justify-center">
-              <Image 
-                src={LOGO_URL} 
-                alt="Dindigul Ananda's Briyani" 
-                fill 
-                className="object-contain p-2" 
-                priority
-              />
+          <div className="relative mx-auto w-32 h-32 mb-8 flex items-center justify-center">
+            {/* Animated background shapes */}
+            <div className="absolute w-full h-full bg-primary/10 rounded-full animate-pulse blur-xl" />
+            <div className="absolute w-2/3 h-2/3 bg-primary/20 rounded-full animate-pulse blur-2xl" />
+            
+            <div className="relative bg-white rounded-full border-4 border-primary/10 shadow-2xl h-full w-full flex items-center justify-center overflow-hidden">
+                {/* Rotating icon with a glow */}
+                <div className="absolute inset-0 bg-primary/20 blur-lg animate-[spin_4s_linear_infinite_reverse]" />
+                <Cpu size={64} className="text-primary relative z-10 animate-[spin_5s_linear_infinite]" />
             </div>
           </div>
           <CardTitle className="text-4xl font-black uppercase italic tracking-tighter text-zinc-900 leading-none">
-            Kitchen Console
+            GetPik POS
           </CardTitle>
           <CardDescription className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.4em] mt-4">
-            Dindigul Ananda's Briyani
+            Restaurant Management
           </CardDescription>
         </CardHeader>
 
@@ -157,7 +152,7 @@ export default function LoginForm() {
       
       {/* Footer Branding */}
       <div className="fixed bottom-8 left-0 w-full flex justify-center opacity-30 pointer-events-none">
-         <p className="text-white text-[10px] font-black uppercase tracking-[1em]">GetPik Digital</p>
+         <p className="text-white text-[10px] font-black uppercase tracking-[1em]">GetPik POS</p>
       </div>
     </div>
   );
