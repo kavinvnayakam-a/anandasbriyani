@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect, useMemo } from 'react';
@@ -8,7 +9,7 @@ import {
 } from 'firebase/firestore';
 import { Order, MenuItem, CartItem } from '@/lib/types';
 import { 
-  Printer, Settings, Check, Clock, User, Phone, Banknote, Store, X, Save, Plus, Minus, Search, ShoppingBag, CreditCard, Smartphone, Loader2, ReceiptText, ShieldCheck, Wallet, Hash, Cpu
+  Printer, Settings, Check, Clock, User, Phone, Banknote, Store, X, Save, Plus, Minus, Search, ShoppingBag, CreditCard, Smartphone, Loader2, ReceiptText, ShieldCheck, Wallet, Hash, Cpu, Ticket
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn, formatCurrency } from '@/lib/utils';
@@ -17,8 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
+import Image from "next/image";
 
 interface PrintSettings {
   storeName: string;
@@ -65,6 +65,7 @@ export default function OrderManager() {
   const [menuSearch, setMenuSearch] = useState("");
 
   const [printSettings, setPrintSettings] = useState<PrintSettings>(DEFAULT_PRINT_SETTINGS);
+  const [tempSettings, setTempSettings] = useState<PrintSettings>(DEFAULT_PRINT_SETTINGS);
 
   useEffect(() => {
     if (!firestore) return;
@@ -80,15 +81,17 @@ export default function OrderManager() {
 
     const unsubSettings = onSnapshot(doc(firestore, "settings", "print_template"), (d) => {
       if (d.exists()) {
-        setPrintSettings({ ...DEFAULT_PRINT_SETTINGS, ...d.data() } as PrintSettings);
+        const settings = { ...DEFAULT_PRINT_SETTINGS, ...d.data() } as PrintSettings;
+        setPrintSettings(settings);
+        setTempSettings(settings);
       }
     });
 
     return () => { unsubOrders(); unsubMenu(); unsubSettings(); };
   }, [firestore]);
 
-  const calculateTotals = () => {
-    const subtotal = selectedItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+  const calculateTotals = (items: CartItem[]) => {
+    const subtotal = items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
     const cgst = subtotal * 0.025;
     const sgst = subtotal * 0.025;
     const rawTotal = subtotal + cgst + sgst;
@@ -97,7 +100,7 @@ export default function OrderManager() {
     return { subtotal, cgst, sgst, total, roundOff };
   };
 
-  const totals = useMemo(() => calculateTotals(), [selectedItems]);
+  const totals = useMemo(() => calculateTotals(selectedItems), [selectedItems]);
   const changeDue = useMemo(() => {
     const received = Number(cashReceived) || 0;
     return Math.max(0, received - totals.total);
@@ -139,7 +142,7 @@ export default function OrderManager() {
 
   const saveSettings = async () => {
     if (!firestore) return;
-    await setDoc(doc(firestore, "settings", "print_template"), printSettings);
+    await setDoc(doc(firestore, "settings", "print_template"), tempSettings);
     setShowSettings(false);
     toast({ title: "Settings Saved" });
   };
@@ -242,11 +245,11 @@ export default function OrderManager() {
     const date = ts.seconds ? new Date(ts.seconds * 1000) : new Date(ts);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
   };
-
+  
   const formatOrderDate = (ts: any) => {
     if (!ts) return "";
     const date = ts.seconds ? new Date(ts.seconds * 1000) : new Date(ts);
-    return date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' });
+    return date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
   };
 
   const pendingOrders = orders.filter(o => o.status === 'Pending');
@@ -275,9 +278,16 @@ export default function OrderManager() {
           </button>
         </div>
       </div>
-
+      
+      <div className="mb-4">
+        <h3 className="text-xl font-black uppercase italic text-zinc-900 tracking-tight flex items-center gap-3">
+          <Ticket className="text-primary"/>
+          Incoming Customer Orders
+        </h3>
+      </div>
+      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {pendingOrders.map((order) => {
+        {pendingOrders.length > 0 ? pendingOrders.map((order) => {
           const cashInputVal = feedCashReceived[order.id] || "";
           const change = Math.max(0, (Number(cashInputVal) || order.totalPrice) - order.totalPrice);
 
@@ -356,11 +366,16 @@ export default function OrderManager() {
               </button>
             </div>
           );
-        })}
+        }) : (
+          <div className="col-span-full h-64 flex flex-col items-center justify-center bg-zinc-50 border-4 border-dashed border-zinc-100 rounded-[2.5rem] text-zinc-200">
+             <div className="opacity-40"><Ticket size={48}/></div>
+             <p className="text-[10px] font-black uppercase tracking-widest mt-4">No Incoming Orders</p>
+          </div>
+        )}
       </div>
 
       <Dialog open={showNewOrder} onOpenChange={setShowNewOrder}>
-        <DialogContent className="max-w-6xl bg-zinc-50 rounded-[2.5rem] p-0 border-none shadow-2xl overflow-hidden flex flex-col h-[90vh]">
+        <DialogContent className="max-w-7xl bg-zinc-50 rounded-[2.5rem] p-0 border-none shadow-2xl overflow-hidden flex flex-col h-[90vh]">
           <DialogHeader className="p-6 bg-white border-b border-zinc-100 flex-shrink-0">
             <div className="flex justify-between items-center">
               <div>
@@ -374,7 +389,7 @@ export default function OrderManager() {
           </DialogHeader>
 
           <div className="flex-1 flex overflow-hidden">
-            <div className="w-1/2 border-r border-zinc-200 flex flex-col bg-white">
+            <div className="w-3/5 border-r border-zinc-200 flex flex-col bg-white">
               <div className="p-4 border-b border-zinc-100 bg-zinc-50/50">
                 <div className="relative">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300" size={16} />
@@ -387,25 +402,23 @@ export default function OrderManager() {
                 </div>
               </div>
               <ScrollArea className="flex-1 p-4">
-                <div className="grid grid-cols-1 gap-2">
+                <div className="grid grid-cols-2 gap-3">
                   {filteredMenu.map(item => (
                     <button
                       key={item.id}
                       onClick={() => handleAddItem(item)}
-                      className="flex items-center justify-between p-3.5 bg-zinc-50 hover:bg-primary/5 border border-zinc-100 rounded-xl transition-all group"
+                      className="flex flex-col text-left p-4 bg-zinc-50 hover:bg-primary/5 border border-zinc-100 rounded-2xl transition-all group shadow-sm hover:shadow-lg hover:border-primary/20"
                     >
-                      <div className="text-left">
-                        <p className="font-black italic uppercase text-[11px] text-zinc-900 leading-none mb-1">{item.name}</p>
-                        <p className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest">{item.category}</p>
-                      </div>
-                      <span className="font-black italic text-primary text-sm">₹{item.price}</span>
+                      <p className="font-black italic uppercase text-sm text-zinc-900 leading-none mb-1">{item.name}</p>
+                      <p className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest mb-3">{item.category}</p>
+                      <p className="mt-auto font-black italic text-primary text-lg">₹{item.price}</p>
                     </button>
                   ))}
                 </div>
               </ScrollArea>
             </div>
 
-            <div className="w-1/2 flex flex-col bg-zinc-50 relative">
+            <div className="w-2/5 flex flex-col bg-zinc-50 relative">
               <ScrollArea className="flex-1">
                 <div className="p-6 space-y-6">
                   <div className="grid grid-cols-2 gap-4">
@@ -478,21 +491,24 @@ export default function OrderManager() {
                   )}
 
                   <div className="space-y-3">
-                    <Label className="text-[9px] font-black uppercase text-zinc-400 tracking-widest">Selected Items ({selectedItems.length})</Label>
-                    <div className="space-y-2">
+                    <Label className="text-[9px] font-black uppercase text-zinc-400 tracking-widest">Selected Items ({selectedItems.reduce((acc, item) => acc + item.quantity, 0)})</Label>
+                    <div className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-2">
                       {selectedItems.length > 0 ? selectedItems.map((item, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-3 bg-white rounded-xl border border-zinc-100 shadow-sm">
-                          <div className="flex-1 min-w-0 pr-4">
+                        <div key={idx} className="flex items-center p-2 bg-white rounded-xl border border-zinc-100 shadow-sm">
+                          {item.image && (
+                            <Image src={item.image} alt={item.name} width={40} height={40} className="rounded-lg object-cover" />
+                          )}
+                          <div className="flex-1 min-w-0 px-3">
                             <p className="font-bold text-zinc-900 text-[11px] truncate leading-none mb-1">{item.name}</p>
                             <p className="text-[10px] font-black text-primary">₹{item.price * item.quantity}</p>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <button onClick={() => handleRemoveItem(item.id)} className="p-1.5 hover:bg-zinc-50 rounded-lg transition-colors text-zinc-400">
-                              {item.quantity > 1 ? <Minus size={14} /> : <X size={14} />}
+                          <div className="flex items-center gap-1 bg-zinc-100 rounded-full p-1">
+                            <button onClick={() => handleRemoveItem(item.id)} className="p-1.5 bg-white hover:bg-zinc-200 rounded-full transition-colors text-zinc-500">
+                              {item.quantity > 1 ? <Minus size={12} /> : <X size={12} />}
                             </button>
                             <span className="text-xs font-black w-6 text-center text-zinc-900">{item.quantity}</span>
-                            <button onClick={() => handleAddItem(item)} className="p-1.5 hover:bg-zinc-50 rounded-lg transition-colors text-primary">
-                              <Plus size={14} />
+                            <button onClick={() => handleAddItem(item)} className="p-1.5 bg-white hover:bg-zinc-200 rounded-full transition-colors text-primary">
+                              <Plus size={12} />
                             </button>
                           </div>
                         </div>
@@ -527,6 +543,57 @@ export default function OrderManager() {
           </div>
         </DialogContent>
       </Dialog>
+      
+      <Dialog open={showSettings} onOpenChange={setShowSettings}>
+        <DialogContent className="sm:max-w-2xl bg-zinc-900 border-zinc-800 text-white rounded-[2rem]">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-black uppercase italic flex items-center gap-3"><Settings className="text-primary"/>POS Hardware Config</DialogTitle>
+            <DialogDescription className="text-zinc-400 text-xs font-bold uppercase tracking-widest">
+              Calibrate thermal printer and cash drawer settings.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-6 py-4 max-h-[60vh] overflow-y-auto pr-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="storeName" className="text-[10px] font-black uppercase text-zinc-400">Store Name</Label>
+                <Input id="storeName" value={tempSettings.storeName} onChange={(e) => setTempSettings(s => ({...s, storeName: e.target.value}))} className="bg-zinc-950 border-zinc-800" />
+              </div>
+              <div>
+                <Label htmlFor="optimizedFor" className="text-[10px] font-black uppercase text-zinc-400">Optimized For</Label>
+                <Input id="optimizedFor" value={tempSettings.optimizedFor} onChange={(e) => setTempSettings(s => ({...s, optimizedFor: e.target.value}))} className="bg-zinc-950 border-zinc-800" />
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="address" className="text-[10px] font-black uppercase text-zinc-400">Store Address</Label>
+              <Input id="address" value={tempSettings.address} onChange={(e) => setTempSettings(s => ({...s, address: e.target.value}))} className="bg-zinc-950 border-zinc-800" />
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="phone" className="text-[10px] font-black uppercase text-zinc-400">Phone</Label>
+                <Input id="phone" value={tempSettings.phone} onChange={(e) => setTempSettings(s => ({...s, phone: e.target.value}))} className="bg-zinc-950 border-zinc-800" />
+              </div>
+              <div>
+                <Label htmlFor="gstin" className="text-[10px] font-black uppercase text-zinc-400">GSTIN</Label>
+                <Input id="gstin" value={tempSettings.gstin} onChange={(e) => setTempSettings(s => ({...s, gstin: e.target.value}))} className="bg-zinc-950 border-zinc-800" />
+              </div>
+              <div>
+                <Label htmlFor="fssai" className="text-[10px] font-black uppercase text-zinc-400">FSSAI</Label>
+                <Input id="fssai" value={tempSettings.fssai} onChange={(e) => setTempSettings(s => ({...s, fssai: e.target.value}))} className="bg-zinc-950 border-zinc-800" />
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="footerMessage" className="text-[10px] font-black uppercase text-zinc-400">Footer Message</Label>
+              <Input id="footerMessage" value={tempSettings.footerMessage} onChange={(e) => setTempSettings(s => ({...s, footerMessage: e.target.value}))} className="bg-zinc-950 border-zinc-800" />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={saveSettings} className="bg-primary text-white hover:bg-zinc-900 font-black uppercase text-xs tracking-widest py-3 px-6 h-auto">
+              <Save className="mr-2 h-4 w-4"/>Save Configuration
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
 
       <Dialog open={showPrintPreview} onOpenChange={setShowPrintPreview}>
         <DialogContent className="max-w-lg bg-zinc-900 border-zinc-800 p-0 overflow-hidden rounded-[3rem] shadow-2xl">
@@ -587,20 +654,20 @@ export default function OrderManager() {
               </div>
 
               <div className="border-t-2 border-dashed border-black pt-2 space-y-1 text-right text-[10px] font-bold">
-                <div className="flex justify-between"><span>Sub Total</span> <span>{printingOrder?.subtotal?.toFixed(2)}</span></div>
-                <div className="flex justify-between"><span>CGST @ 2.5%</span> <span>{printingOrder?.cgst?.toFixed(2)}</span></div>
-                <div className="flex justify-between"><span>SGST @ 2.5%</span> <span>{printingOrder?.sgst?.toFixed(2)}</span></div>
-                {printingOrder?.roundOff !== 0 && (
+                <div className="flex justify-between"><span>Sub Total</span> <span>{formatCurrency(printingOrder?.subtotal || 0)}</span></div>
+                <div className="flex justify-between"><span>CGST @ 2.5%</span> <span>{formatCurrency(printingOrder?.cgst || 0)}</span></div>
+                <div className="flex justify-between"><span>SGST @ 2.5%</span> <span>{formatCurrency(printingOrder?.sgst || 0)}</span></div>
+                {(printingOrder?.roundOff || 0) !== 0 && (
                   <div className="flex justify-between"><span>Round off</span> <span>{printingOrder?.roundOff?.toFixed(2)}</span></div>
                 )}
                 <div className="flex justify-between items-center text-lg font-black border-t-2 border-black pt-1 mt-1">
                   <span>TOTAL</span>
-                  <span>₹{printingOrder?.totalPrice.toFixed(2)}</span>
+                  <span>{formatCurrency(printingOrder?.totalPrice || 0)}</span>
                 </div>
                  {printingOrder?.paymentMethod === 'Cash' && printingOrder.cashReceived && (
                   <div className="pt-2 mt-2 border-t-2 border-dashed border-black/40 text-xs">
-                    <div className="flex justify-between"><span>CASH RECEIVED</span> <span>₹{printingOrder.cashReceived?.toFixed(2)}</span></div>
-                    <div className="flex justify-between"><span>CHANGE DUE</span> <span>₹{printingOrder.changeDue?.toFixed(2)}</span></div>
+                    <div className="flex justify-between"><span>CASH RECEIVED</span> <span>{formatCurrency(printingOrder.cashReceived || 0)}</span></div>
+                    <div className="flex justify-between"><span>CHANGE DUE</span> <span>{formatCurrency(printingOrder.changeDue || 0)}</span></div>
                   </div>
                 )}
               </div>
@@ -619,7 +686,7 @@ export default function OrderManager() {
         </DialogContent>
       </Dialog>
       
-      <div id="printable-receipt">
+      <div id="printable-receipt" className="hidden">
         {printingOrder && (
           <>
             <div className='font-mono text-black font-black w-[80mm] p-0 m-0' style={{breakAfter: 'page'}}>
@@ -645,17 +712,17 @@ export default function OrderManager() {
                 </div>
                 <div className="mb-2">
                     <div className="grid grid-cols-12 font-black border-b-2 border-dashed border-black pb-1 mb-1 text-[10px]">
-                        <span className="col-span-6">Item</span>
+                        <span className="col-span-5">Item</span>
                         <span className="col-span-2 text-center">Qty</span>
                         <span className="col-span-2 text-right">Rate</span>
-                        <span className="col-span-2 text-right">Amt</span>
+                        <span className="col-span-3 text-right">Amount</span>
                     </div>
                     {printingOrder.items.map((item, idx) => (
                         <div key={idx} className="grid grid-cols-12 text-[10px] leading-tight font-bold">
-                            <span className="col-span-6 uppercase truncate pr-1">{item.name}</span>
+                            <span className="col-span-5 uppercase truncate pr-1">{item.name}</span>
                             <span className="col-span-2 text-center">{item.quantity}</span>
                             <span className="col-span-2 text-right">{item.price.toFixed(2)}</span>
-                            <span className="col-span-2 text-right">{(item.price * item.quantity).toFixed(2)}</span>
+                            <span className="col-span-3 text-right">{(item.price * item.quantity).toFixed(2)}</span>
                         </div>
                     ))}
                 </div>
@@ -663,17 +730,17 @@ export default function OrderManager() {
                     <div className="flex justify-between"><span>Sub Total</span> <span>{printingOrder.subtotal?.toFixed(2)}</span></div>
                     <div className="flex justify-between"><span>CGST @ 2.5%</span> <span>{printingOrder.cgst?.toFixed(2)}</span></div>
                     <div className="flex justify-between"><span>SGST @ 2.5%</span> <span>{printingOrder.sgst?.toFixed(2)}</span></div>
-                    {printingOrder.roundOff !== 0 && (
+                    {(printingOrder.roundOff || 0) !== 0 && (
                         <div className="flex justify-between"><span>Round off</span> <span>{printingOrder.roundOff?.toFixed(2)}</span></div>
                     )}
                     <div className="flex justify-between items-center text-lg font-black border-t-2 border-black pt-1 mt-1">
                         <span>TOTAL</span>
-                        <span>₹{printingOrder.totalPrice.toFixed(2)}</span>
+                        <span>{formatCurrency(printingOrder.totalPrice)}</span>
                     </div>
-                    {printingOrder.paymentMethod === 'Cash' && printingOrder.cashReceived && (
+                     {printingOrder.paymentMethod === 'Cash' && printingOrder.cashReceived != null && (
                         <div className="pt-2 mt-2 border-t-2 border-dashed border-black/40 text-xs">
-                          <div className="flex justify-between"><span>CASH RECEIVED</span> <span>₹{printingOrder.cashReceived?.toFixed(2)}</span></div>
-                          <div className="flex justify-between"><span>CHANGE DUE</span> <span>₹{printingOrder.changeDue?.toFixed(2)}</span></div>
+                          <div className="flex justify-between"><span>CASH RECEIVED</span> <span>{formatCurrency(printingOrder.cashReceived)}</span></div>
+                          <div className="flex justify-between"><span>CHANGE DUE</span> <span>{formatCurrency(printingOrder.changeDue || 0)}</span></div>
                         </div>
                     )}
                 </div>
@@ -682,8 +749,8 @@ export default function OrderManager() {
                 </div>
             </div>
             
-            <div className="token-section p-10 text-center font-black">
-               <p className="text-sm font-black uppercase mb-6 tracking-widest">Collection Token</p>
+            <div className="token-section p-10 text-center font-black" style={{breakBefore: 'page'}}>
+               <p className="text-base font-black uppercase mb-6 tracking-widest">Collection Token</p>
                <h1 className="text-6xl font-black italic leading-none m-0">#{printingOrder.orderNumber}</h1>
                <div className="mt-10 pt-10 border-t-4 border-dashed border-black uppercase">
                   <p className="text-2xl font-black mb-2">{printingOrder.customerName}</p>
