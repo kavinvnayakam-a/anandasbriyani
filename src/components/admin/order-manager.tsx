@@ -625,18 +625,23 @@ export default function OrderManager() {
              </button>
           </DialogHeader>
           
-          <div className="p-10 bg-zinc-950 flex flex-col md:flex-row items-start justify-center gap-10 no-print">
-            
+          <div className="p-10 bg-zinc-950 flex flex-col md:flex-row items-start justify-center gap-10 no-print overflow-y-auto max-h-[60vh]">
             <div className="w-[302px] flex-shrink-0">
               <p className="text-center text-white/50 font-bold uppercase text-xs tracking-widest mb-2">Receipt</p>
               {printingOrder && <ReceiptComponent order={printingOrder} settings={printSettings} tableNumber={tableNumberForPrinting} />}
             </div>
 
+            {printingOrder && printingOrder.tableId === 'Takeaway' && (
+              <div className="w-[302px] flex-shrink-0">
+                <p className="text-center text-white/50 font-bold uppercase text-xs tracking-widest mb-2">Collection Token</p>
+                <CollectionTokenComponent order={printingOrder} />
+              </div>
+            )}
+
             <div className="w-[302px] flex-shrink-0">
               <p className="text-center text-white/50 font-bold uppercase text-xs tracking-widest mb-2">Kitchen Order Ticket</p>
               {printingOrder && <KOTComponent order={printingOrder} tableNumber={tableNumberForPrinting} />}
             </div>
-
           </div>
 
           <DialogFooter className="p-8 bg-zinc-900">
@@ -649,14 +654,33 @@ export default function OrderManager() {
       
       <div id="printable-receipt" className="hidden">
         {printingOrder && (
-          <>
-            <div style={{breakAfter: 'page'}}>
+          printingOrder.tableId === 'Takeaway' ? (
+            <>
+              {/* Page 1: Invoice */}
+              <div style={{ breakAfter: 'page' }}>
+                <ReceiptComponent order={printingOrder} settings={printSettings} tableNumber={null} />
+              </div>
+              {/* Page 2: Collection Token */}
+              <div style={{ breakAfter: 'page' }}>
+                <CollectionTokenComponent order={printingOrder} />
+              </div>
+              {/* Page 3: KOT */}
+              <div>
+                <KOTComponent order={printingOrder} tableNumber={null} />
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Dine-in: Receipt */}
+              <div style={{ breakAfter: 'page' }}>
                 <ReceiptComponent order={printingOrder} settings={printSettings} tableNumber={tableNumberForPrinting} />
-            </div>
-            <div>
+              </div>
+              {/* Dine-in: KOT */}
+              <div>
                 <KOTComponent order={printingOrder} tableNumber={tableNumberForPrinting} />
-            </div>
-          </>
+              </div>
+            </>
+          )
         )}
       </div>
     </div>
@@ -762,5 +786,22 @@ const KOTComponent = ({ order, tableNumber }: { order: Order, tableNumber: strin
             ))}
         </div>
         <p className="text-center text-xs">{formatTime(order.timestamp)}</p>
+    </div>
+);
+
+const CollectionTokenComponent = ({ order }: { order: Order }) => (
+    <div className="bg-white text-black p-4 font-mono w-[80mm] text-center">
+        <p className="text-lg font-black uppercase tracking-widest">Collection Token</p>
+        <h1 className="text-8xl font-black italic leading-none my-4">#{order.orderNumber}</h1>
+        <div className="border-y-2 border-dashed border-black py-2 my-2 text-left">
+            <p className="text-xl font-black uppercase mb-1">{order.customerName}</p>
+            {order.items.map((item, idx) => (
+                <p key={idx} className="text-base font-black uppercase">
+                    {item.quantity}x {item.name}
+                </p>
+            ))}
+        </div>
+        <p className="text-center text-xs mt-4 font-bold">Please show this token at the pickup counter.</p>
+        <p className="text-center text-xs font-bold">{formatDate(order.timestamp)} {formatTime(order.timestamp)}</p>
     </div>
 );
