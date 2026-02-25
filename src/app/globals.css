@@ -8,25 +8,34 @@ body {
 
 @layer base {
   :root {
-    --background: 19 60% 45%; /* Terracotta #b8582e */
-    --foreground: 0 0% 100%;
-    --card: 19 60% 40%;
-    --card-foreground: 0 0% 100%;
-    --popover: 19 60% 40%;
-    --popover-foreground: 0 0% 100%;
-    --primary: 0 0% 0%;      /* Black for buttons and primary actions */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 19 60% 35%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 19 40% 35%;
-    --muted-foreground: 19 20% 90%;
-    --accent: 0 0% 100%; 
-    --accent-foreground: 19 60% 45%;
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 0 72.2% 50.6%; /* Red */
+    --primary-foreground: 0 85.7% 97.3%;
+
+    --secondary: 240 4.8% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 240 4.8% 15.9%;
+    --muted-foreground: 240 3.7% 65.9%;
+
+    --accent: 45 93.4% 47.5%; /* Yellow */
+    --accent-foreground: 48 95.8% 13.5%;
+
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 19 60% 55%;
-    --input: 19 60% 35%;
-    --ring: 0 0% 0%;
+
+    --border: 240 4.8% 15.9%;
+    --input: 240 4.8% 15.9%;
+    --ring: 0 72.2% 50.6%;
+
     --radius: 0.75rem;
   }
 }
@@ -42,14 +51,37 @@ body {
 
 /* Print Specific Utility: Target layout elements instead of root containers to prevent blank prints */
 @media print {
+  body * {
+    visibility: hidden !important;
+  }
+
+  #printable-receipt, #printable-receipt *,
+  #printable-eod-report, #printable-eod-report * {
+    visibility: visible !important;
+  }
+
+  #printable-receipt, #printable-eod-report {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+    width: 80mm !important;
+  }
+  
+  @page {
+    margin: 0 !important;
+    size: auto !important;
+  }
+
   nav, header, footer, button, aside, .no-print, .sidebar-provider, [role="dialog"], .sheet {
     display: none !important;
   }
+  
   body {
     background: white !important;
     color: black !important;
-    margin: 0 !important;
-    padding: 0 !important;
   }
 }
 

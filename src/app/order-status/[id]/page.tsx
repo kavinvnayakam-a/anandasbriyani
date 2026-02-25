@@ -17,8 +17,8 @@ import {
 import { cn } from "@/lib/utils";
 import { Order } from '@/lib/types';
 
-const HALEEM_HERO = "https://firebasestorage.googleapis.com/v0/b/dasara-finedine.firebasestorage.app/o/Haleem.webp?alt=media&token=be38e4df-e859-48e5-8811-14b5142bc2b5";
-const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/dasara-finedine.firebasestorage.app/o/RAVOYI%20LOGO.pdf.webp?alt=media&token=f09f33b3-b303-400e-bbc4-b5dca418c8af";
+const HALEEM_HERO = "https://picsum.photos/seed/briyani_hero/1200/800";
+const LOGO_URL = "https://picsum.photos/seed/dindigul/200/200";
 const BEEP_SOUND_URL = "https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3";
 
 const PICKUP_TIMER_DURATION = 3 * 60; // 3 minutes in seconds
@@ -171,7 +171,7 @@ export default function OrderStatusPage() {
       {/* PERSISTENT FLOATING TIMER (Top Left) */}
       {isTimerActive && (
         <div className="fixed top-6 left-6 z-[100] animate-in slide-in-from-left-4 duration-500">
-          <div className="bg-[#b8582e] px-5 py-3 rounded-2xl border-2 border-white/20 shadow-2xl flex items-center gap-3 backdrop-blur-md">
+          <div className="bg-primary px-5 py-3 rounded-2xl border-2 border-white/20 shadow-2xl flex items-center gap-3 backdrop-blur-md">
             <div className="p-2 bg-white/10 rounded-xl">
               <Clock size={16} className="text-white animate-pulse" />
             </div>
@@ -186,7 +186,7 @@ export default function OrderStatusPage() {
       <div className="relative h-[40vh] w-full overflow-hidden">
         <Image 
           src={HALEEM_HERO} 
-          alt="Ravoyi Haleem"
+          alt="Dindigul Briyani"
           fill
           className="object-cover"
           priority
@@ -195,10 +195,10 @@ export default function OrderStatusPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0500] via-transparent to-transparent" />
         
         <div className="absolute top-8 right-6 z-30">
-          <div className="relative p-1 bg-white rounded-full shadow-2xl border-2 border-[#b8582e]">
+          <div className="relative p-1 bg-white rounded-full shadow-2xl border-2 border-primary">
             <Image 
               src={LOGO_URL} 
-              alt="Ravoyi Logo" 
+              alt="Dindigul Ananda's Briyani Logo" 
               width={60} 
               height={60} 
               className="rounded-full"
@@ -208,7 +208,7 @@ export default function OrderStatusPage() {
       </div>
 
       <div className="relative -mt-24 px-4 md:px-6 z-20">
-        <div className="bg-[#b8582e] rounded-[3rem] p-8 md:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+        <div className="bg-primary rounded-[3rem] p-8 md:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
           
           <div className="mb-10 pb-6 border-b border-white/10 flex justify-between items-end">
             <div>
@@ -266,7 +266,7 @@ export default function OrderStatusPage() {
           <div className="mt-14 pt-8 border-t border-white/10 flex flex-col items-center gap-4">
              <div className="flex items-center gap-3">
                 <Star size={10} className="text-white/20 fill-white/20" />
-                <p className="text-[10px] font-black uppercase tracking-[0.5em] text-white/40">Ravoyi Telangana Kitchen</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.5em] text-white/40">Dindigul Ananda's Briyani</p>
                 <Star size={10} className="text-white/20 fill-white/20" />
              </div>
           </div>

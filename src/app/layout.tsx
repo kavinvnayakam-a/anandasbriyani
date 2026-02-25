@@ -5,10 +5,10 @@ import { CartProvider } from '@/context/cart-context';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 
 export const metadata: Metadata = {
-  title: 'RAVOYI - A Telangana Kitchen',
-  description: 'Premium dining experience.',
+  title: 'Dindigul Ananda\'s Briyani',
+  description: 'Authentic Dindigul Briyani experience.',
   icons: {
-    icon: 'https://firebasestorage.googleapis.com/v0/b/dasara-finedine.firebasestorage.app/o/RAVOYI%20LOGO.pdf.webp?alt=media&token=f09f33b3-b303-400e-bbc4-b5dca418c8af',
+    icon: 'https://picsum.photos/seed/dindigul/100/100',
   },
   robots: {
     index: false,

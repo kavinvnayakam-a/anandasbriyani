@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { cn } from "@/lib/utils";
 
-const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/dasara-finedine.firebasestorage.app/o/RAVOYI%20LOGO.pdf.webp?alt=media&token=f09f33b3-b303-400e-bbc4-b5dca418c8af";
+const LOGO_URL = "https://picsum.photos/seed/dindigul/200/200";
 
 const HangingDecoration = ({ className, delay = "0s", height = "h-32", type = "lantern" }: { className?: string, delay?: string, height?: string, type?: "lantern" | "moon" | "star" }) => (
   <div 
@@ -19,7 +19,7 @@ const HangingDecoration = ({ className, delay = "0s", height = "h-32", type = "l
       <div className="relative w-7 h-10">
         <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-5 h-4 bg-gradient-to-b from-amber-200 to-amber-400 rounded-t-full border border-white/30" />
         <div className="w-full h-full bg-[#0c1a2b] rounded-sm border border-amber-300 relative overflow-hidden">
-          <div className="absolute inset-x-1 top-1 bottom-1 bg-gradient-to-t from-orange-500 to-white/80 rounded-t-full flex items-center justify-center">
+          <div className="absolute inset-x-1 top-1 bottom-1 bg-gradient-to-t from-red-500 to-white/80 rounded-t-full flex items-center justify-center">
              <div className="w-1.5 h-3 bg-white rounded-full blur-[2px] opacity-80 animate-pulse" />
           </div>
         </div>
@@ -51,7 +51,7 @@ export default function ThankYouPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#b8582e] flex flex-col items-center justify-center p-6 text-white overflow-hidden relative">
+    <div className="min-h-screen bg-primary flex flex-col items-center justify-center p-6 text-white overflow-hidden relative">
       
       <style jsx global>{`
         @keyframes sway {
@@ -76,7 +76,7 @@ export default function ThankYouPage() {
           <div className="relative bg-white p-3 rounded-full shadow-2xl border-4 border-white/30">
             <Image 
               src={LOGO_URL} 
-              alt="RAVOYI Logo" 
+              alt="Dindigul Ananda's Briyani Logo" 
               width={160} 
               height={160}
               className="rounded-full" 
@@ -90,7 +90,7 @@ export default function ThankYouPage() {
           <span className="text-[8px] font-black uppercase tracking-[0.6em] text-white/40">Digital Experience By</span>
           <div className="flex items-center gap-3 bg-black px-6 py-2.5 rounded-full shadow-2xl border border-white/10">
             <span className="text-white font-black text-sm tracking-tighter">GetPik</span>
-            <div className="w-1.5 h-1.5 rounded-full bg-[#b8582e] shadow-[0_0_10px_#fff] animate-pulse" />
+            <div className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_10px_#fff] animate-pulse" />
           </div>
         </Link>
 
@@ -116,13 +116,13 @@ export default function ThankYouPage() {
         >
           <div className="flex items-center justify-center gap-1.5 mb-5">
             {[...Array(5)].map((_, i) => (
-              <Star key={i} className="h-6 w-6 fill-[#b8582e] text-[#b8582e]" />
+              <Star key={i} className="h-6 w-6 fill-primary text-primary" />
             ))}
           </div>
           <p className="font-black italic uppercase text-zinc-900 text-xl mb-1 tracking-tighter">Loved the taste?</p>
           <p className="text-[10px] text-zinc-400 mb-8 font-black uppercase tracking-widest">Rate your experience on Google</p>
           
-          <div className="inline-flex items-center gap-3 bg-[#b8582e] text-white font-black text-[12px] uppercase tracking-[0.4em] px-8 py-4 rounded-full group-hover:bg-zinc-900 transition-all shadow-xl shadow-[#b8582e]/20">
+          <div className="inline-flex items-center gap-3 bg-primary text-white font-black text-[12px] uppercase tracking-[0.4em] px-8 py-4 rounded-full group-hover:bg-zinc-900 transition-all shadow-xl shadow-primary/20">
             Open Maps <ArrowRight size={16} />
           </div>
         </Link>

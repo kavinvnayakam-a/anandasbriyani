@@ -2,7 +2,7 @@ import CustomerView from '@/components/customer-view';
 import { Suspense } from 'react';
 import Image from 'next/image';
 
-const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/dasara-finedine.firebasestorage.app/o/RAVOYI%20LOGO.pdf.webp?alt=media&token=f09f33b3-b303-400e-bbc4-b5dca418c8af";
+const LOGO_URL = "https://picsum.photos/seed/dindigul/200/200";
 
 export default async function Home() {
   return (
@@ -21,7 +21,7 @@ export default async function Home() {
                 
                 <Image 
                   src={LOGO_URL} 
-                  alt="RAVOYI Logo" 
+                  alt="Dindigul Ananda's Briyani Logo" 
                   width={120} 
                   height={120} 
                   className="opacity-90 grayscale-[0.2] hover:grayscale-0 transition-all duration-700"
@@ -32,7 +32,7 @@ export default async function Home() {
             {/* Typography Section */}
             <div className="mt-12 text-center space-y-3">
               <h1 className="text-white text-2xl font-light tracking-[0.2em] uppercase">
-                Ravoyi <span className="text-primary font-bold">Kitchen</span>
+                Dindigul Ananda's <span className="text-primary font-bold">Briyani</span>
               </h1>
               
               {/* Progress Line */}

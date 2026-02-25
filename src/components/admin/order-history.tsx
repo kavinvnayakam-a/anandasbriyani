@@ -62,7 +62,7 @@ export default function OrderHistory() {
           <input 
             type="text" 
             placeholder="Search Customer or Order #..." 
-            className="w-full pl-12 pr-4 py-4 bg-zinc-50 border-4 border-zinc-100 rounded-2xl font-black uppercase italic outline-none focus:border-[#b8582e] transition-all"
+            className="w-full pl-12 pr-4 py-4 bg-zinc-50 border-4 border-zinc-100 rounded-2xl font-black uppercase italic outline-none focus:border-primary transition-all"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -71,7 +71,7 @@ export default function OrderHistory() {
           <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={20} />
           <input 
             type="date" 
-            className="w-full pl-12 pr-4 py-4 bg-zinc-50 border-4 border-zinc-100 rounded-2xl font-black uppercase outline-none focus:border-[#b8582e] transition-all"
+            className="w-full pl-12 pr-4 py-4 bg-zinc-50 border-4 border-zinc-100 rounded-2xl font-black uppercase outline-none focus:border-primary transition-all"
             value={selectedDate}
             onChange={(e) => setSelectedDate(e.target.value)}
           />
@@ -101,7 +101,7 @@ export default function OrderHistory() {
                 {order.items?.map((item: any, i: number) => (
                   <div key={i} className="flex justify-between items-center bg-zinc-50 p-3 rounded-xl border-2 border-zinc-100 font-black uppercase italic text-[11px]">
                     <span className="truncate pr-4">
-                      <span className="text-[#b8582e] mr-2">{item.quantity}x</span>
+                      <span className="text-primary mr-2">{item.quantity}x</span>
                       {item.name}
                     </span>
                     <span className="text-zinc-400 shrink-0 font-bold">₹{item.price * item.quantity}</span>
@@ -116,7 +116,7 @@ export default function OrderHistory() {
                 </div>
                 <button 
                   onClick={() => window.print()} 
-                  className="p-4 bg-[#b8582e] text-white rounded-2xl border-2 border-zinc-900 shadow-[4px_4px_0_0_#000] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all"
+                  className="p-4 bg-primary text-white rounded-2xl border-2 border-zinc-900 shadow-[4px_4px_0_0_#000] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all"
                 >
                   <Printer size={20} />
                 </button>

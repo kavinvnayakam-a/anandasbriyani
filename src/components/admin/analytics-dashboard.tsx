@@ -138,21 +138,21 @@ export default function AnalyticsDashboard() {
               placeholder="Search Transactions..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-12 pr-6 py-3 bg-zinc-50 border border-zinc-200 rounded-2xl text-xs font-bold uppercase outline-none focus:border-[#b8582e] transition-all w-full md:w-64 text-black"
+              className="pl-12 pr-6 py-3 bg-zinc-50 border border-zinc-200 rounded-2xl text-xs font-bold uppercase outline-none focus:border-primary transition-all w-full md:w-64 text-black"
             />
           </div>
           <div className="relative flex-1 md:flex-none">
-            <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-[#b8582e]" size={16} />
+            <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-primary" size={16} />
             <input 
               type="date" 
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="pl-12 pr-6 py-3 bg-zinc-50 border border-zinc-200 rounded-2xl text-xs font-bold uppercase outline-none focus:border-[#b8582e] transition-all w-full md:w-auto text-black"
+              className="pl-12 pr-6 py-3 bg-zinc-50 border border-zinc-200 rounded-2xl text-xs font-bold uppercase outline-none focus:border-primary transition-all w-full md:w-auto text-black"
             />
           </div>
           <button 
             onClick={handlePrintReport}
-            className="flex items-center gap-2 bg-[#b8582e] text-white px-6 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg hover:bg-zinc-900 transition-all active:scale-95"
+            className="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg hover:bg-zinc-900 transition-all active:scale-95"
           >
             <Printer size={16} /> Print EOD Report
           </button>
@@ -165,8 +165,8 @@ export default function AnalyticsDashboard() {
           value={formatCurrency(stats.revenue.total)} 
           icon={<Banknote size={24} />} 
           trend="Incl. all taxes"
-          color="text-[#b8582e]"
-          bgColor="bg-[#b8582e]/10"
+          color="text-primary"
+          bgColor="bg-primary/10"
         />
         <StatCard 
           title="Net Revenue" 
@@ -262,7 +262,7 @@ export default function AnalyticsDashboard() {
                       <span className="text-xs font-bold text-zinc-400 tracking-tight">{formatCurrency(subTotal)}</span>
                     </td>
                     <td className="px-10 py-8 text-right">
-                      <span className="text-xs font-bold text-[#b8582e] tracking-tight">{formatCurrency(taxTotal)}</span>
+                      <span className="text-xs font-bold text-primary tracking-tight">{formatCurrency(taxTotal)}</span>
                     </td>
                     <td className="px-10 py-8 text-right">
                       <span className="text-lg font-black italic text-zinc-900">{formatCurrency(order.totalPrice)}</span>
@@ -292,7 +292,7 @@ export default function AnalyticsDashboard() {
           <DialogHeader className="p-8 border-b border-zinc-800 flex justify-between items-center bg-black/40">
              <div>
                 <DialogTitle className="text-xl font-black uppercase italic text-white flex items-center gap-3">
-                   <ReceiptText className="text-[#b8582e]" /> EOD Report Preview
+                   <ReceiptText className="text-primary" /> EOD Report Preview
                 </DialogTitle>
                 <DialogDescription className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Verify Daily Summary Before Printing</DialogDescription>
              </div>
@@ -301,10 +301,10 @@ export default function AnalyticsDashboard() {
              </button>
           </DialogHeader>
           
-          <ScrollArea className="max-h-[60vh] p-10 bg-zinc-950 flex flex-col items-center">
-            <div className="bg-white text-black p-8 shadow-2xl font-mono text-[12px] w-[300px] font-black">
+          <div className='p-10 bg-zinc-950 flex flex-col items-center'>
+            <div id="eod-report-preview-content" className="bg-white text-black p-8 shadow-2xl font-mono text-[12px] w-[300px] font-black">
               <div className="text-center border-b-2 border-dashed border-black pb-4 mb-4">
-                <h1 className="text-lg font-black uppercase">{printSettings?.storeName || 'RAVOYI KITCHEN'}</h1>
+                <h1 className="text-lg font-black uppercase">{printSettings?.storeName || 'Dindigul Ananda\'s Briyani'}</h1>
                 <p className="uppercase text-[9px] mt-1">{printSettings?.address}</p>
                 <p className="text-base font-black mt-4 border-y border-black py-2">DAILY SALES SUMMARY</p>
                 <p className="text-[11px] mt-2 uppercase">DATE: {new Date(selectedDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
@@ -349,82 +349,68 @@ export default function AnalyticsDashboard() {
                 <p className="italic text-[9px] uppercase">Audit Report • {new Date().toLocaleTimeString()}</p>
               </div>
             </div>
-          </ScrollArea>
+          </div>
 
-          <div className="p-8 bg-zinc-900 flex flex-col gap-4">
-             <button onClick={executePrint} className="w-full py-5 bg-[#b8582e] text-white rounded-2xl font-black uppercase text-xs flex items-center justify-center gap-3 shadow-xl hover:bg-zinc-900 transition-all">
+          <DialogFooter className="p-8 bg-zinc-900 flex flex-col gap-4">
+             <button onClick={executePrint} className="w-full py-5 bg-primary text-white rounded-2xl font-black uppercase text-xs flex items-center justify-center gap-3 shadow-xl hover:bg-zinc-900 transition-all">
                 <Printer size={18} /> Execute RTP-81 Print
              </button>
-          </div>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
+      
+      <div id="printable-eod-report" className="hidden">
+          <div className="font-mono text-black p-0 m-0 w-[80mm] text-xs">
+            <div className="text-center border-b-2 border-dashed border-black pb-2 mb-2">
+              <h1 className="text-base font-black uppercase leading-tight mb-1">{printSettings?.storeName || "Dindigul Ananda's Briyani"}</h1>
+              <p className="uppercase text-[9px] font-bold mb-1">{printSettings?.address}</p>
+              <div className="text-sm font-black border-y-2 border-black py-1 my-1 uppercase">
+                End of Day Report
+              </div>
+              <p className="text-xs font-black uppercase">DATE: {new Date(selectedDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
+            </div>
 
-      <div id="printable-eod-report" className="hidden print:block font-mono text-black p-0 m-0 w-[80mm] font-bold">
-          <div className="text-center border-b-2 border-dashed border-black pb-4 mb-4">
-            <h1 className="text-lg font-black uppercase leading-tight mb-1">{printSettings?.storeName || 'RAVOYI KITCHEN'}</h1>
-            <p className="uppercase text-[9px] font-bold mb-2">{printSettings?.address}</p>
-            <div className="text-base font-black border-y-2 border-black py-2 my-2 uppercase">
-              End of Day Report
+            <div className="space-y-1 border-b-2 border-dashed border-black pb-2 mb-2">
+              <div className="flex justify-between">
+                <span>TOTAL BILLS</span>
+                <span className="font-black">{allOrders.length}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>NET SALES</span>
+                <span className="font-black">{formatCurrency(stats.revenue.subtotal)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>TAX (GST 5%)</span>
+                <span className="font-black">{formatCurrency(stats.revenue.gst)}</span>
+              </div>
+              <div className="flex justify-between text-base font-black border-t-2 border-black pt-1 mt-1">
+                <span>TOTAL</span>
+                <span>{formatCurrency(stats.revenue.total)}</span>
+              </div>
             </div>
-            <p className="text-xs font-black uppercase">DATE: {new Date(selectedDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
-          </div>
 
-          <div className="space-y-3 border-b-2 border-dashed border-black pb-4 mb-4 text-xs">
-            <div className="flex justify-between">
-              <span>TOTAL BILLS</span>
-              <span className="font-black">{allOrders.length}</span>
+            <div className="space-y-1 mb-4">
+              <p className="font-black text-center mb-1 border-b border-black text-sm uppercase">Payment Split</p>
+              <div className="flex justify-between">
+                <span>UPI ({stats.payments.count_UPI || 0})</span>
+                <span className="font-black">{formatCurrency(stats.payments.UPI || 0)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>CASH ({stats.payments.count_Cash || 0})</span>
+                <span className="font-black">{formatCurrency(stats.payments.Cash || 0)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>CARD ({stats.payments.count_Card || 0})</span>
+                <span className="font-black">{formatCurrency(stats.payments.Card || 0)}</span>
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span>NET SALES</span>
-              <span className="font-black">{formatCurrency(stats.revenue.subtotal)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>TAX (GST 5%)</span>
-              <span className="font-black">{formatCurrency(stats.revenue.gst)}</span>
-            </div>
-            <div className="flex justify-between text-xl font-black border-t-2 border-black pt-3 mt-2">
-              <span>TOTAL</span>
-              <span>{formatCurrency(stats.revenue.total)}</span>
-            </div>
-          </div>
 
-          <div className="space-y-2 mb-6 text-xs">
-            <p className="font-black text-center mb-2 border-b-2 border-black pb-1 text-sm uppercase">Payment Split</p>
-            <div className="flex justify-between">
-              <span>UPI ({stats.payments.count_UPI || 0})</span>
-              <span className="font-black">{formatCurrency(stats.payments.UPI || 0)}</span>
+            <div className="text-center pt-2 border-t-2 border-dashed border-black">
+              <p className="italic text-[9px] uppercase font-bold">Audit Generated: {new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}</p>
+              <p className="text-[8px] mt-1 font-black uppercase tracking-widest">Dindigul Ananda's System</p>
             </div>
-            <div className="flex justify-between">
-              <span>CASH ({stats.payments.count_Cash || 0})</span>
-              <span className="font-black">{formatCurrency(stats.payments.Cash || 0)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>CARD ({stats.payments.count_Card || 0})</span>
-              <span className="font-black">{formatCurrency(stats.payments.Card || 0)}</span>
-            </div>
-          </div>
-
-          <div className="text-center pt-4 border-t-2 border-dashed border-black opacity-100">
-            <p className="italic text-[9px] uppercase font-bold">Audit Generated: {new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}</p>
-            <p className="text-[8px] mt-2 font-black uppercase tracking-widest">RAVOYI Management System</p>
-          </div>
+        </div>
       </div>
-
-      <style jsx global>{`
-        @media print {
-          body * { visibility: hidden !important; }
-          #printable-eod-report, #printable-eod-report * { visibility: visible !important; }
-          #printable-eod-report { 
-            position: absolute !important; 
-            left: 0 !important; 
-            top: 0 !important; 
-            display: block !important;
-            width: 80mm !important;
-            padding: 10px !important;
-          }
-          @page { margin: 0; size: auto; }
-        }
-      `}</style>
     </div>
   );
 }

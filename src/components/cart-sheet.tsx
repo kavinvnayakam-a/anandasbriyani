@@ -15,6 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { cn } from "@/lib/utils";
 
 type CartSheetProps = {
   isOpen: boolean;
@@ -119,7 +120,7 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
       <Sheet open={isOpen} onOpenChange={onOpenChange}>
         <SheetContent 
           side="right" 
-          className="flex flex-col bg-[#b8582e] border-l border-white/20 w-[90vw] sm:max-w-md p-0 overflow-hidden"
+          className="flex flex-col bg-primary border-l border-white/20 w-[90vw] sm:max-w-md p-0 overflow-hidden"
         >
           <SheetHeader className="p-8 border-b border-white/10 bg-black/10 backdrop-blur-md">
             <SheetTitle className="text-2xl font-bold text-white flex items-center justify-between">
@@ -171,14 +172,14 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
                       <div className="flex items-center gap-4 mt-4">
                         <div className="flex items-center bg-black/20 rounded-full border border-white/20 p-1">
                           <button 
-                            className="w-8 h-8 flex items-center justify-center hover:bg-white hover:text-[#b8582e] rounded-full transition-all text-white/40"
+                            className="w-8 h-8 flex items-center justify-center hover:bg-white hover:text-primary rounded-full transition-all text-white/40"
                             onClick={() => updateQuantity(item.id, item.quantity - 1)}
                           >
                             <Minus className="h-4 w-4"/>
                           </button>
                           <span className="w-10 text-center font-black text-sm text-white tabular-nums">{item.quantity}</span>
                           <button 
-                            className="w-8 h-8 flex items-center justify-center hover:bg-white hover:text-[#b8582e] rounded-full transition-all text-white/40"
+                            className="w-8 h-8 flex items-center justify-center hover:bg-white hover:text-primary rounded-full transition-all text-white/40"
                             onClick={() => updateQuantity(item.id, item.quantity + 1)}
                           >
                             <Plus className="h-4 w-4"/>
@@ -230,7 +231,7 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
                 
                 <Button
                   onClick={handleOpenCheckout}
-                  className="w-full h-16 text-[10px] font-black uppercase tracking-[0.3em] bg-white text-[#b8582e] hover:bg-black hover:text-white rounded-full transition-all flex items-center justify-center gap-4 shadow-2xl active:scale-95 border-none mt-4"
+                  className="w-full h-16 text-[10px] font-black uppercase tracking-[0.3em] bg-white text-primary hover:bg-black hover:text-white rounded-full transition-all flex items-center justify-center gap-4 shadow-2xl active:scale-95 border-none mt-4"
                 >
                   Confirm Order
                   <ShoppingBag className="h-4 w-4" />
@@ -243,7 +244,7 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
 
       {/* Checkout Details Dialog */}
       <Dialog open={isCheckoutOpen} onOpenChange={setIsCheckoutOpen}>
-        <DialogContent className="bg-[#b8582e] text-white border-white/20 sm:max-w-[425px] rounded-[2.5rem]">
+        <DialogContent className="bg-primary text-white border-white/20 sm:max-w-[425px] rounded-[2.5rem]">
           <DialogHeader>
             <DialogTitle className="text-2xl font-black italic uppercase tracking-tighter">Order Details</DialogTitle>
             <DialogDescription className="text-white/60 text-xs font-bold uppercase tracking-widest">
@@ -285,7 +286,7 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
                   htmlFor="upi"
                   className={cn(
                     "flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 transition-all cursor-pointer",
-                    paymentMethod === 'UPI' ? "bg-white text-[#b8582e] border-white" : "bg-black/10 border-white/10 text-white/60"
+                    paymentMethod === 'UPI' ? "bg-white text-primary border-white" : "bg-black/10 border-white/10 text-white/60"
                   )}
                 >
                   <RadioGroupItem value="UPI" id="upi" className="sr-only" />
@@ -296,7 +297,7 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
                   htmlFor="card"
                   className={cn(
                     "flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 transition-all cursor-pointer",
-                    paymentMethod === 'Card' ? "bg-white text-[#b8582e] border-white" : "bg-black/10 border-white/10 text-white/60"
+                    paymentMethod === 'Card' ? "bg-white text-primary border-white" : "bg-black/10 border-white/10 text-white/60"
                   )}
                 >
                   <RadioGroupItem value="Card" id="card" className="sr-only" />
@@ -307,7 +308,7 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
                   htmlFor="cash"
                   className={cn(
                     "flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 transition-all cursor-pointer",
-                    paymentMethod === 'Cash' ? "bg-white text-[#b8582e] border-white" : "bg-black/10 border-white/10 text-white/60"
+                    paymentMethod === 'Cash' ? "bg-white text-primary border-white" : "bg-black/10 border-white/10 text-white/60"
                   )}
                 >
                   <RadioGroupItem value="Cash" id="cash" className="sr-only" />
@@ -322,7 +323,7 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
             <Button 
               onClick={handlePlaceOrder}
               disabled={isPlacingOrder || !customerName}
-              className="w-full h-14 bg-white text-[#b8582e] hover:bg-black hover:text-white rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-xl transition-all active:scale-95 border-none"
+              className="w-full h-14 bg-white text-primary hover:bg-black hover:text-white rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-xl transition-all active:scale-95 border-none"
             >
               {isPlacingOrder ? <Loader2 className="animate-spin" /> : "Complete Checkout"}
             </Button>
@@ -331,8 +332,4 @@ export function CartSheet({ isOpen, onOpenChange, tableId }: CartSheetProps) {
       </Dialog>
     </>
   );
-}
-
-function cn(...classes: string[]) {
-  return classes.filter(Boolean).join(' ');
 }

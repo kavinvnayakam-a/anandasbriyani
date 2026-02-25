@@ -129,7 +129,7 @@ export default function KotView() {
     <div className="space-y-10">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
-          <div className="bg-[#b8582e] p-4 rounded-3xl shadow-lg shadow-[#b8582e]/20 text-white">
+          <div className="bg-primary p-4 rounded-3xl shadow-lg shadow-primary/20 text-white">
             <Box size={32} />
           </div>
           <div>
@@ -146,7 +146,7 @@ export default function KotView() {
               <span className="text-[8px] font-black text-zinc-400 uppercase tracking-widest leading-tight">Preparing</span>
           </div>
           <div className="bg-white border border-zinc-200 rounded-3xl px-6 py-4 shadow-sm flex items-center gap-4">
-              <span className="text-3xl font-black text-[#b8582e] italic leading-none">{handoverQueue.length}</span>
+              <span className="text-3xl font-black text-primary italic leading-none">{handoverQueue.length}</span>
               <span className="text-[8px] font-black text-zinc-400 uppercase tracking-widest leading-tight">Handed Over</span>
           </div>
         </div>
@@ -208,13 +208,13 @@ function OrderTicket({ order, onPack, onReady, onHandover, formatTime, isHandove
     <div className={cn(
       "bg-white border-2 rounded-[2.5rem] p-6 flex flex-col transition-all shadow-xl hover:shadow-2xl relative overflow-hidden group",
       order.status === 'Ready' ? 'border-emerald-500/50' : 
-      isHandover ? 'border-[#b8582e] bg-[#b8582e]/5 opacity-80' : 
+      isHandover ? 'border-primary bg-primary/5 opacity-80' : 
       'border-zinc-100'
     )}>
       <div className="flex justify-between items-start mb-4">
         <div className="flex items-center gap-3">
            <div className="w-10 h-10 bg-zinc-50 rounded-2xl flex items-center justify-center border border-zinc-100">
-              <Hash size={16} className="text-[#b8582e]" />
+              <Hash size={16} className="text-primary" />
            </div>
            <div>
               <span className="text-xl font-black italic text-zinc-900">#{order.orderNumber}</span>
@@ -228,7 +228,7 @@ function OrderTicket({ order, onPack, onReady, onHandover, formatTime, isHandove
 
       <div className="mb-4 flex items-center justify-between">
          <span className="text-[9px] font-black uppercase text-zinc-500 truncate max-w-[120px]">{order.customerName}</span>
-         <span className="text-[9px] font-black text-[#b8582e] uppercase italic">{order.items.length} Items</span>
+         <span className="text-[9px] font-black text-primary uppercase italic">{order.items.length} Items</span>
       </div>
 
       <div className="space-y-2 flex-1 mb-6">
@@ -238,13 +238,13 @@ function OrderTicket({ order, onPack, onReady, onHandover, formatTime, isHandove
             item.status === 'Served' ? 'bg-emerald-50 border-emerald-100 opacity-50' : 'bg-zinc-50 border-zinc-100'
           )}>
             <div className="flex items-center gap-2">
-              <span className="text-[#b8582e] font-black italic text-[10px]">{item.quantity}x</span>
+              <span className="text-primary font-black italic text-[10px]">{item.quantity}x</span>
               <span className={cn("text-[10px] font-bold uppercase italic truncate max-w-[140px]", item.status === 'Served' ? 'line-through text-zinc-400' : 'text-zinc-900')}>
                  {item.name}
               </span>
             </div>
             {!isHandover && item.status !== 'Served' && order.status !== 'Ready' && (
-              <button onClick={() => onPack(order.id, idx)} className="bg-[#b8582e] text-white px-3 py-1 rounded-lg text-[8px] font-black uppercase italic">
+              <button onClick={() => onPack(order.id, idx)} className="bg-primary text-white px-3 py-1 rounded-lg text-[8px] font-black uppercase italic">
                 Pack
               </button>
             )}
@@ -272,7 +272,7 @@ function OrderTicket({ order, onPack, onReady, onHandover, formatTime, isHandove
             ) : (
               <button 
                 onClick={() => onHandover(order.id)} 
-                className="w-full py-4 bg-[#b8582e] text-white rounded-2xl font-black uppercase italic text-[10px] flex items-center justify-center gap-2 shadow-lg"
+                className="w-full py-4 bg-primary text-white rounded-2xl font-black uppercase italic text-[10px] flex items-center justify-center gap-2 shadow-lg"
               >
                 <Handshake size={16}/> Handover
               </button>
@@ -290,7 +290,7 @@ function StatusBadge({ status }: { status: string }) {
     'Preparing': 'bg-orange-100 text-orange-600 border-orange-200',
     'Served': 'bg-emerald-100 text-emerald-600 border-emerald-200',
     'Ready': 'bg-emerald-500 text-white border-emerald-600',
-    'Handover': 'bg-[#b8582e] text-white border-[#b8582e]'
+    'Handover': 'bg-primary text-white border-primary'
   };
   return (
     <span className={cn("px-3 py-1 rounded-full text-[8px] font-black uppercase border", config[status])}>

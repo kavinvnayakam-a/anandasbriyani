@@ -38,7 +38,7 @@ import {
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
 
-const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/dasara-finedine.firebasestorage.app/o/RAVOYI%20LOGO.pdf.webp?alt=media&token=f09f33b3-b303-400e-bbc4-b5dca418c8af";
+const LOGO_URL = "https://picsum.photos/seed/dindigul/200/200";
 
 type TabType = 'counter' | 'packing' | 'history' | 'menu' | 'analytics';
 
@@ -46,7 +46,7 @@ export default function AdminDashboard() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabType>('counter');
   const [newOrderCount, setNewOrderCount] = useState(0);
-  const [auth, setAuth, isAuthLoaded] = useLocalStorage('ravoyi-admin-auth', false);
+  const [auth, setAuth, isAuthLoaded] = useLocalStorage('dindigul-admin-auth', false);
   const firestore = useFirestore();
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -99,7 +99,7 @@ export default function AdminDashboard() {
   if (!isAuthLoaded) {
     return (
       <div className="h-screen w-full flex items-center justify-center bg-zinc-50">
-        <Loader2 className="w-10 h-10 text-[#b8582e] animate-spin" />
+        <Loader2 className="w-10 h-10 text-primary animate-spin" />
       </div>
     );
   }
@@ -108,20 +108,20 @@ export default function AdminDashboard() {
 
   return (
     <SidebarProvider defaultOpen={true}>
-      <div className="flex h-screen w-full bg-zinc-50 font-sans selection:bg-[#b8582e] selection:text-white text-zinc-900">
+      <div className="flex h-screen w-full bg-zinc-50 font-sans selection:bg-primary selection:text-white text-zinc-900">
         
-        <Sidebar collapsible="icon" className="border-r-0 bg-[#b8582e] text-white">
+        <Sidebar collapsible="icon" className="border-r-0 bg-primary text-white">
           <SidebarHeader className="py-10 px-4 flex flex-col items-center overflow-hidden">
             <div className="relative group flex items-center justify-center">
               {/* Logo Highlight Glow */}
               <div className="absolute -inset-4 bg-white/20 rounded-full blur-2xl opacity-80 animate-pulse group-hover:opacity-100 transition-opacity" />
               <div className="relative bg-white rounded-full shadow-2xl overflow-hidden w-28 h-28 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:h-10 border-4 border-white/20 flex items-center justify-center transition-all duration-300">
-                 <Image src={LOGO_URL} alt="RAVOYI" fill className="object-cover" />
+                 <Image src={LOGO_URL} alt="Dindigul Ananda's Briyani" fill className="object-cover" />
               </div>
             </div>
             
             <div className="group-data-[collapsible=icon]:hidden text-center transition-all duration-300">
-              <h1 className="text-2xl font-black uppercase tracking-[0.2em] text-white mt-8 italic">RAVOYI</h1>
+              <h1 className="text-xl font-black uppercase tracking-[0.2em] text-white mt-8 italic">Ananda's</h1>
               <div className="flex items-center gap-2 mt-2 px-4 py-1.5 bg-black/10 rounded-full border border-white/10">
                 <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
                 <span className="text-[9px] font-bold text-white/80 uppercase tracking-widest">Management</span>
@@ -142,11 +142,11 @@ export default function AdminDashboard() {
                     className={cn(
                       "flex items-center gap-4 px-4 py-7 rounded-2xl text-[11px] font-black uppercase tracking-[0.1em] transition-all relative w-full h-auto",
                       activeTab === item.id 
-                      ? "bg-white text-[#b8582e] shadow-2xl hover:bg-white/95" 
+                      ? "bg-white text-primary shadow-2xl hover:bg-white/95" 
                       : "text-white hover:bg-white/10"
                     )}
                   >
-                    <item.icon className={cn("w-5 h-5 shrink-0 transition-colors", activeTab === item.id ? "text-[#b8582e]" : "text-white")} />
+                    <item.icon className={cn("w-5 h-5 shrink-0 transition-colors", activeTab === item.id ? "text-primary" : "text-white")} />
                     <span className="group-data-[collapsible=icon]:hidden">{item.label}</span>
                     {item.showBadge && activeTab !== item.id && (
                       <span className="absolute top-4 right-4 w-2 h-2 bg-white rounded-full animate-ping" />
@@ -173,12 +173,12 @@ export default function AdminDashboard() {
         <div className="flex-1 flex flex-col h-screen overflow-hidden">
           <header className="sticky top-0 z-30 bg-white border-b border-zinc-200 px-8 py-6 flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-6">
-              <SidebarTrigger className="p-2 hover:bg-zinc-100 rounded-xl transition-all text-[#b8582e]">
+              <SidebarTrigger className="p-2 hover:bg-zinc-100 rounded-xl transition-all text-primary">
                 <PanelLeft size={24} />
               </SidebarTrigger>
               
               <div className="flex flex-col">
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#b8582e] mb-1 leading-none">
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary mb-1 leading-none">
                   Console / {activeTab}
                 </span>
                 <h2 className="text-3xl font-black italic uppercase text-zinc-900 tracking-tighter leading-none mt-1">
@@ -196,10 +196,10 @@ export default function AdminDashboard() {
                 <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">System Online</span>
               </div>
               
-              <button className="p-3 bg-white border border-zinc-200 text-zinc-400 rounded-2xl hover:bg-zinc-50 hover:text-[#b8582e] transition-all relative">
+              <button className="p-3 bg-white border border-zinc-200 text-zinc-400 rounded-2xl hover:bg-zinc-50 hover:text-primary transition-all relative">
                 <Bell size={20} />
                 {newOrderCount > 0 && (
-                  <span className="absolute top-2 right-2 w-2 h-2 bg-[#b8582e] rounded-full" />
+                  <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full" />
                 )}
               </button>
             </div>
@@ -216,7 +216,7 @@ export default function AdminDashboard() {
 
             <footer className="mt-auto py-12 border-t border-zinc-200 flex flex-col md:flex-row items-center justify-between gap-8 opacity-60 hover:opacity-100 transition-opacity">
                 <div className="flex items-center gap-4">
-                  <ShieldCheck className="text-[#b8582e] w-6 h-6" />
+                  <ShieldCheck className="text-primary w-6 h-6" />
                   <div className="flex flex-col">
                     <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Secure Admin Environment</span>
                     <span className="text-[9px] font-bold text-zinc-300 uppercase">Hardware ID Verified</span>
@@ -225,8 +225,8 @@ export default function AdminDashboard() {
                 
                 <Link href="https://www.getpik.in/" target="_blank" className="group flex flex-col items-center gap-3">
                     <span className="text-[9px] font-bold uppercase tracking-[0.5em] text-zinc-400">Digital Architecture By</span>
-                    <div className="flex items-center gap-4 bg-white px-6 py-2 rounded-xl border border-zinc-200 transition-all group-hover:border-[#b8582e] group-hover:bg-zinc-50 shadow-sm">
-                        <span className="text-zinc-900 font-black text-sm tracking-tighter group-hover:text-[#b8582e] transition-colors">GetPik</span>
+                    <div className="flex items-center gap-4 bg-white px-6 py-2 rounded-xl border border-zinc-200 transition-all group-hover:border-primary group-hover:bg-zinc-50 shadow-sm">
+                        <span className="text-zinc-900 font-black text-sm tracking-tighter group-hover:text-primary transition-colors">GetPik</span>
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
                     </div>
                 </Link>
@@ -234,7 +234,7 @@ export default function AdminDashboard() {
           </main>
         </div>
 
-        <Link href="mailto:info@getpik.in" className="fixed bottom-10 right-10 z-50 bg-[#b8582e] text-white p-5 rounded-2xl shadow-2xl shadow-[#b8582e]/20 hover:scale-110 active:scale-95 transition-all hover:bg-zinc-900 group">
+        <Link href="mailto:info@getpik.in" className="fixed bottom-10 right-10 z-50 bg-primary text-white p-5 rounded-2xl shadow-2xl shadow-primary/20 hover:scale-110 active:scale-95 transition-all hover:bg-zinc-900 group">
             <MessageCircleQuestion className="h-7 w-7" />
             <span className="absolute right-full mr-4 bg-zinc-900 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap">
               Contact Tech Support

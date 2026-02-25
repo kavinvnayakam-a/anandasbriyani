@@ -27,7 +27,7 @@ const prompt = ai.definePrompt({
   name: 'importMenuPrompt',
   input: { schema: ImportMenuInputSchema },
   output: { schema: ImportMenuOutputSchema },
-  prompt: `You are an expert menu digitizer for "Dasara Fine Dine". 
+  prompt: `You are an expert menu digitizer for "Dindigul Ananda's Briyani". 
   
   Your task is to take unstructured text (like a photo transcript or a handwritten list) and convert it into a structured JSON list of menu items.
   

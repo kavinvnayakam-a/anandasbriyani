@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { Star } from 'lucide-react';
 
-const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/dasara-finedine.firebasestorage.app/o/RAVOYI%20LOGO.pdf.webp?alt=media&token=f09f33b3-b303-400e-bbc4-b5dca418c8af";
+const LOGO_URL = "https://picsum.photos/seed/dindigul/200/200";
 
 type HeaderProps = {
   tableId: string | null;
@@ -31,7 +31,7 @@ export function Header({ tableId }: HeaderProps) {
           ">
             <Image 
               src={LOGO_URL} 
-              alt="RAVOYI Logo" 
+              alt="Dindigul Ananda's Briyani Logo" 
               width={56} 
               height={56} 
               className="object-contain"
@@ -40,15 +40,15 @@ export function Header({ tableId }: HeaderProps) {
           </div>
           
           <p className="text-[7px] font-black text-white/50 uppercase tracking-[0.4em] text-center">
-            A Telangana Kitchen
+            Dindigul Ananda's Briyani
           </p>
         </div>
 
         {/* Ramadan Message Section */}
         <div className="hidden md:flex flex-col items-end text-right space-y-1">
-          <div className="flex items-center gap-2 text-orange-500">
+          <div className="flex items-center gap-2 text-yellow-500">
              <Star size={10} fill="currentColor" className="animate-pulse" />
-             <span className="text-[9px] font-black uppercase tracking-[0.3em] text-orange-200">Ramadan Mubarak</span>
+             <span className="text-[9px] font-black uppercase tracking-[0.3em] text-yellow-200">Authentic Briyani</span>
           </div>
           <p className="text-white/60 font-medium italic text-[10px] tracking-tight leading-none">
             "Blessings in every bite, traditions in every spice."
@@ -56,9 +56,9 @@ export function Header({ tableId }: HeaderProps) {
         </div>
 
         {/* Mobile Occasion Badge */}
-        <div className="md:hidden flex items-center gap-1.5 bg-orange-500/10 border border-orange-500/20 px-3 py-1.5 rounded-full">
-           <Star size={10} fill="currentColor" className="text-orange-500 animate-pulse" />
-           <span className="text-[8px] font-black uppercase tracking-widest text-orange-200">Iftar Special</span>
+        <div className="md:hidden flex items-center gap-1.5 bg-yellow-500/10 border border-yellow-500/20 px-3 py-1.5 rounded-full">
+           <Star size={10} fill="currentColor" className="text-yellow-500 animate-pulse" />
+           <span className="text-[8px] font-black uppercase tracking-widest text-yellow-200">Since 1989</span>
         </div>
         
       </div>

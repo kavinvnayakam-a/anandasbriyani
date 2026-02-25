@@ -13,13 +13,13 @@ import { useAuth } from "@/firebase";
 import { initiateAnonymousSignIn } from "@/firebase/non-blocking-login";
 import Image from "next/image";
 
-const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/dasara-finedine.firebasestorage.app/o/RAVOYI%20LOGO.pdf.webp?alt=media&token=f09f33b3-b303-400e-bbc4-b5dca418c8af";
+const LOGO_URL = "https://picsum.photos/seed/dindigul/200/200";
 
 export default function LoginForm() {
   const router = useRouter();
   const { toast } = useToast();
   const authInstance = useAuth();
-  const [auth, setAuth, isAuthLoaded] = useLocalStorage('ravoyi-admin-auth', false);
+  const [auth, setAuth, isAuthLoaded] = useLocalStorage('dindigul-admin-auth', false);
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -34,7 +34,7 @@ export default function LoginForm() {
     e.preventDefault();
     setIsLoading(true);
     
-    const allowedEmails = ["info@getpik.in", "ravoyiatelanganakitchen@gmail.com"];
+    const allowedEmails = ["info@getpik.in", "admin@dindigul.com"];
     
     // Simulate authentication logic with strict email check
     setTimeout(() => {
@@ -49,7 +49,7 @@ export default function LoginForm() {
 
         toast({
           title: "Authentication Successful",
-          description: "Welcome back to the RAVOYI Kitchen Console.",
+          description: "Welcome to the Dindigul Ananda's Briyani Console.",
         });
       } else {
         setIsLoading(false);
@@ -65,7 +65,7 @@ export default function LoginForm() {
   if (!isAuthLoaded) return null;
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-[#b8582e] p-6 relative overflow-hidden">
+    <div className="min-h-screen w-full flex items-center justify-center bg-primary p-6 relative overflow-hidden">
       {/* Background Ambient Glow */}
       <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-white blur-[120px]" />
@@ -76,11 +76,11 @@ export default function LoginForm() {
         <CardHeader className="text-center pt-14 pb-8">
           <div className="relative mx-auto w-32 h-32 mb-8">
             {/* Logo Highlight Glow */}
-            <div className="absolute -inset-4 bg-[#b8582e]/20 rounded-full blur-2xl animate-pulse" />
-            <div className="relative bg-white rounded-full border-4 border-[#b8582e]/10 shadow-2xl overflow-hidden h-full w-full flex items-center justify-center">
+            <div className="absolute -inset-4 bg-primary/20 rounded-full blur-2xl animate-pulse" />
+            <div className="relative bg-white rounded-full border-4 border-primary/10 shadow-2xl overflow-hidden h-full w-full flex items-center justify-center">
               <Image 
                 src={LOGO_URL} 
-                alt="RAVOYI" 
+                alt="Dindigul Ananda's Briyani" 
                 fill 
                 className="object-cover" 
                 priority
@@ -91,7 +91,7 @@ export default function LoginForm() {
             Kitchen Console
           </CardTitle>
           <CardDescription className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.4em] mt-4">
-            RAVOYI Management System
+            Dindigul Ananda's Briyani
           </CardDescription>
         </CardHeader>
 
@@ -103,10 +103,10 @@ export default function LoginForm() {
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300 w-4 h-4" />
                 <Input 
                   type="email" 
-                  placeholder="ravoyiatelanganakitchen@gmail.com" 
+                  placeholder="admin@dindigul.com" 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="pl-12 h-14 bg-zinc-50 border-zinc-100 rounded-2xl font-bold text-black placeholder:text-zinc-300 focus:ring-[#b8582e]/20 focus:border-[#b8582e] transition-all"
+                  className="pl-12 h-14 bg-zinc-50 border-zinc-100 rounded-2xl font-bold text-black placeholder:text-zinc-300 focus:ring-primary/20 focus:border-primary transition-all"
                   required
                 />
               </div>
@@ -121,7 +121,7 @@ export default function LoginForm() {
                   placeholder="••••••••" 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-12 h-14 bg-zinc-50 border-zinc-100 rounded-2xl font-bold text-black placeholder:text-zinc-300 focus:ring-[#b8582e]/20 focus:border-[#b8582e] transition-all"
+                  className="pl-12 h-14 bg-zinc-50 border-zinc-100 rounded-2xl font-bold text-black placeholder:text-zinc-300 focus:ring-primary/20 focus:border-primary transition-all"
                   required
                 />
               </div>
@@ -130,7 +130,7 @@ export default function LoginForm() {
             <Button 
               type="submit"
               disabled={isLoading} 
-              className="w-full h-16 text-xs font-black uppercase tracking-[0.2em] bg-[#b8582e] hover:bg-zinc-900 text-white rounded-2xl shadow-xl shadow-[#b8582e]/20 active:scale-95 transition-all mt-6"
+              className="w-full h-16 text-xs font-black uppercase tracking-[0.2em] bg-primary hover:bg-zinc-900 text-white rounded-2xl shadow-xl shadow-primary/20 active:scale-95 transition-all mt-6"
             >
               {isLoading ? (
                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />
