@@ -23,7 +23,7 @@ export function CartIcon({ onOpen }: { onOpen?: () => void }) {
       className={cn(
         "fixed right-0 top-[60%] -translate-y-1/2 z-[70]",
         "flex flex-col items-center gap-3",
-        "bg-[#0c1a2b] text-white", // Royal Navy Background
+        "bg-card text-card-foreground", // Use card background
         "py-6 px-3",
         "rounded-l-[1.5rem]", 
         "border-2 border-accent/40 border-r-0", // Accent Border
@@ -38,7 +38,7 @@ export function CartIcon({ onOpen }: { onOpen?: () => void }) {
         "relative flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-black transition-all duration-500",
         totalItems > 0 
           ? "bg-accent text-accent-foreground shadow-[0_0_10px_hsla(var(--accent),0.6)]" 
-          : "bg-white/10 text-white/30"
+          : "bg-card-foreground/10 text-card-foreground/30"
       )}>
         {totalItems}
         {totalItems > 0 && (
@@ -48,12 +48,12 @@ export function CartIcon({ onOpen }: { onOpen?: () => void }) {
 
       <ShoppingBag className={cn(
         "h-5 w-5 transition-colors duration-300",
-        totalItems > 0 ? "text-accent" : "text-white/20"
+        totalItems > 0 ? "text-accent" : "text-card-foreground/20"
       )} />
 
       {/* Label with Vertical Text */}
       <div className="flex flex-col items-center gap-2">
-        <span className="[writing-mode:vertical-lr] rotate-180 text-[9px] font-black uppercase tracking-[0.3em] text-white/90 group-hover:text-white">
+        <span className="[writing-mode:vertical-lr] rotate-180 text-[9px] font-black uppercase tracking-[0.3em] text-card-foreground/90 group-hover:text-card-foreground">
           My Tray
         </span>
         

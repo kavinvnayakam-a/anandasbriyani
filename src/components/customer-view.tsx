@@ -48,7 +48,7 @@ const HangingDecoration = ({ className, delay = "0s", height = "h-32", type = "l
 
 const TimeBanner = () => {
   return (
-    <div className="bg-black/50 border-b-2 border-accent/20 text-center py-3 backdrop-blur-sm sticky top-[77px] md:top-[88px] z-40">
+    <div className="bg-card/50 border-b-2 border-accent/20 text-center py-3 backdrop-blur-sm sticky top-[77px] md:top-[88px] z-40">
       <div className="flex flex-col md:flex-row justify-center items-center gap-x-8 gap-y-2">
         <div className="flex items-center gap-3">
           <p className="text-xs font-black uppercase text-accent tracking-widest">Lunch (Biriyani & Meals):</p>
@@ -219,7 +219,7 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
         </div>
       </main>
 
-      <footer className="bg-black/60 border-t border-white/5 py-32 px-6">
+      <footer className="bg-card/60 border-t border-white/5 py-32 px-6">
         <div className="max-w-5xl mx-auto flex flex-col items-center gap-12">
           <div className="h-28 w-28 rounded-full border-2 border-accent/30 p-1 bg-white">
             <Image src={LOGO_URL} alt="Dindigul Ananda's Briyani Logo" width={112} height={112} className="rounded-full object-cover" />
@@ -227,7 +227,7 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
           
           <div className="text-center space-y-8">
              <div className="space-y-2">
-                <p className="text-[10px] font-black uppercase tracking-[0.6em] text-white/20">An Authentic Briyani Experience</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.6em] text-foreground/20">An Authentic Briyani Experience</p>
              </div>
 
              <Link 
@@ -236,11 +236,11 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
               rel="noopener noreferrer"
               className="flex flex-col items-center gap-4 group transition-all duration-500"
              >
-                <span className="text-[8px] font-black uppercase tracking-[0.4em] text-white/30 group-hover:text-accent transition-colors">
+                <span className="text-[8px] font-black uppercase tracking-[0.4em] text-foreground/30 group-hover:text-accent transition-colors">
                   Digital Connect By
                 </span>
                 <div className="px-8 py-4 bg-white/5 border border-white/10 rounded-2xl flex items-center gap-4 group-hover:border-accent/50 group-hover:bg-accent/5 transition-all">
-                  <span className="text-white font-black text-xl tracking-tighter group-hover:text-accent transition-colors">
+                  <span className="text-foreground font-black text-xl tracking-tighter group-hover:text-accent transition-colors">
                     GetPik
                   </span>
                   <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse shadow-[0_0_10px_hsl(var(--accent))]" />

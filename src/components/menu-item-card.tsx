@@ -26,7 +26,7 @@ export function MenuItemCard({ item, onAddToCart, globalShowImages = true }: Men
       {shouldShowImage && (
         <div className="relative h-64 w-full overflow-hidden">
           {isSoldOut && (
-            <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/80 backdrop-blur-[2px]">
+            <div className="absolute inset-0 z-20 flex items-center justify-center bg-card/80 backdrop-blur-[2px]">
               <div className="bg-white/10 text-white/60 px-6 py-2 rounded-full border border-white/20 font-bold uppercase tracking-widest text-[10px]">
                 Sold Out
               </div>
@@ -58,7 +58,7 @@ export function MenuItemCard({ item, onAddToCart, globalShowImages = true }: Men
       <div className="p-6 space-y-4">
         <div className="space-y-2">
           <div className="flex justify-between items-start gap-4">
-            <h3 className="text-xl font-bold text-white tracking-tight leading-snug">
+            <h3 className="text-xl font-bold text-card-foreground tracking-tight leading-snug">
               {item.name}
             </h3>
             <span className="text-accent font-black text-lg tabular-nums shrink-0">
@@ -66,7 +66,7 @@ export function MenuItemCard({ item, onAddToCart, globalShowImages = true }: Men
             </span>
           </div>
           
-          <p className="text-white/70 text-xs font-medium leading-relaxed line-clamp-2">
+          <p className="text-card-foreground/70 text-xs font-medium leading-relaxed line-clamp-2">
             {item.description || "An authentic specialty, carefully prepared with hand-picked spices for a genuine Dindigul Ananda's Briyani experience."}
           </p>
         </div>
@@ -77,7 +77,7 @@ export function MenuItemCard({ item, onAddToCart, globalShowImages = true }: Men
           className={cn(
             "w-full h-12 rounded-full flex items-center justify-center gap-2.5 transition-all duration-300 font-bold uppercase tracking-widest text-[10px]",
             isSoldOut 
-              ? "bg-white/5 text-white/20 cursor-not-allowed" 
+              ? "bg-card-foreground/5 text-card-foreground/20 cursor-not-allowed" 
               : "bg-accent text-accent-foreground shadow-lg hover:bg-white hover:text-black active:scale-95"
           )}
         >
