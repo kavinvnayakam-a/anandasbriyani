@@ -16,7 +16,7 @@ export interface CartItem extends MenuItem {
 
 export interface Order {
   id: string;
-  tableId: string; // Used as "Takeaway"
+  tableId: string; // Used as "Takeaway" or a table ID from the 'tables' collection
   customerName: string;
   customerPhone: string;
   paymentMethod: 'Card' | 'Cash' | 'UPI';
@@ -31,4 +31,9 @@ export interface Order {
   timestamp: any;
   orderNumber: string;
   createdAt: number;
+}
+
+export interface Table {
+  id: string;
+  tableNumber: string;
 }

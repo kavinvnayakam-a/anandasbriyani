@@ -7,7 +7,7 @@ import {
   collection, onSnapshot, query, orderBy, doc, 
   updateDoc, setDoc, addDoc, serverTimestamp, runTransaction 
 } from 'firebase/firestore';
-import { Order, MenuItem, CartItem } from '@/lib/types';
+import { Order, MenuItem, CartItem, Table as TableType } from '@/lib/types';
 import { 
   Printer, Settings, Check, Clock, User, Phone, Banknote, Store, X, Save, Plus, Minus, Search, ShoppingBag, CreditCard, Smartphone, Loader2, ReceiptText, ShieldCheck, Wallet, Hash, Cpu, Ticket
 } from 'lucide-react';
@@ -20,6 +20,8 @@ import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Image from "next/image";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 
 interface PrintSettings {
   storeName: string;
@@ -48,6 +50,7 @@ const DEFAULT_PRINT_SETTINGS: PrintSettings = {
 export default function OrderManager() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [tables, setTables] = useState<TableType[]>([]);
   const [printingOrder, setPrintingOrder] = useState<Order | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [showNewOrder, setShowNewOrder] = useState(false);
@@ -64,6 +67,7 @@ export default function OrderManager() {
   const [paymentMethod, setPaymentMethod] = useState<'Card' | 'Cash' | 'UPI'>('Cash');
   const [cashReceived, setCashReceived] = useState("");
   const [menuSearch, setMenuSearch] = useState("");
+  const [manualOrderTableId, setManualOrderTableId] = useState('Takeaway');
 
   const [printSettings, setPrintSettings] = useState<PrintSettings>(DEFAULT_PRINT_SETTINGS);
   const [tempSettings, setTempSettings] = useState<PrintSettings>(DEFAULT_PRINT_SETTINGS);
@@ -88,7 +92,11 @@ export default function OrderManager() {
       }
     });
 
-    return () => { unsubOrders(); unsubMenu(); unsubSettings(); };
+    const unsubTables = onSnapshot(query(collection(firestore, "tables"), orderBy("tableNumber")), (snapshot) => {
+        setTables(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as TableType));
+    });
+
+    return () => { unsubOrders(); unsubMenu(); unsubSettings(); unsubTables(); };
   }, [firestore]);
 
   const calculateTotals = (items: CartItem[]) => {
@@ -198,7 +206,7 @@ export default function OrderManager() {
 
       const orderData = {
         orderNumber,
-        tableId: "Takeaway",
+        tableId: manualOrderTableId,
         customerName,
         customerPhone: customerPhone || "N/A",
         paymentMethod,
@@ -221,6 +229,7 @@ export default function OrderManager() {
       setCustomerName("");
       setCustomerPhone("");
       setCashReceived("");
+      setManualOrderTableId('Takeaway');
       setShowNewOrder(false);
       
       const finalOrder = { id: docRef.id, ...orderData, timestamp: { seconds: Math.floor(Date.now() / 1000) } } as Order;
@@ -442,6 +451,21 @@ export default function OrderManager() {
                       />
                     </div>
                   </div>
+                  
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] font-black uppercase text-zinc-400 tracking-widest">Table / Order Type</Label>
+                    <Select value={manualOrderTableId} onValueChange={setManualOrderTableId}>
+                      <SelectTrigger className="bg-white border-zinc-200 h-11 rounded-xl font-bold text-black text-sm">
+                        <SelectValue placeholder="Select a table" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Takeaway">Takeaway</SelectItem>
+                        {tables.map(table => (
+                          <SelectItem key={table.id} value={table.id}>Table {table.tableNumber}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
                   <div className="space-y-2">
                     <Label className="text-[9px] font-black uppercase text-zinc-400 tracking-widest">Payment Method</Label>
@@ -630,7 +654,7 @@ export default function OrderManager() {
                 </div>
                 <div className="flex justify-between">
                   <span>Token No.: {printingOrder?.orderNumber}</span>
-                  <span className="font-black">Takeaway</span>
+                  <span className="font-black">{printingOrder?.tableId === 'Takeaway' ? 'Takeaway' : `Table: ${tables.find(t => t.id === printingOrder?.tableId)?.tableNumber}`}</span>
                 </div>
                  <div className="flex justify-between mt-1 pt-1 border-t border-black/10">
                   <span className="uppercase">Cust: {printingOrder?.customerName}</span>
@@ -665,7 +689,7 @@ export default function OrderManager() {
                   <span>TOTAL</span>
                   <span>{formatCurrency(printingOrder?.totalPrice || 0)}</span>
                 </div>
-                 {printingOrder?.paymentMethod === 'Cash' && printingOrder.cashReceived && (
+                 {printingOrder?.paymentMethod === 'Cash' && printingOrder.cashReceived != null && (
                   <div className="pt-2 mt-2 border-t-2 border-dashed border-black/40 text-xs">
                     <div className="flex justify-between"><span>CASH RECEIVED</span> <span>{formatCurrency(printingOrder.cashReceived || 0)}</span></div>
                     <div className="flex justify-between"><span>CHANGE DUE</span> <span>{formatCurrency(printingOrder.changeDue || 0)}</span></div>
@@ -705,7 +729,7 @@ export default function OrderManager() {
                     </div>
                     <div className="flex justify-between">
                         <span>Token No.: {printingOrder.orderNumber}</span>
-                        <span className="font-black">Takeaway</span>
+                        <span className="font-black">{printingOrder?.tableId === 'Takeaway' ? 'Takeaway' : `Table: ${tables.find(t => t.id === printingOrder?.tableId)?.tableNumber}`}</span>
                     </div>
                     <div className="flex justify-between mt-1 pt-1 border-t border-black/10">
                         <span className="uppercase">Cust: {printingOrder.customerName}</span>
@@ -750,12 +774,21 @@ export default function OrderManager() {
                 </div>
             </div>
             
-            <div className="token-section p-10 text-center font-black" style={{breakBefore: 'page'}}>
-               <p className="text-base font-black uppercase mb-6 tracking-widest">Collection Token</p>
-               <h1 className="text-6xl font-black italic leading-none m-0">#{printingOrder.orderNumber}</h1>
-               <div className="mt-10 pt-10 border-t-4 border-dashed border-black uppercase">
-                  <p className="text-2xl font-black mb-2">{printingOrder.customerName}</p>
-                  <p className="text-xs font-bold opacity-100">Dindigul Ananda's Briyani</p>
+            <div className="kot-section p-4 text-center font-black" style={{breakBefore: 'page'}}>
+               <p className="text-xl font-black uppercase mb-4 tracking-widest">KITCHEN ORDER</p>
+               <h1 className="text-8xl font-black italic leading-none m-0">#{printingOrder.orderNumber}</h1>
+               <div className="mt-8 pt-8 border-t-4 border-dashed border-black uppercase">
+                  <p className="text-3xl font-black mb-4">
+                    {printingOrder.tableId === 'Takeaway' ? printingOrder.customerName : `TABLE: ${tables.find(t => t.id === printingOrder.tableId)?.tableNumber || printingOrder.tableId}`}
+                  </p>
+                  <div className="space-y-2 text-left">
+                    {printingOrder.items.map((item, idx) => (
+                       <p key={idx} className="text-2xl font-black">
+                         {item.quantity}x {item.name}
+                       </p>
+                    ))}
+                  </div>
+                  <p className="text-sm font-bold opacity-80 mt-8">Dindigul Ananda's Briyani</p>
                </div>
             </div>
           </>
@@ -764,4 +797,3 @@ export default function OrderManager() {
     </div>
   );
 }
-

@@ -2,10 +2,26 @@
 import CustomerView from '@/components/customer-view';
 import { Suspense } from 'react';
 import Image from 'next/image';
+import TableSelection from '@/components/table-selection';
 
 const LOGO_URL = "https://firebasestorage.googleapis.com/v0/b/getpik-digital.firebasestorage.app/o/dindigual_anandas_briyani%2FDAB_logo.webp?alt=media&token=2a082303-daa9-4187-89de-bbeefac2ceec";
 
-export default async function Home() {
+export default function Home({
+  searchParams,
+}: {
+  searchParams?: { [key: string]: string | string[] | undefined };
+}) {
+
+  const tableId = searchParams?.table as string | undefined;
+
+  if (!tableId) {
+    return (
+       <Suspense>
+         <TableSelection />
+       </Suspense>
+    );
+  }
+
   return (
     <Suspense 
       fallback={
@@ -49,7 +65,7 @@ export default async function Home() {
         </div>
       }
     >
-      <CustomerView tableId="Takeaway" mode="takeaway" />
+      <CustomerView tableId={tableId} mode={tableId === 'Takeaway' ? 'takeaway' : 'dine-in'} />
     </Suspense>
   );
 }
