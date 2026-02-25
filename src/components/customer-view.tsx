@@ -46,6 +46,25 @@ const HangingDecoration = ({ className, delay = "0s", height = "h-32", type = "l
   </div>
 );
 
+const TimeBanner = () => {
+  return (
+    <div className="bg-black/50 border-b-2 border-accent/20 text-center py-3 backdrop-blur-sm sticky top-[77px] md:top-[88px] z-40">
+      <div className="flex flex-col md:flex-row justify-center items-center gap-x-8 gap-y-2">
+        <div className="flex items-center gap-3">
+          <p className="text-xs font-black uppercase text-accent tracking-widest">Lunch (Biriyani & Meals):</p>
+          <p className="text-sm font-bold text-white">12:00 PM – 4:00 PM</p>
+        </div>
+        <div className="hidden md:block h-6 w-px bg-accent/20" />
+        <div className="flex items-center gap-3">
+          <p className="text-xs font-black uppercase text-accent tracking-widest">Dinner (Biriyani & Tiffin):</p>
+          <p className="text-sm font-bold text-white">6:30 PM – 10:30 PM</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
 export default function CustomerView({ tableId }: { tableId: string | null, mode: 'dine-in' | 'takeaway' }) {
   const { addToCart } = useCart();
   const [isCartOpen, setCartOpen] = useState(false);
@@ -53,6 +72,31 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [activePeriod, setActivePeriod] = useState<'lunch' | 'dinner' | 'other' | null>(null);
+
+  useEffect(() => {
+    // This effect runs only on the client
+    const checkTime = () => {
+      const now = new Date();
+      const currentHour = now.getHours() + now.getMinutes() / 60;
+      
+      // Lunch: 12:00 PM to 4:00 PM (16:00)
+      if (currentHour >= 12 && currentHour < 16) {
+        setActivePeriod('lunch');
+      } 
+      // Dinner: 6:30 PM (18.5) to 10:30 PM (22.5)
+      else if (currentHour >= 18.5 && currentHour < 22.5) {
+        setActivePeriod('dinner');
+      } 
+      else {
+        setActivePeriod('other');
+      }
+    };
+    
+    checkTime();
+    const interval = setInterval(checkTime, 60000); 
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const handleContextMenu = (e: MouseEvent) => e.preventDefault();
@@ -78,8 +122,29 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
   }, []);
 
   const categorizedMenu = useMemo(() => {
-    const categoryOrder = ['Iftar Specials', 'Cinematic Combos', 'Combo', 'Specialties', 'Appetizers', 'Main Course', 'Biryani', 'Desserts', 'Beverages'];
-    const grouped = menuItems.reduce((acc, item) => {
+    if (!activePeriod) return [];
+
+    const lunchCategories = ['Main Course', 'Biryani & Rice'];
+    const dinnerCategories = ['Starters', 'Appetizers', 'Puff\'s', 'Biryani & Rice'];
+
+    const availableItems = menuItems.filter(item => {
+      const category = item.category;
+      const isTimeRestricted = [...lunchCategories, ...dinnerCategories].includes(category);
+      
+      if (!isTimeRestricted) return true; // Always show all-day items
+
+      if (activePeriod === 'lunch' && lunchCategories.includes(category)) {
+        return true;
+      }
+      if (activePeriod === 'dinner' && dinnerCategories.includes(category)) {
+        return true;
+      }
+
+      return false; // Hide time-restricted items outside their window
+    });
+
+    const categoryOrder = ['Iftar Specials', 'Cinematic Combos', 'Combo', 'Specialties', 'Appetizers', 'Main Course', 'Biryani & Rice', 'Desserts', 'Beverages'];
+    const grouped = availableItems.reduce((acc, item) => {
       const category = item.category || 'Other';
       if (!acc[category]) acc[category] = [];
       acc[category].push(item);
@@ -89,11 +154,15 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
     return Object.keys(grouped).sort((a, b) => {
       const indexA = categoryOrder.indexOf(a);
       const indexB = categoryOrder.indexOf(b);
+      if (indexA === -1 && indexB === -1) return a.localeCompare(b);
       return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
-    }).map(cat => ({ category: cat, items: grouped[cat] }));
-  }, [menuItems]);
+    }).map(cat => ({ category: cat, items: grouped[cat] })).filter(group => group.items.length > 0);
+  }, [menuItems, activePeriod]);
 
-  if (loading) return null;
+  if (loading || !activePeriod) {
+    // You can return a loader here if you want
+    return null; 
+  }
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden relative">
@@ -105,6 +174,7 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
       `}</style>
 
       <Header tableId={tableId} onCartClick={() => setCartOpen(true)} timeLeft={0} />
+      <TimeBanner />
 
       <div className="absolute top-20 left-0 w-full h-[400px] overflow-hidden pointer-events-none z-10">
         <HangingDecoration className="left-[10%]" height="h-32" type="moon" delay="0s" />
@@ -122,7 +192,7 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
         </header>
 
         <div className="space-y-40">
-          {categorizedMenu.map(({ category, items }) => (
+          {categorizedMenu.length > 0 ? categorizedMenu.map(({ category, items }) => (
             <section key={category} id={category} className="scroll-mt-52">
               <div className="flex flex-col gap-4 mb-16">
                 <span className="text-accent/60 font-black text-[10px] uppercase tracking-[0.4em]">Experience</span>
@@ -140,7 +210,12 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
                 ))}
               </div>
             </section>
-          ))}
+          )) : (
+            <div className="text-center py-20">
+              <p className="text-2xl font-bold text-white/50">No items available at this time.</p>
+              <p className="text-accent/80 mt-2">Please check our lunch and dinner timings.</p>
+            </div>
+          )}
         </div>
       </main>
 
@@ -158,6 +233,7 @@ export default function CustomerView({ tableId }: { tableId: string | null, mode
              <Link 
               href="https://www.getpik.in/pos" 
               target="_blank" 
+              rel="noopener noreferrer"
               className="flex flex-col items-center gap-4 group transition-all duration-500"
              >
                 <span className="text-[8px] font-black uppercase tracking-[0.4em] text-white/30 group-hover:text-accent transition-colors">

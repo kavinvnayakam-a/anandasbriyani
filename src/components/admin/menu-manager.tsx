@@ -25,7 +25,7 @@ import {
   RefreshCw, 
   Eye, 
   EyeOff,
-  AlignLeft
+  Coins
 } from 'lucide-react';
 import { MenuItem } from '@/lib/types';
 import { useToast } from "@/hooks/use-toast";
@@ -76,6 +76,33 @@ export default function MenuManager() {
     if (!firestore) return;
     const itemRef = doc(firestore, "menu_items", item.id);
     await updateDoc(itemRef, { available: !item.available });
+  };
+
+  const handleUpdatePrice = async (itemId: string, newPrice: number) => {
+    if (!firestore || isNaN(newPrice) || newPrice < 0) {
+      toast({
+        variant: "destructive",
+        title: "Invalid Price",
+        description: "Please enter a valid positive number for the price.",
+      });
+      // Optionally, reset the input to the old value
+      return;
+    }
+    const itemRef = doc(firestore, "menu_items", itemId);
+    try {
+      await updateDoc(itemRef, { price: newPrice });
+      toast({
+        title: "Price Updated",
+        description: `The price has been successfully set to ₹${newPrice}.`,
+      });
+    } catch (err) {
+      console.error("Price update failed:", err);
+      toast({
+        variant: "destructive",
+        title: "Update Failed",
+        description: "Could not save the new price.",
+      });
+    }
   };
 
   const handleUpdateDescription = async (itemId: string, newDesc: string) => {
@@ -261,7 +288,17 @@ export default function MenuManager() {
                   </button>
                 </td>
 
-                <td className="p-4 font-black text-lg text-stone-800">₹{item.price}</td>
+                <td className="p-4">
+                  <div className="relative">
+                    <Coins className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400 pointer-events-none" />
+                    <Input
+                      type="number"
+                      defaultValue={item.price}
+                      onBlur={(e) => handleUpdatePrice(item.id, Number(e.target.value))}
+                      className="w-28 pl-9 font-black text-lg text-stone-800 border-2 border-stone-200 rounded-xl focus:border-amber-500 focus:ring-amber-500"
+                    />
+                  </div>
+                </td>
                 
                 <td className="p-4">
                   <button onClick={() => toggleStatus(item)} className={`px-4 py-2 rounded-full text-[10px] font-black uppercase transition-all border-2 ${item.available ? "bg-emerald-50 border-emerald-500 text-emerald-600" : "bg-rose-50 border-rose-500 text-rose-600"}`}>
