@@ -12,6 +12,7 @@ import {
   Printer, Settings, Check, Clock, User, Phone, Banknote, Store, X, Save, Plus, Minus, Search, ShoppingBag, CreditCard, Smartphone, Loader2, ReceiptText, ShieldCheck, Wallet, Hash, Cpu, Ticket
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Button } from "@/components/ui/button";
 import { cn, formatCurrency } from '@/lib/utils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -763,3 +764,4 @@ export default function OrderManager() {
     </div>
   );
 }
+
