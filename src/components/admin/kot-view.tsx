@@ -29,7 +29,7 @@ export default function KotView() {
     return () => unsubscribe();
   }, [firestore]);
 
-  // 2. Auto-Archive Logic (4:00 AM Cutoff)
+  // 2. Auto-Archive Logic (11:00 PM Cutoff)
   useEffect(() => {
     if (!firestore || orders.length === 0 || isCleaning) return;
 
@@ -38,7 +38,7 @@ export default function KotView() {
       try {
         const now = new Date();
         const cutoff = new Date();
-        cutoff.setHours(4, 0, 0, 0);
+        cutoff.setHours(23, 0, 0, 0); // 11:00 PM cutoff
         
         if (now < cutoff) {
           cutoff.setDate(cutoff.getDate() - 1);
@@ -63,15 +63,15 @@ export default function KotView() {
               ...order, 
               status: "Completed",
               archivedAt: serverTimestamp(),
-              archiveReason: "Daily 4AM Maintenance"
+              archiveReason: "Daily 11PM Auto-Archive"
             });
             batch.delete(orderRef);
           });
 
           await batch.commit();
           toast({ 
-            title: "Queue Maintenance Complete", 
-            description: `Archived ${expiredOrders.length} orders from previous shift.` 
+            title: "Daily Archive Complete", 
+            description: `Archived ${expiredOrders.length} orders from the day.` 
           });
         }
       } catch (err) {
@@ -135,7 +135,7 @@ export default function KotView() {
           <div>
             <h3 className="text-3xl font-black italic uppercase text-zinc-900 tracking-tighter">Kitchen Workspace</h3>
             <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
-              Shift resets at 4:00 AM • {preparationQueue.length + handoverQueue.length} Active Tickets
+              Shift resets at 11:00 PM • {preparationQueue.length + handoverQueue.length} Active Tickets
             </p>
           </div>
         </div>

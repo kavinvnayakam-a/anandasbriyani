@@ -142,11 +142,11 @@ export default function AdminDashboard() {
                     className={cn(
                       "flex items-center gap-4 px-4 py-7 rounded-2xl text-[11px] font-black uppercase tracking-[0.1em] transition-all relative w-full h-auto",
                       activeTab === item.id 
-                      ? "bg-white text-primary shadow-2xl hover:bg-white/95" 
+                      ? "bg-accent text-white shadow-xl shadow-yellow-400/20" 
                       : "text-white hover:bg-white/10"
                     )}
                   >
-                    <item.icon className={cn("w-5 h-5 shrink-0 transition-colors", activeTab === item.id ? "text-primary" : "text-white")} />
+                    <item.icon className={cn("w-5 h-5 shrink-0 transition-colors text-white")} />
                     <span className="group-data-[collapsible=icon]:hidden">{item.label}</span>
                     {item.showBadge && activeTab !== item.id && (
                       <span className="absolute top-4 right-4 w-2 h-2 bg-white rounded-full animate-ping" />
